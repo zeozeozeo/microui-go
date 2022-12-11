@@ -1,6 +1,7 @@
 package microui
 
 func drawFrame(ctx *Context, rect MuRect, colorid int) {
+	ctx.DrawRect(rect, ctx.Style.Colors[colorid])
 	if colorid == MU_COLOR_SCROLLBASE ||
 		colorid == MU_COLOR_SCROLLTHUMB ||
 		colorid == MU_COLOR_TITLEBG {
