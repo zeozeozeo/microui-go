@@ -1,0 +1,82 @@
+package microui
+
+const (
+	MU_CLIP_PART = 1 + iota
+	MU_CLIP_ALL
+)
+
+const (
+	MU_COMMAND_JUMP = 1 + iota
+	MU_COMMAND_CLIP
+	MU_COMMAND_RECT
+	MU_COMMAND_TEXT
+	MU_COMMAND_ICON
+	MU_COMMAND_MAX
+)
+
+const (
+	MU_COLOR_TEXT = iota
+	MU_COLOR_BORDER
+	MU_COLOR_WINDOWBG
+	MU_COLOR_TITLEBG
+	MU_COLOR_TITLETEXT
+	MU_COLOR_PANELBG
+	MU_COLOR_BUTTON
+	MU_COLOR_BUTTONHOVER
+	MU_COLOR_BUTTONFOCUS
+	MU_COLOR_BASE
+	MU_COLOR_BASEHOVER
+	MU_COLOR_BASEFOCUS
+	MU_COLOR_SCROLLBASE
+	MU_COLOR_SCROLLTHUMB
+	MU_COLOR_MAX
+)
+
+const (
+	MU_ICON_CLOSE = 1 + iota
+	MU_ICON_CHECK
+	MU_ICON_COLLAPSED
+	MU_ICON_EXPANDED
+	MU_ICON_MAX
+)
+
+const (
+	MU_RES_ACTIVE = (1 << 0)
+	MU_RES_SUBMIT = (1 << 1)
+	MU_RES_CHANGE = (1 << 2)
+)
+
+const (
+	MU_OPT_ALIGNCENTER = (1 << 0)
+	MU_OPT_ALIGNRIGHT  = (1 << 1)
+	MU_OPT_NOINTERACT  = (1 << 2)
+	MU_OPT_NOFRAME     = (1 << 3)
+	MU_OPT_NORESIZE    = (1 << 4)
+	MU_OPT_NOSCROLL    = (1 << 5)
+	MU_OPT_NOCLOSE     = (1 << 6)
+	MU_OPT_NOTITLE     = (1 << 7)
+	MU_OPT_HOLDFOCUS   = (1 << 8)
+	MU_OPT_AUTOSIZE    = (1 << 9)
+	MU_OPT_POPUP       = (1 << 10)
+	MU_OPT_CLOSED      = (1 << 11)
+	MU_OPT_EXPANDED    = (1 << 12)
+)
+
+const (
+	MU_MOUSE_LEFT   = (1 << 0)
+	MU_MOUSE_RIGHT  = (1 << 1)
+	MU_MOUSE_MIDDLE = (1 << 2)
+)
+
+const (
+	MU_KEY_SHIFT     = (1 << 0)
+	MU_KEY_CTRL      = (1 << 1)
+	MU_KEY_ALT       = (1 << 2)
+	MU_KEY_BACKSPACE = (1 << 3)
+	MU_KEY_RETURN    = (1 << 4)
+)
+
+const (
+	RELATIVE = 1 + iota
+	ABSOLUTE
+)
