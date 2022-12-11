@@ -6,12 +6,16 @@ A tiny, portable, immediate-mode UI library ported to Go (as of commit [05d7b46c
 
 -   Functions and structs are renamed to be PascalCase and the prefix `mu_` is removed, like this:
 
-    > `mu_push_command` -> `PushCommand` > `mu_begin_treenode_ex` -> `BeginTreeNodeEx` > `mu_get_clip_rect` -> `GetClipRect`
+    > `mu_push_command` -> `PushCommand`
+
+    > `mu_begin_treenode_ex` -> `BeginTreeNodeEx`
+
+    > `mu_get_clip_rect` -> `GetClipRect`
 
 -   Every function that takes `mu_Context` (`Context`) instead has a `Context` reciever, so `Button(ctx, label)` becomes `ctx.Button(label)`
 -   Stacks are now slices with variable length, `append` is used for `push` and `slice = slice[:len(slice)-1]` is used for `pop`
 -   `mu_Font` (`Font`) is `interface{}`, since it doesn't store any font data. You can use `reflect` if you want to store values inside it
--   The library is split into separate files instead of one file 
+-   The library is split into separate files instead of one file
 -   The library is ~1300 lines of code in total
 
 ## Additional functions:
