@@ -55,7 +55,6 @@ func (ctx *Context) DrawControlText(str string, rect MuRect, colorid int, opt in
 }
 
 func (ctx *Context) MouseOver(rect MuRect) bool {
-	fmt.Println("mouseover:", ctx.GetClipRect(), ctx.MousePos)
 	return rect_overlaps_vec2(rect, ctx.MousePos) &&
 		rect_overlaps_vec2(ctx.GetClipRect(), ctx.MousePos) &&
 		ctx.InHoverRoot()
