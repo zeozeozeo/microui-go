@@ -35,13 +35,13 @@ func (ctx *Context) PushJump(dst *Command) *Command {
 }
 
 // pushes a new clip command
-func (ctx *Context) SetClip(rect MuRect) {
+func (ctx *Context) SetClip(rect Rect) {
 	cmd := ctx.PushCommand(MU_COMMAND_CLIP)
 	cmd.Clip.Rect = rect
 }
 
 // pushes a new rect command
-func (ctx *Context) DrawRect(rect MuRect, color MuColor) {
+func (ctx *Context) DrawRect(rect Rect, color Color) {
 	rect2 := intersect_rects(rect, ctx.GetClipRect())
 	if rect2.W > 0 && rect2.H > 0 {
 		cmd := ctx.PushCommand(MU_COMMAND_RECT)
@@ -50,15 +50,15 @@ func (ctx *Context) DrawRect(rect MuRect, color MuColor) {
 	}
 }
 
-func (ctx *Context) DrawBox(rect MuRect, color MuColor) {
-	ctx.DrawRect(Rect(rect.X+1, rect.Y, rect.W-2, 1), color)
-	ctx.DrawRect(Rect(rect.X+1, rect.Y+rect.H-1, rect.W-2, 1), color)
-	ctx.DrawRect(Rect(rect.X, rect.Y, 1, rect.H), color)
-	ctx.DrawRect(Rect(rect.X+rect.W-1, rect.Y, 1, rect.H), color)
+func (ctx *Context) DrawBox(rect Rect, color Color) {
+	ctx.DrawRect(NewRect(rect.X+1, rect.Y, rect.W-2, 1), color)
+	ctx.DrawRect(NewRect(rect.X+1, rect.Y+rect.H-1, rect.W-2, 1), color)
+	ctx.DrawRect(NewRect(rect.X, rect.Y, 1, rect.H), color)
+	ctx.DrawRect(NewRect(rect.X+rect.W-1, rect.Y, 1, rect.H), color)
 }
 
-func (ctx *Context) DrawText(font Font, str string, pos MuVec2, color MuColor) {
-	rect := Rect(pos.X, pos.Y, ctx.TextWidth(font, str), ctx.TextHeight(font))
+func (ctx *Context) DrawText(font Font, str string, pos Vec2, color Color) {
+	rect := NewRect(pos.X, pos.Y, ctx.TextWidth(font, str), ctx.TextHeight(font))
 	clipped := ctx.CheckClip(rect)
 	if clipped == MU_CLIP_ALL {
 		return
@@ -78,7 +78,7 @@ func (ctx *Context) DrawText(font Font, str string, pos MuVec2, color MuColor) {
 	}
 }
 
-func (ctx *Context) DrawIcon(id int, rect MuRect, color MuColor) {
+func (ctx *Context) DrawIcon(id int, rect Rect, color Color) {
 	// do clip command if the rect isn't fully contained within the cliprect
 	clipped := ctx.CheckClip(rect)
 	if clipped == MU_CLIP_ALL {

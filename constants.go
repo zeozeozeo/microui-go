@@ -22,14 +22,14 @@ const (
 
 var default_style Style = Style{
 	Font:          nil,
-	Size:          MuVec2{68, 10},
+	Size:          Vec2{68, 10},
 	Padding:       5,
 	Spacing:       4,
 	Indent:        24,
 	TitleHeight:   24,
 	ScrollbarSize: 12,
 	ThumbSize:     8,
-	Colors: [14]MuColor{
+	Colors: [14]Color{
 		{230, 230, 230, 255}, // MU_COLOR_TEXT
 		{25, 25, 25, 255},    // MU_COLOR_BORDER
 		{50, 50, 50, 255},    // MU_COLOR_WINDOWBG
@@ -48,7 +48,7 @@ var default_style Style = Style{
 }
 
 var (
-	UnclippedRect = MuRect{0, 0, 0x1000000, 0x1000000}
+	UnclippedRect = Rect{0, 0, 0x1000000, 0x1000000}
 )
 
 const (

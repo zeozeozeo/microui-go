@@ -25,7 +25,7 @@ func (ctx *Context) InHoverRoot() bool {
 	return false
 }
 
-func (ctx *Context) DrawControlFrame(id mu_Id, rect MuRect, colorid int, opt int) {
+func (ctx *Context) DrawControlFrame(id mu_Id, rect Rect, colorid int, opt int) {
 	if (opt & MU_OPT_NOFRAME) != 0 {
 		return
 	}
@@ -37,8 +37,8 @@ func (ctx *Context) DrawControlFrame(id mu_Id, rect MuRect, colorid int, opt int
 	ctx.DrawFrame(ctx, rect, colorid)
 }
 
-func (ctx *Context) DrawControlText(str string, rect MuRect, colorid int, opt int) {
-	var pos MuVec2
+func (ctx *Context) DrawControlText(str string, rect Rect, colorid int, opt int) {
+	var pos Vec2
 	font := ctx.Style.Font
 	tw := ctx.TextWidth(font, str)
 	ctx.PushClipRect(rect)
@@ -54,13 +54,13 @@ func (ctx *Context) DrawControlText(str string, rect MuRect, colorid int, opt in
 	ctx.PopClipRect()
 }
 
-func (ctx *Context) MouseOver(rect MuRect) bool {
+func (ctx *Context) MouseOver(rect Rect) bool {
 	return rect_overlaps_vec2(rect, ctx.MousePos) &&
 		rect_overlaps_vec2(ctx.GetClipRect(), ctx.MousePos) &&
 		ctx.InHoverRoot()
 }
 
-func (ctx *Context) UpdateControl(id mu_Id, rect MuRect, opt int) {
+func (ctx *Context) UpdateControl(id mu_Id, rect Rect, opt int) {
 	mouseover := ctx.MouseOver(rect)
 
 	if ctx.Focus == id {
@@ -116,7 +116,7 @@ func (ctx *Context) Text(text string) {
 			end_idx = p
 			p++
 		}
-		ctx.DrawText(font, text[start_idx:end_idx], Vec2(r.X, r.Y), color)
+		ctx.DrawText(font, text[start_idx:end_idx], NewVec2(r.X, r.Y), color)
 		p = end_idx + 1
 	}
 	ctx.LayoutEndColumn()
@@ -130,9 +130,9 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	var res int = 0
 	var id mu_Id
 	if len(label) > 0 {
-		ctx.GetID([]byte(label))
+		id = ctx.GetID([]byte(label))
 	} else {
-		ctx.GetID([]byte{byte(icon)})
+		id = ctx.GetID([]byte{byte(icon)})
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
@@ -159,7 +159,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	}
 	id := ctx.GetID([]byte{state_i})
 	r := ctx.LayoutNext()
-	box := Rect(r.X, r.Y, r.H, r.H)
+	box := NewRect(r.X, r.Y, r.H, r.H)
 	ctx.UpdateControl(id, r, 0)
 	// handle click
 	if ctx.MousePressed == MU_MOUSE_LEFT && ctx.Focus == id {
@@ -171,12 +171,12 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	if *state {
 		ctx.DrawIcon(MU_ICON_CHECK, box, ctx.Style.Colors[MU_COLOR_TEXT])
 	}
-	r = Rect(r.X+box.W, r.Y, r.W-box.W, r.H)
+	r = NewRect(r.X+box.W, r.Y, r.W-box.W, r.H)
 	ctx.DrawControlText(label, r, MU_COLOR_TEXT, 0)
 	return res
 }
 
-func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r MuRect, opt int) int {
+func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 	var res int = 0
 	ctx.UpdateControl(id, r, opt|MU_OPT_HOLDFOCUS)
 	buflen := len(*buf)
@@ -210,8 +210,8 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r MuRect, opt int) int {
 		textx := r.X + mu_min(ofx, ctx.Style.Padding)
 		texty := r.Y + (r.H-texth)/2
 		ctx.PushClipRect(r)
-		ctx.DrawText(font, *buf, Vec2(textx, texty), color)
-		ctx.DrawRect(Rect(textx+textw, texty, 1, texth), color)
+		ctx.DrawText(font, *buf, NewVec2(textx, texty), color)
+		ctx.DrawRect(NewRect(textx+textw, texty, 1, texth), color)
 		ctx.PopClipRect()
 	} else {
 		ctx.DrawControlText(*buf, r, MU_COLOR_TEXT, opt)
@@ -220,7 +220,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r MuRect, opt int) int {
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *mu_Real, r MuRect, id mu_Id) bool {
+func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
 	if ctx.MousePressed == MU_MOUSE_LEFT && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -249,7 +249,7 @@ func (ctx *Context) TextBoxEx(buf *string, opt int) int {
 }
 
 func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_Real, format string, opt int) int {
-	var thumb MuRect
+	var thumb Rect
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
@@ -284,7 +284,7 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 	// draw thumb
 	w = ctx.Style.ThumbSize
 	x = int((v - low) * mu_Real(base.W-w) / (high - low))
-	thumb = Rect(base.X+x, base.Y, w, base.H)
+	thumb = NewRect(base.X+x, base.Y, w, base.H)
 	ctx.DrawControlFrame(id, thumb, MU_COLOR_BUTTON, opt)
 	// draw text
 	text := fmt.Sprintf(format, v)
@@ -328,7 +328,7 @@ func (ctx *Context) NumberEx(value *mu_Real, step mu_Real, format string, opt in
 }
 
 func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
-	var r MuRect
+	var r Rect
 	var active, expanded bool
 	id := ctx.GetID([]byte(label))
 	idx := ctx.PoolGet(ctx.TreeNodePool[:], id)
@@ -384,7 +384,7 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	}
 	ctx.DrawIcon(
 		icon_id,
-		Rect(r.X, r.Y, r.H, r.H),
+		NewRect(r.X, r.Y, r.H, r.H),
 		ctx.Style.Colors[MU_COLOR_TEXT],
 	)
 	r.X += r.H - ctx.Style.Padding
@@ -417,10 +417,10 @@ func (ctx *Context) EndTreeNode() {
 }
 
 // x = x, y = y, w = w, h = h
-func (ctx *Context) scrollbarVertical(cnt *Container, b *MuRect, cs MuVec2) {
+func (ctx *Context) scrollbarVertical(cnt *Container, b *Rect, cs Vec2) {
 	maxscroll := cs.Y - b.H
 	if maxscroll > 0 && b.H > 0 {
-		var base, thumb MuRect
+		var base, thumb Rect
 		id := ctx.GetID([]byte("!scrollbar" + "y"))
 
 		// get sizing / positioning
@@ -454,10 +454,10 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b *MuRect, cs MuVec2) {
 }
 
 // x = y, y = x, w = h, h = w
-func (ctx *Context) scrollbarHorizontal(cnt *Container, b *MuRect, cs MuVec2) {
+func (ctx *Context) scrollbarHorizontal(cnt *Container, b *Rect, cs Vec2) {
 	maxscroll := cs.X - b.W
 	if maxscroll > 0 && b.W > 0 {
-		var base, thumb MuRect
+		var base, thumb Rect
 		id := ctx.GetID([]byte("!scrollbar" + "x"))
 
 		// get sizing / positioning
@@ -491,7 +491,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b *MuRect, cs MuVec2) {
 }
 
 // if `swap` is true, X = Y, Y = X, W = H, H = W
-func (ctx *Context) AddScrollbar(cnt *Container, b *MuRect, cs MuVec2, swap bool) {
+func (ctx *Context) AddScrollbar(cnt *Container, b *Rect, cs Vec2, swap bool) {
 	if swap {
 		ctx.scrollbarHorizontal(cnt, b, cs)
 	} else {
@@ -499,7 +499,7 @@ func (ctx *Context) AddScrollbar(cnt *Container, b *MuRect, cs MuVec2, swap bool
 	}
 }
 
-func (ctx *Context) Scrollbars(cnt *Container, body *MuRect) {
+func (ctx *Context) Scrollbars(cnt *Container, body *Rect) {
 	sz := ctx.Style.ScrollbarSize
 	cs := cnt.ContentSize
 	cs.X += ctx.Style.Padding * 2
@@ -519,7 +519,7 @@ func (ctx *Context) Scrollbars(cnt *Container, body *MuRect) {
 	ctx.PopClipRect()
 }
 
-func (ctx *Context) PushContainerBody(cnt *Container, body MuRect, opt int) {
+func (ctx *Context) PushContainerBody(cnt *Container, body Rect, opt int) {
 	if (^opt & MU_OPT_NOSCROLL) != 0 {
 		ctx.Scrollbars(cnt, &body)
 	}
@@ -558,8 +558,8 @@ func (ctx *Context) EndRootContainer() {
 	ctx.PopContainer()
 }
 
-func (ctx *Context) BeginWindowEx(title string, rect MuRect, opt int) int {
-	var body MuRect
+func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
+	var body Rect
 	id := ctx.GetID([]byte(title))
 	cnt := ctx.getContainer(id, opt)
 	if cnt == nil || !cnt.Open {
@@ -602,7 +602,7 @@ func (ctx *Context) BeginWindowEx(title string, rect MuRect, opt int) int {
 		// do `close` button
 		if (^opt & MU_OPT_NOCLOSE) != 0 {
 			id := ctx.GetID([]byte("!close"))
-			r := Rect(tr.X+tr.W-tr.H, tr.Y, tr.H, tr.H)
+			r := NewRect(tr.X+tr.W-tr.H, tr.Y, tr.H, tr.H)
 			tr.W -= r.W
 			ctx.DrawIcon(MU_ICON_CLOSE, r, ctx.Style.Colors[MU_COLOR_TITLETEXT])
 			ctx.UpdateControl(id, r, opt)
@@ -618,7 +618,7 @@ func (ctx *Context) BeginWindowEx(title string, rect MuRect, opt int) int {
 	if (^opt & MU_OPT_NORESIZE) != 0 {
 		sz := ctx.Style.TitleHeight
 		id := ctx.GetID([]byte("!resize"))
-		r := Rect(rect.X+rect.W-sz, rect.Y+rect.H-sz, sz, sz)
+		r := NewRect(rect.X+rect.W-sz, rect.Y+rect.H-sz, sz, sz)
 		ctx.UpdateControl(id, r, opt)
 		if id == ctx.Focus && ctx.MouseDown == MU_MOUSE_LEFT {
 			cnt.Rect.W = mu_max(96, cnt.Rect.W+ctx.MouseDelta.X)
@@ -653,7 +653,7 @@ func (ctx *Context) OpenPopup(name string) {
 	ctx.NextHoverRoot = cnt
 	ctx.HoverRoot = ctx.NextHoverRoot
 	// position at mouse cursor, open and bring-to-front
-	cnt.Rect = Rect(ctx.MousePos.X, ctx.MousePos.Y, 1, 1)
+	cnt.Rect = NewRect(ctx.MousePos.X, ctx.MousePos.Y, 1, 1)
 	cnt.Open = true
 	ctx.BringToFront(cnt)
 }
@@ -661,7 +661,7 @@ func (ctx *Context) OpenPopup(name string) {
 func (ctx *Context) BeginPopup(name string) int {
 	opt := MU_OPT_POPUP | MU_OPT_AUTOSIZE | MU_OPT_NORESIZE |
 		MU_OPT_NOSCROLL | MU_OPT_NOTITLE | MU_OPT_CLOSED
-	return ctx.BeginWindowEx(name, Rect(0, 0, 0, 0), opt)
+	return ctx.BeginWindowEx(name, NewRect(0, 0, 0, 0), opt)
 }
 
 func (ctx *Context) EndPopup() {

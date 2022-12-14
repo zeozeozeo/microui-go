@@ -5,19 +5,19 @@ import "image/color"
 type mu_Id uintptr
 type mu_Real float32
 
-type MuVec2 struct {
+type Vec2 struct {
 	X, Y int
 }
 
-type MuRect struct {
+type Rect struct {
 	X, Y, W, H int
 }
 
-type MuColor struct {
+type Color struct {
 	R, G, B, A uint8
 }
 
-func (c *MuColor) ToRGBA() color.RGBA {
+func (c *Color) ToRGBA() color.RGBA {
 	return color.RGBA{c.R, c.G, c.B, c.A}
 }
 
@@ -38,13 +38,13 @@ type JumpCommand struct {
 
 type ClipCommand struct {
 	Base BaseCommand
-	Rect MuRect
+	Rect Rect
 }
 
 type RectCommand struct {
 	Base  BaseCommand
-	Rect  MuRect
-	Color MuColor
+	Rect  Rect
+	Color Color
 }
 
 type Font interface{} // Font is interface{}, microui does not manage fonts
@@ -52,24 +52,24 @@ type Font interface{} // Font is interface{}, microui does not manage fonts
 type TextCommand struct {
 	Base  BaseCommand
 	Font  Font
-	Pos   MuVec2
-	Color MuColor
+	Pos   Vec2
+	Color Color
 	Str   string
 }
 
 type IconCommand struct {
 	Base  BaseCommand
-	Rect  MuRect
+	Rect  Rect
 	Id    int
-	Color MuColor
+	Color Color
 }
 
 type Layout struct {
-	Body      MuRect
-	Next      MuRect
-	Position  MuVec2
-	Size      MuVec2
-	Max       MuVec2
+	Body      Rect
+	Next      Rect
+	Position  Vec2
+	Size      Vec2
+	Max       Vec2
 	Widths    [MU_MAX_WIDTHS]int
 	Items     int
 	ItemIndex int
@@ -91,24 +91,24 @@ type Command struct {
 
 type Container struct {
 	Head, Tail  *Command
-	Rect        MuRect
-	Body        MuRect
-	ContentSize MuVec2
-	Scroll      MuVec2
+	Rect        Rect
+	Body        Rect
+	ContentSize Vec2
+	Scroll      Vec2
 	Zindex      int
 	Open        bool
 }
 
 type Style struct {
 	Font          Font
-	Size          MuVec2
+	Size          Vec2
 	Padding       int
 	Spacing       int
 	Indent        int
 	TitleHeight   int
 	ScrollbarSize int
 	ThumbSize     int
-	Colors        [MU_COLOR_MAX]MuColor
+	Colors        [MU_COLOR_MAX]Color
 }
 
 type Context struct {
@@ -116,7 +116,7 @@ type Context struct {
 
 	TextWidth  func(font Font, str string) int
 	TextHeight func(font Font) int
-	DrawFrame  func(ctx *Context, rect MuRect, colorid int)
+	DrawFrame  func(ctx *Context, rect Rect, colorid int)
 
 	// core state
 
@@ -125,7 +125,7 @@ type Context struct {
 	Hover         mu_Id
 	Focus         mu_Id
 	LastID        mu_Id
-	LastRect      MuRect
+	LastRect      Rect
 	LastZindex    int
 	UpdatedFocus  bool
 	Frame         int
@@ -140,7 +140,7 @@ type Context struct {
 	CommandList    []*Command
 	RootList       []*Container
 	ContainerStack []*Container
-	ClipStack      []MuRect
+	ClipStack      []Rect
 	IdStack        []mu_Id
 	LayoutStack    []Layout
 
@@ -152,10 +152,10 @@ type Context struct {
 
 	// input state
 
-	MousePos     MuVec2
-	lastMousePos MuVec2
-	MouseDelta   MuVec2
-	ScrollDelta  MuVec2
+	MousePos     Vec2
+	lastMousePos Vec2
+	MouseDelta   Vec2
+	ScrollDelta  Vec2
 	MouseDown    int
 	MousePressed int
 	KeyDown      int

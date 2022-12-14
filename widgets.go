@@ -24,7 +24,7 @@ func (ctx *Context) BeginTreeNode(label string) bool {
 	return ctx.BeginTreeNodeEx(label, 0) != 0
 }
 
-func (ctx *Context) BeginWindow(title string, rect MuRect) bool {
+func (ctx *Context) BeginWindow(title string, rect Rect) bool {
 	return ctx.BeginWindowEx(title, rect, 0) != 0
 }
 

@@ -4,10 +4,10 @@ package microui
 ** layout
 **============================================================================*/
 
-func (ctx *Context) PushLayout(body MuRect, scroll MuVec2) {
+func (ctx *Context) PushLayout(body Rect, scroll Vec2) {
 	layout := Layout{}
-	layout.Body = Rect(body.X-scroll.X, body.Y-scroll.Y, body.W, body.H)
-	layout.Max = Vec2(-0x1000000, -0x1000000)
+	layout.Body = NewRect(body.X-scroll.X, body.Y-scroll.Y, body.W, body.H)
+	layout.Max = NewVec2(-0x1000000, -0x1000000)
 
 	// push()
 	ctx.LayoutStack = append(ctx.LayoutStack, layout)
@@ -40,7 +40,7 @@ func (ctx *Context) LayoutRow(items int, widths []int, height int) {
 	copy(layout.Widths[:], widths)
 
 	layout.Items = items
-	layout.Position = Vec2(layout.Indent, layout.NextRow)
+	layout.Position = NewVec2(layout.Indent, layout.NextRow)
 	layout.Size.Y = height
 	layout.ItemIndex = 0
 }
@@ -55,7 +55,7 @@ func (ctx *Context) LayoutHeight(height int) {
 	ctx.GetLayout().Size.Y = height
 }
 
-func (ctx *Context) LayoutSetNext(r MuRect, relative bool) {
+func (ctx *Context) LayoutSetNext(r Rect, relative bool) {
 	layout := ctx.GetLayout()
 	layout.Next = r
 	if relative {
@@ -65,10 +65,10 @@ func (ctx *Context) LayoutSetNext(r MuRect, relative bool) {
 	}
 }
 
-func (ctx *Context) LayoutNext() MuRect {
+func (ctx *Context) LayoutNext() Rect {
 	layout := ctx.GetLayout()
 	style := ctx.Style
-	var res MuRect
+	var res Rect
 
 	if layout.NextType != 0 {
 		// handle rect set by `mu_layout_set_next`

@@ -5,7 +5,7 @@ package microui
 **============================================================================*/
 
 func (ctx *Context) InputMouseMove(x, y int) {
-	ctx.MousePos = Vec2(x, y)
+	ctx.MousePos = NewVec2(x, y)
 }
 
 func (ctx *Context) InputMouseDown(x, y int, btn int) {

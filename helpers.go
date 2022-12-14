@@ -46,23 +46,23 @@ func mu_clamp_real(x, a, b mu_Real) mu_Real {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
-func Vec2(x, y int) MuVec2 {
-	return MuVec2{x, y}
+func NewVec2(x, y int) Vec2 {
+	return Vec2{x, y}
 }
 
-func Rect(x, y, w, h int) MuRect {
-	return MuRect{x, y, w, h}
+func NewRect(x, y, w, h int) Rect {
+	return Rect{x, y, w, h}
 }
 
-func Color(r, g, b, a uint8) MuColor {
-	return MuColor{r, g, b, a}
+func NewColor(r, g, b, a uint8) Color {
+	return Color{r, g, b, a}
 }
 
-func expand_rect(rect MuRect, n int) MuRect {
-	return Rect(rect.X-n, rect.Y-n, rect.W+n*2, rect.H+n*2)
+func expand_rect(rect Rect, n int) Rect {
+	return NewRect(rect.X-n, rect.Y-n, rect.W+n*2, rect.H+n*2)
 }
 
-func intersect_rects(r1, r2 MuRect) MuRect {
+func intersect_rects(r1, r2 Rect) Rect {
 	var x1 int = mu_max(r1.X, r2.X)
 	var y1 int = mu_max(r1.Y, r2.Y)
 	var x2 int = mu_min(r1.X+r1.W, r2.X+r2.W)
@@ -73,10 +73,10 @@ func intersect_rects(r1, r2 MuRect) MuRect {
 	if y2 < y1 {
 		y2 = y1
 	}
-	return Rect(x1, y1, x2-x1, y2-y1)
+	return NewRect(x1, y1, x2-x1, y2-y1)
 }
 
-func rect_overlaps_vec2(r MuRect, p MuVec2) bool {
+func rect_overlaps_vec2(r Rect, p Vec2) bool {
 	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
 }
 
@@ -109,7 +109,7 @@ func (ctx *Context) PopID() {
 	ctx.IdStack = ctx.IdStack[:len(ctx.IdStack)-1]
 }
 
-func (ctx *Context) PushClipRect(rect MuRect) {
+func (ctx *Context) PushClipRect(rect Rect) {
 	last := ctx.GetClipRect()
 	// push()
 	ctx.ClipStack = append(ctx.ClipStack, intersect_rects(rect, last))
@@ -120,12 +120,12 @@ func (ctx *Context) PopClipRect() {
 	ctx.ClipStack = ctx.ClipStack[:len(ctx.ClipStack)-1]
 }
 
-func (ctx *Context) GetClipRect() MuRect {
+func (ctx *Context) GetClipRect() Rect {
 	expect(len(ctx.ClipStack) > 0)
 	return ctx.ClipStack[len(ctx.ClipStack)-1]
 }
 
-func (ctx *Context) CheckClip(r MuRect) int {
+func (ctx *Context) CheckClip(r Rect) int {
 	cr := ctx.GetClipRect()
 	if r.X > cr.X+cr.W || r.X+r.W < cr.X ||
 		r.Y > cr.Y+cr.H || r.Y+r.H < cr.Y {
@@ -241,7 +241,7 @@ func (ctx *Context) End() {
 	ctx.KeyPressed = 0
 	ctx.TextInput = nil
 	ctx.MousePressed = 0
-	ctx.ScrollDelta = Vec2(0, 0)
+	ctx.ScrollDelta = NewVec2(0, 0)
 	ctx.lastMousePos = ctx.MousePos
 
 	// sort root containers by zindex
