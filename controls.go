@@ -1,10 +1,9 @@
 package microui
 
 import (
-	"encoding/binary"
 	"fmt"
-	"math"
 	"strconv"
+	"unsafe"
 )
 
 /*============================================================================
@@ -12,7 +11,7 @@ import (
 **============================================================================*/
 
 func (ctx *Context) InHoverRoot() bool {
-	for i := len(ctx.ContainerStack) - 1; i > 0; i-- {
+	for i := len(ctx.ContainerStack) - 1; i >= 0; i-- {
 		if ctx.ContainerStack[i] == ctx.HoverRoot {
 			return true
 		}
@@ -100,7 +99,7 @@ func (ctx *Context) Text(text string) {
 	ctx.LayoutRow(1, []int{-1}, ctx.TextHeight(font))
 	for end_idx < len(text) {
 		r := ctx.LayoutNext()
-		var w int = 0
+		w := 0
 		end_idx = p
 		start_idx = end_idx
 		for end_idx < len(text) && text[end_idx] != '\n' {
@@ -110,6 +109,10 @@ func (ctx *Context) Text(text string) {
 			}
 			w += ctx.TextWidth(font, text[word:p])
 			if w > r.W && end_idx != start_idx {
+				break
+			}
+			if p == len(text) {
+				// TODO: test
 				break
 			}
 			w += ctx.TextWidth(font, string(text[p]))
@@ -130,9 +133,9 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	var res int = 0
 	var id mu_Id
 	if len(label) > 0 {
-		id = ctx.GetID([]byte(label))
+		id = ctx.GetID(GetHashable(unsafe.StringData(label)))
 	} else {
-		id = ctx.GetID([]byte{byte(icon)})
+		id = ctx.GetID(GetHashable(&icon))
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
@@ -153,11 +156,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 
 func (ctx *Context) Checkbox(label string, state *bool) int {
 	var res int = 0
-	var state_i byte = 0
-	if *state {
-		state_i = 1
-	}
-	id := ctx.GetID([]byte{state_i})
+	id := ctx.GetID(GetHashable(state))
 	r := ctx.LayoutNext()
 	box := NewRect(r.X, r.Y, r.H, r.H)
 	ctx.UpdateControl(id, r, 0)
@@ -207,7 +206,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 		textw := ctx.TextWidth(font, *buf)
 		texth := ctx.TextHeight(font)
 		ofx := r.W - ctx.Style.Padding - textw - 1
-		textx := r.X + mu_min(ofx, ctx.Style.Padding)
+		textx := r.X + min(ofx, ctx.Style.Padding)
 		texty := r.Y + (r.H-texth)/2
 		ctx.PushClipRect(r)
 		ctx.DrawText(font, *buf, NewVec2(textx, texty), color)
@@ -220,7 +219,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
+func (ctx *Context) NumberTextBox(value *Mu_Real, r Rect, id mu_Id) bool {
 	if ctx.MousePressed == MU_MOUSE_LEFT && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -233,7 +232,7 @@ func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
 			if err != nil {
 				nval = 0
 			}
-			*value = mu_Real(nval)
+			*value = Mu_Real(nval)
 			ctx.NumberEdit = 0
 		} else {
 			return true
@@ -243,19 +242,17 @@ func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
 }
 
 func (ctx *Context) TextBoxEx(buf *string, opt int) int {
-	id := ctx.GetID([]byte(*buf))
+	id := ctx.GetID(GetHashable(buf))
 	r := ctx.LayoutNext()
 	return ctx.TextboxRaw(buf, id, r, opt)
 }
 
-func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_Real, format string, opt int) int {
+func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_Real, format string, opt int) int {
 	var thumb Rect
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
-	id_buf := make([]byte, 4)
-	binary.LittleEndian.PutUint32(id_buf, math.Float32bits(float32(*value)))
-	id := ctx.GetID(id_buf)
+	id := ctx.GetID(GetHashable(value))
 	base := ctx.LayoutNext()
 
 	// handle text input mode
@@ -268,7 +265,7 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 
 	// handle input
 	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == MU_MOUSE_LEFT {
-		v = low + mu_Real(ctx.MousePos.X-base.X)*(high-low)/mu_Real(base.W)
+		v = low + Mu_Real(ctx.MousePos.X-base.X)*(high-low)/Mu_Real(base.W)
 		if step != 0 {
 			v = ((v + step/2) / step) * step
 		}
@@ -283,7 +280,7 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 	ctx.DrawControlFrame(id, base, MU_COLOR_BASE, opt)
 	// draw thumb
 	w = ctx.Style.ThumbSize
-	x = int((v - low) * mu_Real(base.W-w) / (high - low))
+	x = int((v - low) * Mu_Real(base.W-w) / (high - low))
 	thumb = NewRect(base.X+x, base.Y, w, base.H)
 	ctx.DrawControlFrame(id, thumb, MU_COLOR_BUTTON, opt)
 	// draw text
@@ -293,11 +290,9 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 	return res
 }
 
-func (ctx *Context) NumberEx(value *mu_Real, step mu_Real, format string, opt int) int {
+func (ctx *Context) NumberEx(value *Mu_Real, step Mu_Real, format string, opt int) int {
 	var res int = 0
-	id_buf := make([]byte, 4)
-	binary.LittleEndian.PutUint32(id_buf, math.Float32bits(float32(*value)))
-	id := ctx.GetID(id_buf)
+	id := ctx.GetID(GetHashable(value))
 	base := ctx.LayoutNext()
 	last := *value
 
@@ -311,7 +306,7 @@ func (ctx *Context) NumberEx(value *mu_Real, step mu_Real, format string, opt in
 
 	// handle input
 	if ctx.Focus == id && ctx.MouseDown == MU_MOUSE_LEFT {
-		*value += mu_Real(ctx.MouseDelta.X) * step
+		*value += Mu_Real(ctx.MouseDelta.X) * step
 	}
 	// set flag if value changed
 	if *value != last {
@@ -330,7 +325,7 @@ func (ctx *Context) NumberEx(value *mu_Real, step mu_Real, format string, opt in
 func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	var r Rect
 	var active, expanded bool
-	id := ctx.GetID([]byte(label))
+	id := ctx.GetID(GetHashable(unsafe.StringData(label)))
 	idx := ctx.PoolGet(ctx.TreeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
 
@@ -560,7 +555,7 @@ func (ctx *Context) EndRootContainer() {
 
 func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
 	var body Rect
-	id := ctx.GetID([]byte(title))
+	id := ctx.GetID(GetHashable(unsafe.StringData(title)))
 	cnt := ctx.getContainer(id, opt)
 	if cnt == nil || !cnt.Open {
 		return 0
@@ -678,6 +673,7 @@ func (ctx *Context) BeginPanelEx(name string, opt int) {
 	}
 	// push()
 	ctx.ContainerStack = append(ctx.ContainerStack, cnt)
+	ctx.PushContainerBody(cnt, cnt.Rect, opt)
 	ctx.PushClipRect(cnt.Body)
 }
 

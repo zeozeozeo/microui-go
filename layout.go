@@ -16,8 +16,7 @@ func (ctx *Context) PushLayout(body Rect, scroll Vec2) {
 }
 
 func (ctx *Context) LayoutBeginColumn() {
-	// ctx.push_layout(ctx.mu_layout_next(), mu_vec2(0, 0))
-	panic("not implemented")
+	ctx.PushLayout(ctx.LayoutNext(), NewVec2(0, 0))
 }
 
 func (ctx *Context) LayoutEndColumn() {
@@ -115,15 +114,15 @@ func (ctx *Context) LayoutNext() Rect {
 
 	// update position
 	layout.Position.X += res.W + style.Spacing
-	layout.NextRow = mu_max(layout.NextRow, res.Y+res.H+style.Spacing)
+	layout.NextRow = max(layout.NextRow, res.Y+res.H+style.Spacing)
 
 	// apply body offset
 	res.X += layout.Body.X
 	res.Y += layout.Body.Y
 
 	// update max position
-	layout.Max.X = mu_max(layout.Max.X, res.X+res.W)
-	layout.Max.Y = mu_max(layout.Max.Y, res.Y+res.H)
+	layout.Max.X = max(layout.Max.X, res.X+res.W)
+	layout.Max.Y = max(layout.Max.Y, res.Y+res.H)
 
 	ctx.LastRect = res
 	return ctx.LastRect

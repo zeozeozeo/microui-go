@@ -3,7 +3,7 @@ package microui
 import "image/color"
 
 type mu_Id uintptr
-type mu_Real float32
+type Mu_Real float32
 
 type Vec2 struct {
 	X, Y int

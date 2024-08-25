@@ -2,6 +2,7 @@ package microui
 
 import (
 	"sort"
+	"unsafe"
 )
 
 func expect(x bool) {
@@ -24,14 +25,14 @@ func mu_max(a, b int) int {
 	return b
 }
 
-func mu_min_real(a, b mu_Real) mu_Real {
+func mu_min_real(a, b Mu_Real) Mu_Real {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func mu_max_real(a, b mu_Real) mu_Real {
+func mu_max_real(a, b Mu_Real) Mu_Real {
 	if a > b {
 		return a
 	}
@@ -42,7 +43,7 @@ func mu_clamp(x, a, b int) int {
 	return mu_min(b, mu_max(a, x))
 }
 
-func mu_clamp_real(x, a, b mu_Real) mu_Real {
+func mu_clamp_real(x, a, b Mu_Real) Mu_Real {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
@@ -80,13 +81,25 @@ func rect_overlaps_vec2(r Rect, p Vec2) bool {
 	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
 }
 
+type hashable []byte
+
+func GetHashable[T any](v *T) hashable {
+	ptr := uintptr(unsafe.Pointer(v))
+	h := make(hashable, int(unsafe.Sizeof(ptr)))
+	for i := range h {
+		h[i] = byte(ptr & 0xFF)
+		ptr = ptr >> 8
+	}
+	return h
+}
+
 func hash(hash *mu_Id, data []byte) {
 	for i := 0; i < len(data); i++ {
 		*hash = (*hash ^ mu_Id(data[i])) * 16777619
 	}
 }
 
-func (ctx *Context) GetID(data []byte) mu_Id {
+func (ctx *Context) GetID(h hashable) mu_Id {
 	idx := len(ctx.IdStack)
 	var res mu_Id
 	if idx > 0 {
@@ -94,7 +107,7 @@ func (ctx *Context) GetID(data []byte) mu_Id {
 	} else {
 		res = HASH_INITIAL
 	}
-	hash(&res, data)
+	hash(&res, h)
 	ctx.LastID = res
 	return res
 }
@@ -150,10 +163,10 @@ func (ctx *Context) PopContainer() {
 	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Y
 	// pop container, layout and id
 	// pop()
-	expect(len(ctx.ContainerStack) > 0)
+	expect(len(ctx.ContainerStack) > 0) // TODO: no expect in original impl
 	ctx.ContainerStack = ctx.ContainerStack[:len(ctx.ContainerStack)-1]
 	// pop()
-	expect(len(ctx.LayoutStack) > 0)
+	expect(len(ctx.LayoutStack) > 0) // TODO: no expect in original impl
 	ctx.LayoutStack = ctx.LayoutStack[:len(ctx.LayoutStack)-1]
 	ctx.PopID()
 }
@@ -201,6 +214,7 @@ func (ctx *Context) SetFocus(id mu_Id) {
 
 func (ctx *Context) Begin() {
 	expect(ctx.TextWidth != nil && ctx.TextHeight != nil)
+	ctx.CommandList = nil //ctx.CommandList[:0]
 	ctx.RootList = nil
 	ctx.ScrollTarget = nil
 	ctx.HoverRoot = ctx.NextHoverRoot
@@ -211,7 +225,6 @@ func (ctx *Context) Begin() {
 }
 
 func (ctx *Context) End() {
-	var n int
 	// check stacks
 	expect(len(ctx.ContainerStack) == 0)
 	expect(len(ctx.ClipStack) == 0)
@@ -246,12 +259,12 @@ func (ctx *Context) End() {
 
 	// sort root containers by zindex
 	// TODO (port): i'm not sure if this works
-	sort.Slice(ctx.RootList, func(i, j int) bool {
+	sort.SliceStable(ctx.RootList, func(i, j int) bool {
 		return ctx.RootList[i].Zindex < ctx.RootList[j].Zindex
 	})
 
 	// set root container jump commands
-	for i := 0; i < n; i++ {
+	for i := 0; i < len(ctx.RootList); i++ {
 		cnt := ctx.RootList[i]
 		// if this is the first container then make the first command jump to it.
 		// otherwise set the previous container's tail to jump to this one
@@ -263,7 +276,7 @@ func (ctx *Context) End() {
 			prev.Tail.Jump.Dst = cnt.Head
 		}
 		// make the last container's tail jump to the end of command list
-		if i == n-1 {
+		if i == len(ctx.RootList)-1 {
 			cnt.Tail.Jump.Dst = ctx.CommandList[len(ctx.CommandList)-1]
 		}
 	}
