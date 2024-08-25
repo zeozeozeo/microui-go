@@ -192,6 +192,9 @@ func (ctx *Context) getContainer(id mu_Id, opt int) *Container {
 	// container not found in pool: init new container
 	idx = ctx.PoolInit(ctx.ContainerPool[:], id)
 	cnt = &ctx.Containers[idx]
+	cnt.Clear()
+	cnt.HeadIdx = -1
+	cnt.TailIdx = -1
 	cnt.Open = true
 	ctx.BringToFront(cnt)
 	return cnt
@@ -214,8 +217,8 @@ func (ctx *Context) SetFocus(id mu_Id) {
 
 func (ctx *Context) Begin() {
 	expect(ctx.TextWidth != nil && ctx.TextHeight != nil)
-	ctx.CommandList = nil //ctx.CommandList[:0]
-	ctx.RootList = nil
+	ctx.CommandList = ctx.CommandList[:0]
+	ctx.RootList = ctx.RootList[:0]
 	ctx.ScrollTarget = nil
 	ctx.HoverRoot = ctx.NextHoverRoot
 	ctx.NextHoverRoot = nil
@@ -270,14 +273,16 @@ func (ctx *Context) End() {
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
 			cmd := ctx.CommandList[0]
-			cmd.Jump.Dst = cnt.Head
+			expect(cmd.Type == MU_COMMAND_JUMP)
+			cmd.Jump.DstIdx = cnt.HeadIdx + 1
+			expect(cmd.Jump.DstIdx < MU_COMMANDLIST_SIZE)
 		} else {
 			prev := ctx.RootList[i-1]
-			prev.Tail.Jump.Dst = cnt.Head
+			ctx.CommandList[prev.TailIdx].Jump.DstIdx = cnt.HeadIdx + 1
 		}
 		// make the last container's tail jump to the end of command list
 		if i == len(ctx.RootList)-1 {
-			cnt.Tail.Jump.Dst = ctx.CommandList[len(ctx.CommandList)-1]
+			ctx.CommandList[cnt.TailIdx].Jump.DstIdx = len(ctx.CommandList)
 		}
 	}
 }

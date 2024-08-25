@@ -15,10 +15,7 @@ var (
 )
 
 func WriteLog(text string) {
-	if len(logBuf) > 0 {
-		logBuf += "\n"
-	}
-	logBuf += text
+	logBuf += text + "\n"
 	logUpdated = true
 }
 
@@ -172,7 +169,7 @@ func LogWindow(ctx *microui.Context) {
 
 func ProcessFrame(ctx *microui.Context) {
 	ctx.Begin()
-	LogWindow(ctx)
 	TestWindow(ctx)
+	LogWindow(ctx)
 	ctx.End()
 }

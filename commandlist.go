@@ -1,7 +1,5 @@
 package microui
 
-import "unsafe"
-
 /*============================================================================
 ** commandlist
 **============================================================================*/
@@ -9,29 +7,42 @@ import "unsafe"
 // adds a new command with type cmd_type to command_list
 func (ctx *Context) PushCommand(cmd_type int) *Command {
 	cmd := Command{Type: cmd_type}
-	size := unsafe.Sizeof(cmd)
-	expect(uintptr(len(ctx.CommandList))*size+size < MU_COMMANDLIST_SIZE)
+	//expect(uintptr(len(ctx.CommandList))*size+size < MU_COMMANDLIST_SIZE)
 	cmd.Base.Type = cmd_type
-	cmd.Base.Size = size
 	cmd.Idx = len(ctx.CommandList)
 	ctx.CommandList = append(ctx.CommandList, &cmd)
 	return &cmd
 }
 
 // sets cmd to the next command in command_list, returns true if success
-func (ctx *Context) NextCommand(cmd *Command) bool {
-	if cmd.Idx+1 < len(ctx.CommandList) {
-		*cmd = *ctx.CommandList[cmd.Idx+1]
-		return true
+func (ctx *Context) NextCommand(cmd **Command) bool {
+	if len(ctx.CommandList) == 0 {
+		return false
+	}
+	if *cmd == nil {
+		*cmd = ctx.CommandList[0]
+	} else {
+		*cmd = ctx.CommandList[(*cmd).Idx+1]
+	}
+
+	for (*cmd).Idx < len(ctx.CommandList) {
+		if (*cmd).Type != MU_COMMAND_JUMP {
+			return true
+		}
+		idx := (*cmd).Jump.DstIdx
+		if idx > len(ctx.CommandList)-1 {
+			break
+		}
+		*cmd = ctx.CommandList[idx]
 	}
 	return false
 }
 
 // pushes a new jump command to command_list
-func (ctx *Context) PushJump(dst *Command) *Command {
+func (ctx *Context) PushJump(dstIdx int) int {
 	cmd := ctx.PushCommand(MU_COMMAND_JUMP)
-	cmd.Jump.Dst = dst
-	return cmd
+	cmd.Jump.DstIdx = dstIdx
+	return len(ctx.CommandList) - 1
 }
 
 // pushes a new clip command

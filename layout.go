@@ -114,15 +114,15 @@ func (ctx *Context) LayoutNext() Rect {
 
 	// update position
 	layout.Position.X += res.W + style.Spacing
-	layout.NextRow = max(layout.NextRow, res.Y+res.H+style.Spacing)
+	layout.NextRow = mu_max(layout.NextRow, res.Y+res.H+style.Spacing)
 
 	// apply body offset
 	res.X += layout.Body.X
 	res.Y += layout.Body.Y
 
 	// update max position
-	layout.Max.X = max(layout.Max.X, res.X+res.W)
-	layout.Max.Y = max(layout.Max.Y, res.Y+res.H)
+	layout.Max.X = mu_max(layout.Max.X, res.X+res.W)
+	layout.Max.Y = mu_max(layout.Max.Y, res.Y+res.H)
 
 	ctx.LastRect = res
 	return ctx.LastRect

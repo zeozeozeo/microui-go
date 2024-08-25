@@ -3,7 +3,6 @@ package microui
 import (
 	"fmt"
 	"strconv"
-	"unsafe"
 )
 
 /*============================================================================
@@ -17,7 +16,7 @@ func (ctx *Context) InHoverRoot() bool {
 		}
 		// only root containers have their `head` field set; stop searching if we've
 		// reached the current root container
-		if ctx.ContainerStack[i].Head != nil {
+		if ctx.ContainerStack[i].HeadIdx < 0 {
 			break
 		}
 	}
@@ -133,7 +132,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	var res int = 0
 	var id mu_Id
 	if len(label) > 0 {
-		id = ctx.GetID(GetHashable(unsafe.StringData(label)))
+		id = ctx.GetID([]byte(label))
 	} else {
 		id = ctx.GetID(GetHashable(&icon))
 	}
@@ -206,7 +205,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 		textw := ctx.TextWidth(font, *buf)
 		texth := ctx.TextHeight(font)
 		ofx := r.W - ctx.Style.Padding - textw - 1
-		textx := r.X + min(ofx, ctx.Style.Padding)
+		textx := r.X + mu_min(ofx, ctx.Style.Padding)
 		texty := r.Y + (r.H-texth)/2
 		ctx.PushClipRect(r)
 		ctx.DrawText(font, *buf, NewVec2(textx, texty), color)
@@ -325,7 +324,7 @@ func (ctx *Context) NumberEx(value *Mu_Real, step Mu_Real, format string, opt in
 func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	var r Rect
 	var active, expanded bool
-	id := ctx.GetID(GetHashable(unsafe.StringData(label)))
+	id := ctx.GetID([]byte(label))
 	idx := ctx.PoolGet(ctx.TreeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
 
@@ -355,9 +354,10 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 			ctx.PoolUpdate(ctx.TreeNodePool[:], idx)
 		} else {
 			// fill ctx.treenode_pool with 0's
-			for i := 0; i < len(ctx.TreeNodePool); i++ {
+			/*for i := 0; i < len(ctx.TreeNodePool); i++ {
 				ctx.TreeNodePool[i] = MuPoolItem{}
-			}
+			}*/
+			ctx.TreeNodePool[idx] = MuPoolItem{}
 		}
 	} else if active {
 		ctx.PoolInit(ctx.TreeNodePool[:], id)
@@ -528,7 +528,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	// push container to roots list and push head command
 	// push()
 	ctx.RootList = append(ctx.RootList, cnt)
-	cnt.Head = ctx.PushJump(nil)
+	cnt.HeadIdx = ctx.PushJump(-1)
 	// set as hover root if the mouse is overlapping this container and it has a
 	// higher zindex than the current hover root
 	if rect_overlaps_vec2(cnt.Rect, ctx.MousePos) &&
@@ -546,8 +546,8 @@ func (ctx *Context) EndRootContainer() {
 	// push tail 'goto' jump command and set head 'skip' command. the final steps
 	// on initing these are done in mu_end()
 	cnt := ctx.GetCurrentContainer()
-	cnt.Tail = ctx.PushJump(nil)
-	cnt.Head.Jump.Dst = ctx.CommandList[len(ctx.CommandList)-1]
+	cnt.TailIdx = ctx.PushJump(-1)
+	ctx.CommandList[cnt.HeadIdx].Jump.DstIdx = len(ctx.CommandList) //- 1
 	// pop base clip rect and container
 	ctx.PopClipRect()
 	ctx.PopContainer()
@@ -555,7 +555,7 @@ func (ctx *Context) EndRootContainer() {
 
 func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
 	var body Rect
-	id := ctx.GetID(GetHashable(unsafe.StringData(title)))
+	id := ctx.GetID([]byte(title))
 	cnt := ctx.getContainer(id, opt)
 	if cnt == nil || !cnt.Open {
 		return 0

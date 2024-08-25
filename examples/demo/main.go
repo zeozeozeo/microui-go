@@ -79,7 +79,7 @@ func (g *Game) Update() error {
 	}
 	wx, wy := ebiten.Wheel()
 	if wx != 0 || wy != 0 {
-		g.ctx.InputScroll(int(wx), int(wy))
+		g.ctx.InputScroll(int(wx*-30), int(wy*-30))
 	}
 	chars := ebiten.AppendInputChars(nil)
 	if len(chars) > 0 {
@@ -120,9 +120,10 @@ func (g *Game) Update() error {
 	ProcessFrame(g.ctx)
 
 	g.commands = g.commands[:0]
-	g.ctx.Render(func(cmd *microui.Command) {
+	var cmd *microui.Command
+	for g.ctx.NextCommand(&cmd) {
 		g.commands = append(g.commands, cmd)
-	})
+	}
 
 	return nil
 }
@@ -169,8 +170,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			target = screen.SubImage(image.Rect(
 				cmd.Clip.Rect.X,
 				cmd.Clip.Rect.Y,
-				cmd.Clip.Rect.X+cmd.Clip.Rect.W,
-				cmd.Clip.Rect.Y+cmd.Clip.Rect.H,
+				min(cmd.Clip.Rect.X+cmd.Clip.Rect.W, screen.Bounds().Dx()),
+				min(cmd.Clip.Rect.Y+cmd.Clip.Rect.H, screen.Bounds().Dy()),
 			)).(*ebiten.Image)
 		}
 	}
