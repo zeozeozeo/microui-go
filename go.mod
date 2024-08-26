@@ -1,3 +1,3 @@
-module github.com/Zyko0/microui-ebitengine
+module github.com/zeozeozeo/microui-go
 
 go 1.19

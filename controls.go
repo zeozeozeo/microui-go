@@ -351,10 +351,6 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 		if active {
 			ctx.PoolUpdate(ctx.TreeNodePool[:], idx)
 		} else {
-			// fill ctx.treenode_pool with 0's
-			/*for i := 0; i < len(ctx.TreeNodePool); i++ {
-				ctx.TreeNodePool[i] = MuPoolItem{}
-			}*/
 			ctx.TreeNodePool[idx] = MuPoolItem{}
 		}
 	} else if active {
