@@ -110,11 +110,9 @@ func (ctx *Context) Text(text string) {
 			if w > r.W && end_idx != start_idx {
 				break
 			}
-			if p == len(text) {
-				// TODO: test
-				break
+			if p < len(text) {
+				w += ctx.TextWidth(font, string(text[p]))
 			}
-			w += ctx.TextWidth(font, string(text[p]))
 			end_idx = p
 			p++
 		}
@@ -270,7 +268,7 @@ func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_
 		}
 	}
 	// clamp and store value, update res
-	v = mu_clamp_real(v, low, high)
+	*value = mu_clamp_real(v, low, high)
 	if last != v {
 		res |= MU_RES_CHANGE
 	}

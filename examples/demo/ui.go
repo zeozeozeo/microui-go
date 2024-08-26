@@ -37,7 +37,7 @@ func TestWindow(ctx *microui.Context) {
 		}
 
 		/* labels + buttons */
-		if ctx.HeaderEx("Test Buttons", microui.MU_OPT_EXPANDED) > 0 {
+		if ctx.HeaderEx("Test Buttons", microui.MU_OPT_EXPANDED) != 0 {
 			ctx.LayoutRow(3, []int{86, -110, -1}, 0)
 			ctx.Label("Test buttons 1:")
 			if ctx.Button("Button 1") {
@@ -53,7 +53,7 @@ func TestWindow(ctx *microui.Context) {
 			if ctx.Button("Popup") {
 				ctx.OpenPopup("Test Popup")
 			}
-			if ctx.BeginPopup("Test Popup") > 0 {
+			if ctx.BeginPopup("Test Popup") != 0 {
 				ctx.Button("Hello")
 				ctx.Button("World")
 				ctx.EndPopup()
@@ -61,7 +61,7 @@ func TestWindow(ctx *microui.Context) {
 		}
 
 		/* tree */
-		if ctx.HeaderEx("Tree and Text", microui.MU_OPT_EXPANDED) > 0 {
+		if ctx.HeaderEx("Tree and Text", microui.MU_OPT_EXPANDED) != 0 {
 			ctx.LayoutRow(2, []int{140, -1}, 0)
 			ctx.LayoutBeginColumn()
 			if ctx.BeginTreeNode("Test 1") {
@@ -114,7 +114,7 @@ func TestWindow(ctx *microui.Context) {
 		}
 
 		/* background color sliders */
-		if ctx.HeaderEx("Background Color", microui.MU_OPT_EXPANDED) > 0 {
+		if ctx.HeaderEx("Background Color", microui.MU_OPT_EXPANDED) != 0 {
 			ctx.LayoutRow(2, []int{-78, -1}, 74)
 			/* sliders */
 			ctx.LayoutBeginColumn()
@@ -167,9 +167,61 @@ func LogWindow(ctx *microui.Context) {
 	}
 }
 
+func uint8Slider(ctx *microui.Context, fvalue *microui.Mu_Real, value *uint8, low, high uint8) int {
+	*fvalue = microui.Mu_Real(*value)
+	ctx.PushID(microui.GetHashable(fvalue))
+	res := ctx.SliderEx(fvalue, microui.Mu_Real(low), microui.Mu_Real(high), 0, "%.0f", microui.MU_OPT_ALIGNCENTER)
+	*value = uint8(*fvalue)
+	ctx.PopID()
+
+	return res
+}
+
+var (
+	fcolors = [14]struct {
+		R, G, B, A microui.Mu_Real
+	}{}
+	colors = []struct {
+		Label   string
+		ColorID int
+	}{
+		{"text:", microui.MU_COLOR_TEXT},
+		{"border:", microui.MU_COLOR_BORDER},
+		{"windowbg:", microui.MU_COLOR_WINDOWBG},
+		{"titlebg:", microui.MU_COLOR_TITLEBG},
+		{"titletext:", microui.MU_COLOR_TITLETEXT},
+		{"panelbg:", microui.MU_COLOR_PANELBG},
+		{"button:", microui.MU_COLOR_BUTTON},
+		{"buttonhover:", microui.MU_COLOR_BUTTONHOVER},
+		{"buttonfocus:", microui.MU_COLOR_BUTTONFOCUS},
+		{"base:", microui.MU_COLOR_BASE},
+		{"basehover:", microui.MU_COLOR_BASEHOVER},
+		{"basefocus:", microui.MU_COLOR_BASEFOCUS},
+		{"scrollbase:", microui.MU_COLOR_SCROLLBASE},
+		{"scrollthumb:", microui.MU_COLOR_SCROLLTHUMB},
+	}
+)
+
+func StyleWindow(ctx *microui.Context) {
+	if ctx.BeginWindow("Style Editor", microui.NewRect(350, 250, 300, 240)) {
+		sw := int(float64(ctx.GetCurrentContainer().Body.W) * 0.14)
+		ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
+		for _, c := range colors {
+			ctx.Label(c.Label)
+			uint8Slider(ctx, &fcolors[c.ColorID].R, &ctx.Style.Colors[c.ColorID].R, 0, 255)
+			uint8Slider(ctx, &fcolors[c.ColorID].G, &ctx.Style.Colors[c.ColorID].G, 0, 255)
+			uint8Slider(ctx, &fcolors[c.ColorID].B, &ctx.Style.Colors[c.ColorID].B, 0, 255)
+			uint8Slider(ctx, &fcolors[c.ColorID].A, &ctx.Style.Colors[c.ColorID].A, 0, 255)
+			ctx.DrawRect(ctx.LayoutNext(), ctx.Style.Colors[c.ColorID])
+		}
+		ctx.EndWindow()
+	}
+}
+
 func ProcessFrame(ctx *microui.Context) {
 	ctx.Begin()
 	TestWindow(ctx)
 	LogWindow(ctx)
+	StyleWindow(ctx)
 	ctx.End()
 }
