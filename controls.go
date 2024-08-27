@@ -133,8 +133,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	if len(label) > 0 {
 		id = ctx.GetID([]byte(label))
 	} else {
-		iconPtr := &icon
-		id = ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&iconPtr)), unsafe.Sizeof(iconPtr)))
+		id = ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&icon)), unsafe.Sizeof(icon)))
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
