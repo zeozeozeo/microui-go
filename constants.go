@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2024 The Ebitengine Authors
+
 package microui
 
 const MU_VERSION = "2.01"

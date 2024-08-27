@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2024 The Ebitengine Authors
+
 package microui
 
 func drawFrame(ctx *Context, rect Rect, colorid int) {
