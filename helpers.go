@@ -2,6 +2,7 @@ package microui
 
 import (
 	"sort"
+	"unsafe"
 )
 
 func expect(x bool) {
@@ -78,6 +79,23 @@ func intersect_rects(r1, r2 Rect) Rect {
 
 func rect_overlaps_vec2(r Rect, p Vec2) bool {
 	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
+}
+
+// Convinience function for custom widgets. This will convert the literal pointer
+// (NOT the data it points to) to a byte slice (to be used with GetID()). This is
+// basically equivalent to passing a pointer pointer to mu_get_id.
+//
+// This function will allocate a new byte slice on the heap. It produces different
+// results based on the endianess of the machine, but that should be fine for hashing purposes.
+func PtrToBytes(ptr unsafe.Pointer) []byte {
+	slice := unsafe.Slice((*byte)(unsafe.Pointer(&ptr)), unsafe.Sizeof(ptr))
+
+	// `slice` points to `ptr`, which is currently allocated on the stack.
+	// after this function returns, `slice` will point to freed memory, so
+	// we need to copy it to the heap for this to be safe
+	heapSlice := make([]byte, len(slice))
+	copy(heapSlice, slice)
+	return heapSlice
 }
 
 func hash(hash *mu_Id, data []byte) {
