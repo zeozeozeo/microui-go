@@ -2,7 +2,6 @@ package microui
 
 import (
 	"sort"
-	"unsafe"
 )
 
 func expect(x bool) {
@@ -81,25 +80,13 @@ func rect_overlaps_vec2(r Rect, p Vec2) bool {
 	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
 }
 
-type hashable []byte
-
-func GetHashable[T any](v *T) hashable {
-	ptr := uintptr(unsafe.Pointer(v))
-	h := make(hashable, int(unsafe.Sizeof(ptr)))
-	for i := range h {
-		h[i] = byte(ptr & 0xFF)
-		ptr = ptr >> 8
-	}
-	return h
-}
-
 func hash(hash *mu_Id, data []byte) {
 	for i := 0; i < len(data); i++ {
 		*hash = (*hash ^ mu_Id(data[i])) * 16777619
 	}
 }
 
-func (ctx *Context) GetID(h hashable) mu_Id {
+func (ctx *Context) GetID(h []byte) mu_Id {
 	idx := len(ctx.IdStack)
 	var res mu_Id
 	if idx > 0 {
