@@ -17,7 +17,7 @@ func (ctx *Context) InHoverRoot() bool {
 		}
 		// only root containers have their `head` field set; stop searching if we've
 		// reached the current root container
-		if ctx.ContainerStack[i].HeadIdx < 0 {
+		if ctx.ContainerStack[i].HeadIdx >= 0 {
 			break
 		}
 	}
