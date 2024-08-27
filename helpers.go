@@ -24,14 +24,14 @@ func mu_max(a, b int) int {
 	return b
 }
 
-func mu_min_real(a, b mu_Real) mu_Real {
+func mu_min_real(a, b Mu_Real) Mu_Real {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func mu_max_real(a, b mu_Real) mu_Real {
+func mu_max_real(a, b Mu_Real) Mu_Real {
 	if a > b {
 		return a
 	}
@@ -42,7 +42,7 @@ func mu_clamp(x, a, b int) int {
 	return mu_min(b, mu_max(a, x))
 }
 
-func mu_clamp_real(x, a, b mu_Real) mu_Real {
+func mu_clamp_real(x, a, b Mu_Real) Mu_Real {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
@@ -150,10 +150,10 @@ func (ctx *Context) PopContainer() {
 	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Y
 	// pop container, layout and id
 	// pop()
-	expect(len(ctx.ContainerStack) > 0)
+	expect(len(ctx.ContainerStack) > 0) // TODO: no expect in original impl
 	ctx.ContainerStack = ctx.ContainerStack[:len(ctx.ContainerStack)-1]
 	// pop()
-	expect(len(ctx.LayoutStack) > 0)
+	expect(len(ctx.LayoutStack) > 0) // TODO: no expect in original impl
 	ctx.LayoutStack = ctx.LayoutStack[:len(ctx.LayoutStack)-1]
 	ctx.PopID()
 }
@@ -179,6 +179,9 @@ func (ctx *Context) getContainer(id mu_Id, opt int) *Container {
 	// container not found in pool: init new container
 	idx = ctx.PoolInit(ctx.ContainerPool[:], id)
 	cnt = &ctx.Containers[idx]
+	cnt.Clear()
+	cnt.HeadIdx = -1
+	cnt.TailIdx = -1
 	cnt.Open = true
 	ctx.BringToFront(cnt)
 	return cnt
@@ -201,7 +204,8 @@ func (ctx *Context) SetFocus(id mu_Id) {
 
 func (ctx *Context) Begin() {
 	expect(ctx.TextWidth != nil && ctx.TextHeight != nil)
-	ctx.RootList = nil
+	ctx.CommandList = ctx.CommandList[:0]
+	ctx.RootList = ctx.RootList[:0]
 	ctx.ScrollTarget = nil
 	ctx.HoverRoot = ctx.NextHoverRoot
 	ctx.NextHoverRoot = nil
@@ -211,7 +215,6 @@ func (ctx *Context) Begin() {
 }
 
 func (ctx *Context) End() {
-	var n int
 	// check stacks
 	expect(len(ctx.ContainerStack) == 0)
 	expect(len(ctx.ClipStack) == 0)
@@ -246,25 +249,27 @@ func (ctx *Context) End() {
 
 	// sort root containers by zindex
 	// TODO (port): i'm not sure if this works
-	sort.Slice(ctx.RootList, func(i, j int) bool {
+	sort.SliceStable(ctx.RootList, func(i, j int) bool {
 		return ctx.RootList[i].Zindex < ctx.RootList[j].Zindex
 	})
 
 	// set root container jump commands
-	for i := 0; i < n; i++ {
+	for i := 0; i < len(ctx.RootList); i++ {
 		cnt := ctx.RootList[i]
 		// if this is the first container then make the first command jump to it.
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
 			cmd := ctx.CommandList[0]
-			cmd.Jump.Dst = cnt.Head
+			expect(cmd.Type == MU_COMMAND_JUMP)
+			cmd.Jump.DstIdx = cnt.HeadIdx + 1
+			expect(cmd.Jump.DstIdx < MU_COMMANDLIST_SIZE)
 		} else {
 			prev := ctx.RootList[i-1]
-			prev.Tail.Jump.Dst = cnt.Head
+			ctx.CommandList[prev.TailIdx].Jump.DstIdx = cnt.HeadIdx + 1
 		}
 		// make the last container's tail jump to the end of command list
-		if i == n-1 {
-			cnt.Tail.Jump.Dst = ctx.CommandList[len(ctx.CommandList)-1]
+		if i == len(ctx.RootList)-1 {
+			ctx.CommandList[cnt.TailIdx].Jump.DstIdx = len(ctx.CommandList)
 		}
 	}
 }

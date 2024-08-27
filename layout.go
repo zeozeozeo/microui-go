@@ -16,8 +16,7 @@ func (ctx *Context) PushLayout(body Rect, scroll Vec2) {
 }
 
 func (ctx *Context) LayoutBeginColumn() {
-	// ctx.push_layout(ctx.mu_layout_next(), mu_vec2(0, 0))
-	panic("not implemented")
+	ctx.PushLayout(ctx.LayoutNext(), NewVec2(0, 0))
 }
 
 func (ctx *Context) LayoutEndColumn() {

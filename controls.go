@@ -1,10 +1,9 @@
 package microui
 
 import (
-	"encoding/binary"
 	"fmt"
-	"math"
 	"strconv"
+	"unsafe"
 )
 
 /*============================================================================
@@ -12,13 +11,13 @@ import (
 **============================================================================*/
 
 func (ctx *Context) InHoverRoot() bool {
-	for i := len(ctx.ContainerStack) - 1; i > 0; i-- {
+	for i := len(ctx.ContainerStack) - 1; i >= 0; i-- {
 		if ctx.ContainerStack[i] == ctx.HoverRoot {
 			return true
 		}
 		// only root containers have their `head` field set; stop searching if we've
 		// reached the current root container
-		if ctx.ContainerStack[i].Head != nil {
+		if ctx.ContainerStack[i].HeadIdx >= 0 {
 			break
 		}
 	}
@@ -100,7 +99,7 @@ func (ctx *Context) Text(text string) {
 	ctx.LayoutRow(1, []int{-1}, ctx.TextHeight(font))
 	for end_idx < len(text) {
 		r := ctx.LayoutNext()
-		var w int = 0
+		w := 0
 		end_idx = p
 		start_idx = end_idx
 		for end_idx < len(text) && text[end_idx] != '\n' {
@@ -112,7 +111,9 @@ func (ctx *Context) Text(text string) {
 			if w > r.W && end_idx != start_idx {
 				break
 			}
-			w += ctx.TextWidth(font, string(text[p]))
+			if p < len(text) {
+				w += ctx.TextWidth(font, string(text[p]))
+			}
 			end_idx = p
 			p++
 		}
@@ -132,7 +133,8 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	if len(label) > 0 {
 		id = ctx.GetID([]byte(label))
 	} else {
-		id = ctx.GetID([]byte{byte(icon)})
+		iconPtr := &icon
+		id = ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&iconPtr)), unsafe.Sizeof(iconPtr)))
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
@@ -153,11 +155,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 
 func (ctx *Context) Checkbox(label string, state *bool) int {
 	var res int = 0
-	var state_i byte = 0
-	if *state {
-		state_i = 1
-	}
-	id := ctx.GetID([]byte{state_i})
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&state)), unsafe.Sizeof(state)))
 	r := ctx.LayoutNext()
 	box := NewRect(r.X, r.Y, r.H, r.H)
 	ctx.UpdateControl(id, r, 0)
@@ -220,7 +218,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
+func (ctx *Context) NumberTextBox(value *Mu_Real, r Rect, id mu_Id) bool {
 	if ctx.MousePressed == MU_MOUSE_LEFT && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -233,7 +231,7 @@ func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
 			if err != nil {
 				nval = 0
 			}
-			*value = mu_Real(nval)
+			*value = Mu_Real(nval)
 			ctx.NumberEdit = 0
 		} else {
 			return true
@@ -243,19 +241,17 @@ func (ctx *Context) NumberTextBox(value *mu_Real, r Rect, id mu_Id) bool {
 }
 
 func (ctx *Context) TextBoxEx(buf *string, opt int) int {
-	id := ctx.GetID([]byte(*buf))
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&buf)), unsafe.Sizeof(buf)))
 	r := ctx.LayoutNext()
 	return ctx.TextboxRaw(buf, id, r, opt)
 }
 
-func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_Real, format string, opt int) int {
+func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_Real, format string, opt int) int {
 	var thumb Rect
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
-	id_buf := make([]byte, 4)
-	binary.LittleEndian.PutUint32(id_buf, math.Float32bits(float32(*value)))
-	id := ctx.GetID(id_buf)
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&value)), unsafe.Sizeof(value)))
 	base := ctx.LayoutNext()
 
 	// handle text input mode
@@ -268,13 +264,13 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 
 	// handle input
 	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == MU_MOUSE_LEFT {
-		v = low + mu_Real(ctx.MousePos.X-base.X)*(high-low)/mu_Real(base.W)
+		v = low + Mu_Real(ctx.MousePos.X-base.X)*(high-low)/Mu_Real(base.W)
 		if step != 0 {
 			v = ((v + step/2) / step) * step
 		}
 	}
 	// clamp and store value, update res
-	v = mu_clamp_real(v, low, high)
+	*value = mu_clamp_real(v, low, high)
 	if last != v {
 		res |= MU_RES_CHANGE
 	}
@@ -283,7 +279,7 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 	ctx.DrawControlFrame(id, base, MU_COLOR_BASE, opt)
 	// draw thumb
 	w = ctx.Style.ThumbSize
-	x = int((v - low) * mu_Real(base.W-w) / (high - low))
+	x = int((v - low) * Mu_Real(base.W-w) / (high - low))
 	thumb = NewRect(base.X+x, base.Y, w, base.H)
 	ctx.DrawControlFrame(id, thumb, MU_COLOR_BUTTON, opt)
 	// draw text
@@ -293,11 +289,9 @@ func (ctx *Context) SliderEx(value *mu_Real, low mu_Real, high mu_Real, step mu_
 	return res
 }
 
-func (ctx *Context) NumberEx(value *mu_Real, step mu_Real, format string, opt int) int {
+func (ctx *Context) NumberEx(value *Mu_Real, step Mu_Real, format string, opt int) int {
 	var res int = 0
-	id_buf := make([]byte, 4)
-	binary.LittleEndian.PutUint32(id_buf, math.Float32bits(float32(*value)))
-	id := ctx.GetID(id_buf)
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&value)), unsafe.Sizeof(value)))
 	base := ctx.LayoutNext()
 	last := *value
 
@@ -311,7 +305,7 @@ func (ctx *Context) NumberEx(value *mu_Real, step mu_Real, format string, opt in
 
 	// handle input
 	if ctx.Focus == id && ctx.MouseDown == MU_MOUSE_LEFT {
-		*value += mu_Real(ctx.MouseDelta.X) * step
+		*value += Mu_Real(ctx.MouseDelta.X) * step
 	}
 	// set flag if value changed
 	if *value != last {
@@ -359,10 +353,7 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 		if active {
 			ctx.PoolUpdate(ctx.TreeNodePool[:], idx)
 		} else {
-			// fill ctx.treenode_pool with 0's
-			for i := 0; i < len(ctx.TreeNodePool); i++ {
-				ctx.TreeNodePool[i] = MuPoolItem{}
-			}
+			ctx.TreeNodePool[idx] = MuPoolItem{}
 		}
 	} else if active {
 		ctx.PoolInit(ctx.TreeNodePool[:], id)
@@ -533,7 +524,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	// push container to roots list and push head command
 	// push()
 	ctx.RootList = append(ctx.RootList, cnt)
-	cnt.Head = ctx.PushJump(nil)
+	cnt.HeadIdx = ctx.PushJump(-1)
 	// set as hover root if the mouse is overlapping this container and it has a
 	// higher zindex than the current hover root
 	if rect_overlaps_vec2(cnt.Rect, ctx.MousePos) &&
@@ -551,8 +542,8 @@ func (ctx *Context) EndRootContainer() {
 	// push tail 'goto' jump command and set head 'skip' command. the final steps
 	// on initing these are done in mu_end()
 	cnt := ctx.GetCurrentContainer()
-	cnt.Tail = ctx.PushJump(nil)
-	cnt.Head.Jump.Dst = ctx.CommandList[len(ctx.CommandList)-1]
+	cnt.TailIdx = ctx.PushJump(-1)
+	ctx.CommandList[cnt.HeadIdx].Jump.DstIdx = len(ctx.CommandList) //- 1
 	// pop base clip rect and container
 	ctx.PopClipRect()
 	ctx.PopContainer()
@@ -678,6 +669,7 @@ func (ctx *Context) BeginPanelEx(name string, opt int) {
 	}
 	// push()
 	ctx.ContainerStack = append(ctx.ContainerStack, cnt)
+	ctx.PushContainerBody(cnt, cnt.Rect, opt)
 	ctx.PushClipRect(cnt.Body)
 }
 

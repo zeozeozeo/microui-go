@@ -3,7 +3,7 @@ package microui
 import "image/color"
 
 type mu_Id uintptr
-type mu_Real float32
+type Mu_Real float32
 
 type Vec2 struct {
 	X, Y int
@@ -28,12 +28,11 @@ type MuPoolItem struct {
 
 type BaseCommand struct {
 	Type int
-	Size uintptr
 }
 
 type JumpCommand struct {
-	Base BaseCommand
-	Dst  *Command
+	Base   BaseCommand
+	DstIdx int
 }
 
 type ClipCommand struct {
@@ -90,13 +89,18 @@ type Command struct {
 }
 
 type Container struct {
-	Head, Tail  *Command
+	HeadIdx     int
+	TailIdx     int
 	Rect        Rect
 	Body        Rect
 	ContentSize Vec2
 	Scroll      Vec2
 	Zindex      int
 	Open        bool
+}
+
+func (c *Container) Clear() {
+	*c = Container{}
 }
 
 type Style struct {
