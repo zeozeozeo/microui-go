@@ -24,14 +24,14 @@ func mu_max(a, b int) int {
 	return b
 }
 
-func mu_min_real(a, b Mu_Real) Mu_Real {
+func mu_min_real(a, b float32) float32 {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func mu_max_real(a, b Mu_Real) Mu_Real {
+func mu_max_real(a, b float32) float32 {
 	if a > b {
 		return a
 	}
@@ -42,7 +42,7 @@ func mu_clamp(x, a, b int) int {
 	return mu_min(b, mu_max(a, x))
 }
 
-func mu_clamp_real(x, a, b Mu_Real) Mu_Real {
+func mu_clamp_real(x, a, b float32) float32 {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
