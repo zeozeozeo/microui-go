@@ -14,14 +14,6 @@ type Rect struct {
 	X, Y, W, H int
 }
 
-type Color struct {
-	R, G, B, A uint8
-}
-
-func (c *Color) ToRGBA() color.RGBA {
-	return color.RGBA{c.R, c.G, c.B, c.A}
-}
-
 type MuPoolItem struct {
 	ID         mu_Id
 	LastUpdate int
@@ -44,7 +36,7 @@ type ClipCommand struct {
 type RectCommand struct {
 	Base  BaseCommand
 	Rect  Rect
-	Color Color
+	Color color.Color
 }
 
 type Font interface{} // Font is interface{}, microui does not manage fonts
@@ -53,7 +45,7 @@ type TextCommand struct {
 	Base  BaseCommand
 	Font  Font
 	Pos   image.Point
-	Color Color
+	Color color.Color
 	Str   string
 }
 
@@ -61,7 +53,7 @@ type IconCommand struct {
 	Base  BaseCommand
 	Rect  Rect
 	Id    int
-	Color Color
+	Color color.Color
 }
 
 type Layout struct {
@@ -109,7 +101,7 @@ type Style struct {
 	TitleHeight   int
 	ScrollbarSize int
 	ThumbSize     int
-	Colors        [MU_COLOR_MAX]Color
+	Colors        [MU_COLOR_MAX]color.RGBA
 }
 
 type Context struct {

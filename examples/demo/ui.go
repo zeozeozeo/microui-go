@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"unsafe"
 
 	"github.com/ebitengine/microui"
@@ -149,7 +150,7 @@ func TestWindow(ctx *microui.Context) {
 			ctx.LayoutEndColumn()
 			/* color preview */
 			r := ctx.LayoutNext()
-			ctx.DrawRect(r, microui.NewColor(uint8(bg[0]), uint8(bg[1]), uint8(bg[2]), 255))
+			ctx.DrawRect(r, color.RGBA{byte(bg[0]), byte(bg[1]), byte(bg[2]), 255})
 			clr := fmt.Sprintf("#%02X%02X%02X", int(bg[0]), int(bg[1]), int(bg[2]))
 			ctx.DrawControlText(clr, r, microui.MU_COLOR_TEXT, microui.MU_OPT_ALIGNCENTER)
 		}

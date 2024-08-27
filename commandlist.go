@@ -3,7 +3,10 @@
 
 package microui
 
-import "image"
+import (
+	"image"
+	"image/color"
+)
 
 /*============================================================================
 ** commandlist
@@ -59,7 +62,7 @@ func (ctx *Context) SetClip(rect Rect) {
 }
 
 // pushes a new rect command
-func (ctx *Context) DrawRect(rect Rect, color Color) {
+func (ctx *Context) DrawRect(rect Rect, color color.Color) {
 	rect2 := intersect_rects(rect, ctx.GetClipRect())
 	if rect2.W > 0 && rect2.H > 0 {
 		cmd := ctx.PushCommand(MU_COMMAND_RECT)
@@ -68,14 +71,14 @@ func (ctx *Context) DrawRect(rect Rect, color Color) {
 	}
 }
 
-func (ctx *Context) DrawBox(rect Rect, color Color) {
+func (ctx *Context) DrawBox(rect Rect, color color.Color) {
 	ctx.DrawRect(NewRect(rect.X+1, rect.Y, rect.W-2, 1), color)
 	ctx.DrawRect(NewRect(rect.X+1, rect.Y+rect.H-1, rect.W-2, 1), color)
 	ctx.DrawRect(NewRect(rect.X, rect.Y, 1, rect.H), color)
 	ctx.DrawRect(NewRect(rect.X+rect.W-1, rect.Y, 1, rect.H), color)
 }
 
-func (ctx *Context) DrawText(font Font, str string, pos image.Point, color Color) {
+func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color.Color) {
 	rect := NewRect(pos.X, pos.Y, ctx.TextWidth(font, str), ctx.TextHeight(font))
 	clipped := ctx.CheckClip(rect)
 	if clipped == MU_CLIP_ALL {
@@ -96,7 +99,7 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color Color
 	}
 }
 
-func (ctx *Context) DrawIcon(id int, rect Rect, color Color) {
+func (ctx *Context) DrawIcon(id int, rect Rect, color color.Color) {
 	// do clip command if the rect isn't fully contained within the cliprect
 	clipped := ctx.CheckClip(rect)
 	if clipped == MU_CLIP_ALL {

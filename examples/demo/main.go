@@ -143,7 +143,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				float32(cmd.Rect.Rect.Y),
 				float32(cmd.Rect.Rect.W),
 				float32(cmd.Rect.Rect.H),
-				cmd.Rect.Color.ToRGBA(),
+				cmd.Rect.Color,
 				false,
 			)
 		case microui.MU_COMMAND_TEXT:
@@ -153,7 +153,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				float64(cmd.Text.Pos.Y),
 			)
 			cs := ebiten.ColorScale{}
-			cs.ScaleWithColor(cmd.Text.Color.ToRGBA())
+			cs.ScaleWithColor(cmd.Text.Color)
 			text.Draw(target, cmd.Text.Str, face, &text.DrawOptions{
 				DrawImageOptions: ebiten.DrawImageOptions{
 					GeoM:       geom,
@@ -167,7 +167,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				float32(cmd.Icon.Rect.Y),
 				float32(cmd.Icon.Rect.W),
 				float32(cmd.Icon.Rect.H),
-				cmd.Icon.Color.ToRGBA(),
+				cmd.Icon.Color,
 				false,
 			)
 		case microui.MU_COMMAND_CLIP:

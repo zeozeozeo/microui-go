@@ -3,7 +3,10 @@
 
 package microui
 
-import "image"
+import (
+	"image"
+	"image/color"
+)
 
 const MU_VERSION = "2.01"
 
@@ -34,7 +37,7 @@ var default_style Style = Style{
 	TitleHeight:   24,
 	ScrollbarSize: 12,
 	ThumbSize:     8,
-	Colors: [14]Color{
+	Colors: [14]color.RGBA{
 		{230, 230, 230, 255}, // MU_COLOR_TEXT
 		{25, 25, 25, 255},    // MU_COLOR_BORDER
 		{50, 50, 50, 255},    // MU_COLOR_WINDOWBG

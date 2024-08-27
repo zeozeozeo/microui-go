@@ -55,10 +55,6 @@ func NewRect(x, y, w, h int) Rect {
 	return Rect{x, y, w, h}
 }
 
-func NewColor(r, g, b, a uint8) Color {
-	return Color{r, g, b, a}
-}
-
 func expand_rect(rect Rect, n int) Rect {
 	return NewRect(rect.X-n, rect.Y-n, rect.W+n*2, rect.H+n*2)
 }
