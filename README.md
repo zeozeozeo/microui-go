@@ -1,6 +1,6 @@
 # ![microui](https://user-images.githubusercontent.com/3920290/75171571-be83c500-5723-11ea-8a50-504cc2ae1109.png)
 
-A tiny, portable, immediate-mode UI library ported to Go (as of commit [05d7b46c9cf650dd0c5fbc83a9bebf87c80d02a5](https://github.com/rxi/microui/tree/05d7b46c9cf650dd0c5fbc83a9bebf87c80d02a5))
+A tiny, portable, immediate-mode UI library ported to Go (as of commit [0850aba860959c3e75fb3e97120ca92957f9d057](https://github.com/rxi/microui/tree/0850aba860959c3e75fb3e97120ca92957f9d057), v2.02)
 
 # API changes
 
@@ -25,6 +25,16 @@ A tiny, portable, immediate-mode UI library ported to Go (as of commit [05d7b46c
 -   `NewContext`, which is a helper for creating a new `Context`
 -   `ctx.Render`, which calls a function for every command inside the command list, then clears it
 
+# Integrations, demos, renderers
+
+* [Ebitengine](https://ebitengine.org/) rendering backend + demo port: [zeozeozeo/ebitengine-microui-go](https://github.com/zeozeozeo/ebitengine-microui-go)
+    ![microui demo running in Ebitengine](https://github.com/zeozeozeo/ebitengine-microui-go/blob/main/screenshots/demo.png?raw=true)
+* Official Ebitengine fork and integration efforts: [ebitengine/microui](https://github.com/ebitengine/microui)
+
 # Notes
 
-The library expects the user to provide input and handle the resultant drawing commands, it does not do any drawing itself.
+The library expects the user to provide input and handle the resultant drawing commands, it does not do any drawing/tessellation itself.
+
+# Credits
+
+Thank you [@rxi](https://github.com/rxi) for creating this awesome library and thank you [@Zyko0](https://github.com/Zyko0) for contributing numerous fixes to this Go port.
