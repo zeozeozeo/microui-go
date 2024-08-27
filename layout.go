@@ -3,14 +3,16 @@
 
 package microui
 
+import "image"
+
 /*============================================================================
 ** layout
 **============================================================================*/
 
-func (ctx *Context) PushLayout(body Rect, scroll Vec2) {
+func (ctx *Context) PushLayout(body Rect, scroll image.Point) {
 	layout := Layout{}
 	layout.Body = NewRect(body.X-scroll.X, body.Y-scroll.Y, body.W, body.H)
-	layout.Max = NewVec2(-0x1000000, -0x1000000)
+	layout.Max = image.Pt(-0x1000000, -0x1000000)
 
 	// push()
 	ctx.LayoutStack = append(ctx.LayoutStack, layout)
@@ -19,7 +21,7 @@ func (ctx *Context) PushLayout(body Rect, scroll Vec2) {
 }
 
 func (ctx *Context) LayoutBeginColumn() {
-	ctx.PushLayout(ctx.LayoutNext(), NewVec2(0, 0))
+	ctx.PushLayout(ctx.LayoutNext(), image.Pt(0, 0))
 }
 
 func (ctx *Context) LayoutEndColumn() {
@@ -42,7 +44,7 @@ func (ctx *Context) LayoutRow(items int, widths []int, height int) {
 	copy(layout.Widths[:], widths)
 
 	layout.Items = items
-	layout.Position = NewVec2(layout.Indent, layout.NextRow)
+	layout.Position = image.Pt(layout.Indent, layout.NextRow)
 	layout.Size.Y = height
 	layout.ItemIndex = 0
 }

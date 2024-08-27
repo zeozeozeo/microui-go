@@ -4,6 +4,7 @@
 package microui
 
 import (
+	"image"
 	"sort"
 	"unsafe"
 )
@@ -50,10 +51,6 @@ func mu_clamp_real(x, a, b float32) float32 {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
-func NewVec2(x, y int) Vec2 {
-	return Vec2{x, y}
-}
-
 func NewRect(x, y, w, h int) Rect {
 	return Rect{x, y, w, h}
 }
@@ -80,7 +77,7 @@ func intersect_rects(r1, r2 Rect) Rect {
 	return NewRect(x1, y1, x2-x1, y2-y1)
 }
 
-func rect_overlaps_vec2(r Rect, p Vec2) bool {
+func rect_overlaps_vec2(r Rect, p image.Point) bool {
 	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
 }
 
@@ -251,7 +248,7 @@ func (ctx *Context) End() {
 	ctx.KeyPressed = 0
 	ctx.TextInput = nil
 	ctx.MousePressed = 0
-	ctx.ScrollDelta = NewVec2(0, 0)
+	ctx.ScrollDelta = image.Pt(0, 0)
 	ctx.lastMousePos = ctx.MousePos
 
 	// sort root containers by zindex

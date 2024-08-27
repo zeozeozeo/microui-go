@@ -3,13 +3,12 @@
 
 package microui
 
-import "image/color"
+import (
+	"image"
+	"image/color"
+)
 
 type mu_Id uintptr
-
-type Vec2 struct {
-	X, Y int
-}
 
 type Rect struct {
 	X, Y, W, H int
@@ -53,7 +52,7 @@ type Font interface{} // Font is interface{}, microui does not manage fonts
 type TextCommand struct {
 	Base  BaseCommand
 	Font  Font
-	Pos   Vec2
+	Pos   image.Point
 	Color Color
 	Str   string
 }
@@ -68,9 +67,9 @@ type IconCommand struct {
 type Layout struct {
 	Body      Rect
 	Next      Rect
-	Position  Vec2
-	Size      Vec2
-	Max       Vec2
+	Position  image.Point
+	Size      image.Point
+	Max       image.Point
 	Widths    [MU_MAX_WIDTHS]int
 	Items     int
 	ItemIndex int
@@ -95,15 +94,15 @@ type Container struct {
 	TailIdx     int
 	Rect        Rect
 	Body        Rect
-	ContentSize Vec2
-	Scroll      Vec2
+	ContentSize image.Point
+	Scroll      image.Point
 	Zindex      int
 	Open        bool
 }
 
 type Style struct {
 	Font          Font
-	Size          Vec2
+	Size          image.Point
 	Padding       int
 	Spacing       int
 	Indent        int
@@ -154,10 +153,10 @@ type Context struct {
 
 	// input state
 
-	MousePos     Vec2
-	lastMousePos Vec2
-	MouseDelta   Vec2
-	ScrollDelta  Vec2
+	MousePos     image.Point
+	lastMousePos image.Point
+	MouseDelta   image.Point
+	ScrollDelta  image.Point
 	MouseDown    int
 	MousePressed int
 	KeyDown      int

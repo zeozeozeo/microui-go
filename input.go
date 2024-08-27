@@ -3,12 +3,14 @@
 
 package microui
 
+import "image"
+
 /*============================================================================
 ** input handlers
 **============================================================================*/
 
 func (ctx *Context) InputMouseMove(x, y int) {
-	ctx.MousePos = NewVec2(x, y)
+	ctx.MousePos = image.Pt(x, y)
 }
 
 func (ctx *Context) InputMouseDown(x, y int, btn int) {

@@ -3,6 +3,8 @@
 
 package microui
 
+import "image"
+
 /*============================================================================
 ** commandlist
 **============================================================================*/
@@ -73,7 +75,7 @@ func (ctx *Context) DrawBox(rect Rect, color Color) {
 	ctx.DrawRect(NewRect(rect.X+rect.W-1, rect.Y, 1, rect.H), color)
 }
 
-func (ctx *Context) DrawText(font Font, str string, pos Vec2, color Color) {
+func (ctx *Context) DrawText(font Font, str string, pos image.Point, color Color) {
 	rect := NewRect(pos.X, pos.Y, ctx.TextWidth(font, str), ctx.TextHeight(font))
 	clipped := ctx.CheckClip(rect)
 	if clipped == MU_CLIP_ALL {

@@ -5,6 +5,7 @@ package microui
 
 import (
 	"fmt"
+	"image"
 	"strconv"
 	"unsafe"
 )
@@ -40,7 +41,7 @@ func (ctx *Context) DrawControlFrame(id mu_Id, rect Rect, colorid int, opt int) 
 }
 
 func (ctx *Context) DrawControlText(str string, rect Rect, colorid int, opt int) {
-	var pos Vec2
+	var pos image.Point
 	font := ctx.Style.Font
 	tw := ctx.TextWidth(font, str)
 	ctx.PushClipRect(rect)
@@ -119,7 +120,7 @@ func (ctx *Context) Text(text string) {
 			end_idx = p
 			p++
 		}
-		ctx.DrawText(font, text[start_idx:end_idx], NewVec2(r.X, r.Y), color)
+		ctx.DrawText(font, text[start_idx:end_idx], image.Pt(r.X, r.Y), color)
 		p = end_idx + 1
 	}
 	ctx.LayoutEndColumn()
@@ -213,7 +214,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 		textx := r.X + mu_min(ofx, ctx.Style.Padding)
 		texty := r.Y + (r.H-texth)/2
 		ctx.PushClipRect(r)
-		ctx.DrawText(font, *buf, NewVec2(textx, texty), color)
+		ctx.DrawText(font, *buf, image.Pt(textx, texty), color)
 		ctx.DrawRect(NewRect(textx+textw, texty, 1, texth), color)
 		ctx.PopClipRect()
 	} else {
@@ -413,7 +414,7 @@ func (ctx *Context) EndTreeNode() {
 }
 
 // x = x, y = y, w = w, h = h
-func (ctx *Context) scrollbarVertical(cnt *Container, b *Rect, cs Vec2) {
+func (ctx *Context) scrollbarVertical(cnt *Container, b *Rect, cs image.Point) {
 	maxscroll := cs.Y - b.H
 	if maxscroll > 0 && b.H > 0 {
 		var base, thumb Rect
@@ -450,7 +451,7 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b *Rect, cs Vec2) {
 }
 
 // x = y, y = x, w = h, h = w
-func (ctx *Context) scrollbarHorizontal(cnt *Container, b *Rect, cs Vec2) {
+func (ctx *Context) scrollbarHorizontal(cnt *Container, b *Rect, cs image.Point) {
 	maxscroll := cs.X - b.W
 	if maxscroll > 0 && b.W > 0 {
 		var base, thumb Rect
@@ -487,7 +488,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b *Rect, cs Vec2) {
 }
 
 // if `swap` is true, X = Y, Y = X, W = H, H = W
-func (ctx *Context) AddScrollbar(cnt *Container, b *Rect, cs Vec2, swap bool) {
+func (ctx *Context) AddScrollbar(cnt *Container, b *Rect, cs image.Point, swap bool) {
 	if swap {
 		ctx.scrollbarHorizontal(cnt, b, cs)
 	} else {

@@ -3,6 +3,8 @@
 
 package microui
 
+import "image"
+
 const MU_VERSION = "2.01"
 
 const (
@@ -25,7 +27,7 @@ const (
 
 var default_style Style = Style{
 	Font:          nil,
-	Size:          Vec2{68, 10},
+	Size:          image.Pt(68, 10),
 	Padding:       5,
 	Spacing:       4,
 	Indent:        24,
