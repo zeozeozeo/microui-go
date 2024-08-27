@@ -15,6 +15,8 @@ A tiny, portable, immediate-mode UI library ported to Go (as of commit [05d7b46c
 -   Every function that takes `mu_Context` (`Context`) instead has a `Context` reciever, so `Button(ctx, label)` becomes `ctx.Button(label)`
 -   Stacks are now slices with variable length, `append` is used for `push` and `slice = slice[:len(slice)-1]` is used for `pop`
 -   `mu_Font` (`Font`) is `interface{}`, since it doesn't store any font data. You can use `reflect` if you want to store values inside it
+-   All pointer-based commands (`MU_COMMAND_JUMP`) and the `Command` struct have been reworked to use indices
+-   The `mu_Real` type has been replaced with `float32` because Go does not allow implicit casting of identical type aliases 
 -   The library is split into separate files instead of one file
 -   The library is ~1300 lines of code in total
 
