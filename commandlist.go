@@ -6,7 +6,9 @@ package microui
 
 // adds a new command with type cmd_type to command_list
 func (ctx *Context) PushCommand(cmd_type int) *Command {
-	cmd := Command{Type: cmd_type}
+	cmd := Command{
+		Type: cmd_type,
+	}
 	//expect(uintptr(len(ctx.CommandList))*size+size < MU_COMMANDLIST_SIZE)
 	cmd.Base.Type = cmd_type
 	cmd.Idx = len(ctx.CommandList)

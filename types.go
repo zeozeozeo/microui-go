@@ -3,7 +3,6 @@ package microui
 import "image/color"
 
 type mu_Id uintptr
-type Mu_Real float32
 
 type Vec2 struct {
 	X, Y int
@@ -97,10 +96,6 @@ type Container struct {
 	Scroll      Vec2
 	Zindex      int
 	Open        bool
-}
-
-func (c *Container) Clear() {
-	*c = Container{}
 }
 
 type Style struct {

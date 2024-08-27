@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"unsafe"
 
 	"github.com/Zyko0/microui-ebitengine"
 )
@@ -10,12 +11,15 @@ var (
 	logBuf       string
 	logSubmitBuf string
 	logUpdated   bool
-	bg           = [3]microui.Mu_Real{90, 95, 100}
+	bg           = [3]float32{90, 95, 100}
 	checks       = [3]bool{true, false, true}
 )
 
 func WriteLog(text string) {
-	logBuf += text + "\n"
+	if len(logBuf) > 0 {
+		logBuf += "\n"
+	}
+	logBuf += text
 	logUpdated = true
 }
 
@@ -167,10 +171,10 @@ func LogWindow(ctx *microui.Context) {
 	}
 }
 
-func uint8Slider(ctx *microui.Context, fvalue *microui.Mu_Real, value *uint8, low, high uint8) int {
-	*fvalue = microui.Mu_Real(*value)
-	ctx.PushID(microui.GetHashable(fvalue))
-	res := ctx.SliderEx(fvalue, microui.Mu_Real(low), microui.Mu_Real(high), 0, "%.0f", microui.MU_OPT_ALIGNCENTER)
+func uint8Slider(ctx *microui.Context, fvalue *float32, value *uint8, low, high uint8) int {
+	*fvalue = float32(*value)
+	ctx.PushID(microui.PtrToBytes(unsafe.Pointer(fvalue)))
+	res := ctx.SliderEx(fvalue, float32(low), float32(high), 0, "%.0f", microui.MU_OPT_ALIGNCENTER)
 	*value = uint8(*fvalue)
 	ctx.PopID()
 
@@ -179,7 +183,7 @@ func uint8Slider(ctx *microui.Context, fvalue *microui.Mu_Real, value *uint8, lo
 
 var (
 	fcolors = [14]struct {
-		R, G, B, A microui.Mu_Real
+		R, G, B, A float32
 	}{}
 	colors = []struct {
 		Label   string

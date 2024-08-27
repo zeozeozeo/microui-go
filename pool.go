@@ -6,7 +6,7 @@ package microui
 
 func (ctx *Context) PoolInit(items []MuPoolItem, id mu_Id) int {
 	f := ctx.Frame
-	var n int = -1
+	n := -1
 	for i := 0; i < len(items); i++ {
 		if items[i].LastUpdate < f {
 			f = items[i].LastUpdate

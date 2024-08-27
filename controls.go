@@ -91,8 +91,7 @@ func (ctx *Context) UpdateControl(id mu_Id, rect Rect, opt int) {
 }
 
 func (ctx *Context) Text(text string) {
-	var start_idx, end_idx int
-	var p int
+	var start_idx, end_idx, p int
 	font := ctx.Style.Font
 	color := ctx.Style.Colors[MU_COLOR_TEXT]
 	ctx.LayoutBeginColumn()
@@ -134,7 +133,10 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 		id = ctx.GetID([]byte(label))
 	} else {
 		iconPtr := &icon
-		id = ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&iconPtr)), unsafe.Sizeof(iconPtr)))
+		// TODO: investigate if this okay, if icon represents an icon ID we might need
+		// to refer to the value instead of a pointer, like commented below:
+		// unsafe.Slice((*byte)(unsafe.Pointer(&icon)), unsafe.Sizeof(icon)))
+		id = ctx.GetID(PtrToBytes(unsafe.Pointer(iconPtr)))
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
@@ -155,7 +157,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 
 func (ctx *Context) Checkbox(label string, state *bool) int {
 	var res int = 0
-	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&state)), unsafe.Sizeof(state)))
+	id := ctx.GetID(PtrToBytes(unsafe.Pointer(state)))
 	r := ctx.LayoutNext()
 	box := NewRect(r.X, r.Y, r.H, r.H)
 	ctx.UpdateControl(id, r, 0)
@@ -218,7 +220,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *Mu_Real, r Rect, id mu_Id) bool {
+func (ctx *Context) NumberTextBox(value *float32, r Rect, id mu_Id) bool {
 	if ctx.MousePressed == MU_MOUSE_LEFT && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -231,7 +233,7 @@ func (ctx *Context) NumberTextBox(value *Mu_Real, r Rect, id mu_Id) bool {
 			if err != nil {
 				nval = 0
 			}
-			*value = Mu_Real(nval)
+			*value = float32(nval)
 			ctx.NumberEdit = 0
 		} else {
 			return true
@@ -241,17 +243,17 @@ func (ctx *Context) NumberTextBox(value *Mu_Real, r Rect, id mu_Id) bool {
 }
 
 func (ctx *Context) TextBoxEx(buf *string, opt int) int {
-	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&buf)), unsafe.Sizeof(buf)))
+	id := ctx.GetID(PtrToBytes(unsafe.Pointer(buf)))
 	r := ctx.LayoutNext()
 	return ctx.TextboxRaw(buf, id, r, opt)
 }
 
-func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_Real, format string, opt int) int {
+func (ctx *Context) SliderEx(value *float32, low, high, step float32, format string, opt int) int {
 	var thumb Rect
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
-	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&value)), unsafe.Sizeof(value)))
+	id := ctx.GetID(PtrToBytes(unsafe.Pointer(value)))
 	base := ctx.LayoutNext()
 
 	// handle text input mode
@@ -264,7 +266,7 @@ func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_
 
 	// handle input
 	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == MU_MOUSE_LEFT {
-		v = low + Mu_Real(ctx.MousePos.X-base.X)*(high-low)/Mu_Real(base.W)
+		v = low + float32(ctx.MousePos.X-base.X)*(high-low)/float32(base.W)
 		if step != 0 {
 			v = ((v + step/2) / step) * step
 		}
@@ -279,7 +281,7 @@ func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_
 	ctx.DrawControlFrame(id, base, MU_COLOR_BASE, opt)
 	// draw thumb
 	w = ctx.Style.ThumbSize
-	x = int((v - low) * Mu_Real(base.W-w) / (high - low))
+	x = int((v - low) * float32(base.W-w) / (high - low))
 	thumb = NewRect(base.X+x, base.Y, w, base.H)
 	ctx.DrawControlFrame(id, thumb, MU_COLOR_BUTTON, opt)
 	// draw text
@@ -289,9 +291,9 @@ func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_
 	return res
 }
 
-func (ctx *Context) NumberEx(value *Mu_Real, step Mu_Real, format string, opt int) int {
+func (ctx *Context) NumberEx(value *float32, step float32, format string, opt int) int {
 	var res int = 0
-	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&value)), unsafe.Sizeof(value)))
+	id := ctx.GetID(PtrToBytes(unsafe.Pointer(&value)))
 	base := ctx.LayoutNext()
 	last := *value
 
@@ -305,7 +307,7 @@ func (ctx *Context) NumberEx(value *Mu_Real, step Mu_Real, format string, opt in
 
 	// handle input
 	if ctx.Focus == id && ctx.MouseDown == MU_MOUSE_LEFT {
-		*value += Mu_Real(ctx.MouseDelta.X) * step
+		*value += float32(ctx.MouseDelta.X) * step
 	}
 	// set flag if value changed
 	if *value != last {
@@ -353,10 +355,6 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 		if active {
 			ctx.PoolUpdate(ctx.TreeNodePool[:], idx)
 		} else {
-			// fill ctx.treenode_pool with 0's
-			/*for i := 0; i < len(ctx.TreeNodePool); i++ {
-				ctx.TreeNodePool[i] = MuPoolItem{}
-			}*/
 			ctx.TreeNodePool[idx] = MuPoolItem{}
 		}
 	} else if active {

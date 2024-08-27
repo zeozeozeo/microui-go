@@ -2,6 +2,7 @@ package microui
 
 import (
 	"sort"
+	"unsafe"
 )
 
 func expect(x bool) {
@@ -24,14 +25,14 @@ func mu_max(a, b int) int {
 	return b
 }
 
-func mu_min_real(a, b Mu_Real) Mu_Real {
+func mu_min_real(a, b float32) float32 {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func mu_max_real(a, b Mu_Real) Mu_Real {
+func mu_max_real(a, b float32) float32 {
 	if a > b {
 		return a
 	}
@@ -42,7 +43,7 @@ func mu_clamp(x, a, b int) int {
 	return mu_min(b, mu_max(a, x))
 }
 
-func mu_clamp_real(x, a, b Mu_Real) Mu_Real {
+func mu_clamp_real(x, a, b float32) float32 {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
@@ -63,10 +64,10 @@ func expand_rect(rect Rect, n int) Rect {
 }
 
 func intersect_rects(r1, r2 Rect) Rect {
-	var x1 int = mu_max(r1.X, r2.X)
-	var y1 int = mu_max(r1.Y, r2.Y)
-	var x2 int = mu_min(r1.X+r1.W, r2.X+r2.W)
-	var y2 int = mu_min(r1.Y+r1.H, r2.Y+r2.H)
+	x1 := mu_max(r1.X, r2.X)
+	y1 := mu_max(r1.Y, r2.Y)
+	x2 := mu_min(r1.X+r1.W, r2.X+r2.W)
+	y2 := mu_min(r1.Y+r1.H, r2.Y+r2.H)
 	if x2 < x1 {
 		x2 = x1
 	}
@@ -84,6 +85,10 @@ func hash(hash *mu_Id, data []byte) {
 	for i := 0; i < len(data); i++ {
 		*hash = (*hash ^ mu_Id(data[i])) * 16777619
 	}
+}
+
+func PtrToBytes(ptr unsafe.Pointer) []byte {
+	return unsafe.Slice((*byte)(unsafe.Pointer(&ptr)), unsafe.Sizeof(ptr))
 }
 
 func (ctx *Context) GetID(data []byte) mu_Id {
@@ -164,7 +169,6 @@ func (ctx *Context) GetCurrentContainer() *Container {
 }
 
 func (ctx *Context) getContainer(id mu_Id, opt int) *Container {
-	var cnt *Container
 	// try to get existing container from pool
 	idx := ctx.PoolGet(ctx.ContainerPool[:], id)
 	if idx >= 0 {
@@ -178,8 +182,8 @@ func (ctx *Context) getContainer(id mu_Id, opt int) *Container {
 	}
 	// container not found in pool: init new container
 	idx = ctx.PoolInit(ctx.ContainerPool[:], id)
-	cnt = &ctx.Containers[idx]
-	cnt.Clear()
+	cnt := &ctx.Containers[idx]
+	*cnt = Container{}
 	cnt.HeadIdx = -1
 	cnt.TailIdx = -1
 	cnt.Open = true
@@ -248,7 +252,6 @@ func (ctx *Context) End() {
 	ctx.lastMousePos = ctx.MousePos
 
 	// sort root containers by zindex
-	// TODO (port): i'm not sure if this works
 	sort.SliceStable(ctx.RootList, func(i, j int) bool {
 		return ctx.RootList[i].Zindex < ctx.RootList[j].Zindex
 	})

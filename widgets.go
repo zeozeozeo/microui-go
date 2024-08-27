@@ -8,11 +8,11 @@ func (ctx *Context) TextBox(buf *string) int {
 	return ctx.TextBoxEx(buf, 0)
 }
 
-func (ctx *Context) Slider(value *Mu_Real, lo, hi Mu_Real) int {
+func (ctx *Context) Slider(value *float32, lo, hi float32) int {
 	return ctx.SliderEx(value, lo, hi, 0, MU_SLIDER_FMT, MU_OPT_ALIGNCENTER)
 }
 
-func (ctx *Context) Number(value *Mu_Real, step Mu_Real) int {
+func (ctx *Context) Number(value *float32, step float32) int {
 	return ctx.NumberEx(value, step, MU_SLIDER_FMT, MU_OPT_ALIGNCENTER)
 }
 
