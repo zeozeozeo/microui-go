@@ -182,12 +182,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 1920, 1080
+	return 1280, 960
 }
 
 func main() {
-	ebiten.SetFullscreen(true)
-
+	ebiten.SetWindowTitle("Ebitengine Microui Demo")
+	ebiten.SetWindowSize(1280, 960)
 	if err := ebiten.RunGame(New()); err != nil {
 		log.Fatal("err: ", err)
 	}
