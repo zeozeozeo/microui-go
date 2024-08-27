@@ -86,7 +86,7 @@ func hash(hash *mu_Id, data []byte) {
 	}
 }
 
-func (ctx *Context) GetID(h []byte) mu_Id {
+func (ctx *Context) GetID(data []byte) mu_Id {
 	idx := len(ctx.IdStack)
 	var res mu_Id
 	if idx > 0 {
@@ -94,7 +94,7 @@ func (ctx *Context) GetID(h []byte) mu_Id {
 	} else {
 		res = HASH_INITIAL
 	}
-	hash(&res, h)
+	hash(&res, data)
 	ctx.LastID = res
 	return res
 }
