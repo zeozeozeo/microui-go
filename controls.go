@@ -3,6 +3,7 @@ package microui
 import (
 	"fmt"
 	"strconv"
+	"unsafe"
 )
 
 /*============================================================================
@@ -132,7 +133,8 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	if len(label) > 0 {
 		id = ctx.GetID([]byte(label))
 	} else {
-		id = ctx.GetID(GetHashable(&icon))
+		iconPtr := &icon
+		id = ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&iconPtr)), unsafe.Sizeof(iconPtr)))
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
@@ -153,7 +155,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 
 func (ctx *Context) Checkbox(label string, state *bool) int {
 	var res int = 0
-	id := ctx.GetID(GetHashable(state))
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&state)), unsafe.Sizeof(state)))
 	r := ctx.LayoutNext()
 	box := NewRect(r.X, r.Y, r.H, r.H)
 	ctx.UpdateControl(id, r, 0)
@@ -239,7 +241,7 @@ func (ctx *Context) NumberTextBox(value *Mu_Real, r Rect, id mu_Id) bool {
 }
 
 func (ctx *Context) TextBoxEx(buf *string, opt int) int {
-	id := ctx.GetID(GetHashable(buf))
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&buf)), unsafe.Sizeof(buf)))
 	r := ctx.LayoutNext()
 	return ctx.TextboxRaw(buf, id, r, opt)
 }
@@ -249,7 +251,7 @@ func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
-	id := ctx.GetID(GetHashable(value))
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&value)), unsafe.Sizeof(value)))
 	base := ctx.LayoutNext()
 
 	// handle text input mode
@@ -289,7 +291,7 @@ func (ctx *Context) SliderEx(value *Mu_Real, low Mu_Real, high Mu_Real, step Mu_
 
 func (ctx *Context) NumberEx(value *Mu_Real, step Mu_Real, format string, opt int) int {
 	var res int = 0
-	id := ctx.GetID(GetHashable(value))
+	id := ctx.GetID(unsafe.Slice((*byte)(unsafe.Pointer(&value)), unsafe.Sizeof(value)))
 	base := ctx.LayoutNext()
 	last := *value
 
