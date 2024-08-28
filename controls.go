@@ -128,7 +128,7 @@ func (ctx *Context) Label(text string) {
 	ctx.DrawControlText(text, ctx.LayoutNext(), ColorText, 0)
 }
 
-func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
+func (ctx *Context) ButtonEx(label string, icon Icon, opt int) int {
 	var res int = 0
 	var id ID
 	if len(label) > 0 {
@@ -369,14 +369,14 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	} else {
 		ctx.DrawControlFrame(id, r, ColorButton, 0)
 	}
-	var icon_id int
+	var icon Icon
 	if expanded {
-		icon_id = IconExpanded
+		icon = IconExpanded
 	} else {
-		icon_id = IconCollapsed
+		icon = IconCollapsed
 	}
 	ctx.DrawIcon(
-		icon_id,
+		icon,
 		image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y),
 		ctx.Style.Colors[ColorText],
 	)

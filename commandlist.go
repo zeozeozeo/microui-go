@@ -75,7 +75,7 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color
 	}
 }
 
-func (ctx *Context) DrawIcon(id int, rect image.Rectangle, color color.Color) {
+func (ctx *Context) DrawIcon(icon Icon, rect image.Rectangle, color color.Color) {
 	// do clip command if the rect isn't fully contained within the cliprect
 	clipped := ctx.CheckClip(rect)
 	if clipped == ClipAll {
@@ -86,7 +86,7 @@ func (ctx *Context) DrawIcon(id int, rect image.Rectangle, color color.Color) {
 	}
 	// do icon command
 	cmd := ctx.pushCommand(CommandIcon)
-	cmd.icon.id = id
+	cmd.icon.icon = icon
 	cmd.icon.rect = rect
 	cmd.icon.color = color
 	// reset clipping if it was set

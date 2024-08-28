@@ -34,8 +34,10 @@ const (
 	ColorMax = ColorScrollThumb
 )
 
+type Icon int
+
 const (
-	IconClose = 1 + iota
+	IconClose Icon = 1 + iota
 	IconCheck
 	IconCollapsed
 	IconExpanded

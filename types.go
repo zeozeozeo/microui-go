@@ -43,7 +43,7 @@ type textCommand struct {
 
 type iconCommand struct {
 	rect  image.Rectangle
-	id    int
+	icon  Icon
 	color color.Color
 }
 

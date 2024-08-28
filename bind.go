@@ -5,7 +5,9 @@ package microui
 
 import (
 	"bytes"
+	"embed"
 	"image"
+	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -20,16 +22,54 @@ var (
 
 func init() {
 	var err error
-
 	src, err := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
 	if err != nil {
 		panic(err)
 	}
-
 	face = &text.GoTextFace{
 		Source: src,
 		Size:   14,
 	}
+}
+
+var (
+	//go:embed icon/*.png
+	iconFS  embed.FS
+	iconMap = map[Icon]*ebiten.Image{}
+	iconM   sync.Mutex
+)
+
+func iconImage(icon Icon) *ebiten.Image {
+	iconM.Lock()
+	defer iconM.Unlock()
+
+	if img, ok := iconMap[icon]; ok {
+		return img
+	}
+
+	var name string
+	switch icon {
+	case IconCheck:
+		name = "check.png"
+	case IconClose:
+		name = "close.png"
+	case IconCollapsed:
+		name = "collapsed.png"
+	case IconExpanded:
+		name = "expanded.png"
+	default:
+		return nil
+	}
+	b, err := iconFS.ReadFile("icon/" + name)
+	if err != nil {
+		panic(err)
+	}
+	img, _, err := image.Decode(bytes.NewReader(b))
+	if err != nil {
+		panic(err)
+	}
+	iconMap[icon] = ebiten.NewImageFromImage(img)
+	return iconMap[icon]
 }
 
 func (c *Context) updateInput() {
@@ -85,16 +125,16 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			op.ColorScale.ScaleWithColor(cmd.text.color)
 			text.Draw(target, cmd.text.str, face, op)
 		case CommandIcon:
-			// TODO: Draw icon images.
-			vector.DrawFilledRect(
-				target,
-				float32(cmd.icon.rect.Min.X),
-				float32(cmd.icon.rect.Min.Y),
-				float32(cmd.icon.rect.Dx()),
-				float32(cmd.icon.rect.Dy()),
-				cmd.icon.color,
-				false,
-			)
+			img := iconImage(cmd.icon.icon)
+			if img == nil {
+				continue
+			}
+			op := &ebiten.DrawImageOptions{}
+			x := cmd.icon.rect.Min.X + (cmd.icon.rect.Dx()-img.Bounds().Dx())/2
+			y := cmd.icon.rect.Min.Y + (cmd.icon.rect.Dy()-img.Bounds().Dy())/2
+			op.GeoM.Translate(float64(x), float64(y))
+			op.ColorScale.ScaleWithColor(cmd.icon.color)
+			screen.DrawImage(img, op)
 		case CommandClip:
 			target = screen.SubImage(image.Rect(
 				cmd.clip.rect.Min.X,
