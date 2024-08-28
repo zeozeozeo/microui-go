@@ -88,10 +88,10 @@ func PtrToBytes(ptr unsafe.Pointer) []byte {
 }
 
 func (ctx *Context) GetID(data []byte) ID {
-	idx := len(ctx.IdStack)
+	idx := len(ctx.IDStack)
 	var res ID
 	if idx > 0 {
-		res = ctx.IdStack[len(ctx.IdStack)-1]
+		res = ctx.IDStack[len(ctx.IDStack)-1]
 	} else {
 		res = HASH_INITIAL
 	}
@@ -102,12 +102,12 @@ func (ctx *Context) GetID(data []byte) ID {
 
 func (ctx *Context) PushID(data []byte) {
 	// push()
-	ctx.IdStack = append(ctx.IdStack, ctx.GetID(data))
+	ctx.IDStack = append(ctx.IDStack, ctx.GetID(data))
 }
 
 func (ctx *Context) PopID() {
-	expect(len(ctx.IdStack) > 0)
-	ctx.IdStack = ctx.IdStack[:len(ctx.IdStack)-1]
+	expect(len(ctx.IDStack) > 0)
+	ctx.IDStack = ctx.IDStack[:len(ctx.IDStack)-1]
 }
 
 func (ctx *Context) PushClipRect(rect Rect) {
@@ -218,7 +218,7 @@ func (ctx *Context) End() {
 	// check stacks
 	expect(len(ctx.ContainerStack) == 0)
 	expect(len(ctx.ClipStack) == 0)
-	expect(len(ctx.IdStack) == 0)
+	expect(len(ctx.IDStack) == 0)
 	expect(len(ctx.LayoutStack) == 0)
 
 	// handle scroll input

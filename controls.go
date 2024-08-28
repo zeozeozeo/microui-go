@@ -403,7 +403,7 @@ func (ctx *Context) BeginTreeNodeEx(label string, opt int) int {
 	if (res & ResActive) != 0 {
 		ctx.GetLayout().Indent += ctx.Style.Indent
 		// push()
-		ctx.IdStack = append(ctx.IdStack, ctx.LastID)
+		ctx.IDStack = append(ctx.IDStack, ctx.LastID)
 	}
 	return res
 }
@@ -563,7 +563,7 @@ func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
 		return 0
 	}
 	// push()
-	ctx.IdStack = append(ctx.IdStack, id)
+	ctx.IDStack = append(ctx.IDStack, id)
 
 	if cnt.Rect.W == 0 {
 		cnt.Rect = rect

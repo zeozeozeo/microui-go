@@ -52,7 +52,7 @@ type TextCommand struct {
 type IconCommand struct {
 	Base  BaseCommand
 	Rect  Rect
-	Id    int
+	ID    int
 	Color color.Color
 }
 
@@ -134,7 +134,7 @@ type Context struct {
 	RootList       []*Container
 	ContainerStack []*Container
 	ClipStack      []Rect
-	IdStack        []ID
+	IDStack        []ID
 	LayoutStack    []Layout
 
 	// retained state pools

@@ -110,7 +110,7 @@ func (ctx *Context) DrawIcon(id int, rect Rect, color color.Color) {
 	}
 	// do icon command
 	cmd := ctx.PushCommand(CommandIcon)
-	cmd.Icon.Id = id
+	cmd.Icon.ID = id
 	cmd.Icon.Rect = rect
 	cmd.Icon.Color = color
 	// reset clipping if it was set
