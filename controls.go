@@ -411,14 +411,14 @@ func (ctx *Context) EndTreeNode() {
 }
 
 // x = x, y = y, w = w, h = h
-func (ctx *Context) scrollbarVertical(cnt *Container, b *image.Rectangle, cs image.Point) {
+func (ctx *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs image.Point) {
 	maxscroll := cs.Y - b.Dy()
 	if maxscroll > 0 && b.Dy() > 0 {
 		var base, thumb muRect
 		id := ctx.GetID([]byte("!scrollbar" + "y"))
 
 		// get sizing / positioning
-		base = rectFromRectangle(*b)
+		base = rectFromRectangle(b)
 		base.X = b.Max.X
 		base.W = ctx.Style.ScrollbarSize
 
@@ -439,7 +439,7 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b *image.Rectangle, cs ima
 
 		// set this as the scroll_target (will get scrolled on mousewheel)
 		// if the mouse is over it
-		if ctx.MouseOver(*b) {
+		if ctx.MouseOver(b) {
 			ctx.ScrollTarget = cnt
 		}
 	} else {
@@ -448,14 +448,14 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b *image.Rectangle, cs ima
 }
 
 // x = y, y = x, w = h, h = w
-func (ctx *Context) scrollbarHorizontal(cnt *Container, b *image.Rectangle, cs image.Point) {
+func (ctx *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs image.Point) {
 	maxscroll := cs.X - b.Dx()
 	if maxscroll > 0 && b.Dx() > 0 {
 		var base, thumb muRect
 		id := ctx.GetID([]byte("!scrollbar" + "x"))
 
 		// get sizing / positioning
-		base = rectFromRectangle(*b)
+		base = rectFromRectangle(b)
 		base.Y = b.Max.Y
 		base.H = ctx.Style.ScrollbarSize
 
@@ -476,7 +476,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b *image.Rectangle, cs i
 
 		// set this as the scroll_target (will get scrolled on mousewheel)
 		// if the mouse is over it
-		if ctx.MouseOver(*b) {
+		if ctx.MouseOver(b) {
 			ctx.ScrollTarget = cnt
 		}
 	} else {
@@ -485,7 +485,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b *image.Rectangle, cs i
 }
 
 // if `swap` is true, X = Y, Y = X, W = H, H = W
-func (ctx *Context) AddScrollbar(cnt *Container, b *image.Rectangle, cs image.Point, swap bool) {
+func (ctx *Context) AddScrollbar(cnt *Container, b image.Rectangle, cs image.Point, swap bool) {
 	if swap {
 		ctx.scrollbarHorizontal(cnt, b, cs)
 	} else {
@@ -508,8 +508,8 @@ func (ctx *Context) Scrollbars(cnt *Container, body *image.Rectangle) {
 	}
 	// to create a horizontal or vertical scrollbar almost-identical code is
 	// used; only the references to `x|y` `w|h` need to be switched
-	ctx.AddScrollbar(cnt, body, cs, false)
-	ctx.AddScrollbar(cnt, body, cs, true)
+	ctx.AddScrollbar(cnt, *body, cs, false)
+	ctx.AddScrollbar(cnt, *body, cs, true)
 	ctx.PopClipRect()
 }
 
