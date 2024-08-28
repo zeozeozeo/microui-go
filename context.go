@@ -3,7 +3,9 @@
 
 package microui
 
-func drawFrame(ctx *Context, rect Rect, colorid int) {
+import "image"
+
+func drawFrame(ctx *Context, rect image.Rectangle, colorid int) {
 	ctx.DrawRect(rect, ctx.Style.Colors[colorid])
 	if colorid == ColorScrollBase ||
 		colorid == ColorScrollThumb ||
@@ -13,7 +15,7 @@ func drawFrame(ctx *Context, rect Rect, colorid int) {
 
 	// draw border
 	if ctx.Style.Colors[ColorBorder].A != 0 {
-		ctx.DrawBox(expand_rect(rect, 1), ctx.Style.Colors[ColorBorder])
+		ctx.DrawBox(rect.Inset(-1), ctx.Style.Colors[ColorBorder])
 	}
 }
 

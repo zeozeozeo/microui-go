@@ -10,8 +10,22 @@ import (
 
 type ID uintptr
 
-type Rect struct {
+// TODO: Replace muRect with image.Rectangle.
+
+type muRect struct {
 	X, Y, W, H int
+}
+
+func newMuRect(x, y, w, h int) muRect {
+	return muRect{x, y, w, h}
+}
+
+func rectFromRectangle(r image.Rectangle) muRect {
+	return muRect{r.Min.X, r.Min.Y, r.Dx(), r.Dy()}
+}
+
+func (r muRect) rectangle() image.Rectangle {
+	return image.Rect(r.X, r.Y, r.X+r.W, r.Y+r.H)
 }
 
 type PoolItem struct {
@@ -30,12 +44,12 @@ type JumpCommand struct {
 
 type ClipCommand struct {
 	Base BaseCommand
-	Rect Rect
+	Rect image.Rectangle
 }
 
 type RectCommand struct {
 	Base  BaseCommand
-	Rect  Rect
+	Rect  image.Rectangle
 	Color color.Color
 }
 
@@ -51,14 +65,14 @@ type TextCommand struct {
 
 type IconCommand struct {
 	Base  BaseCommand
-	Rect  Rect
+	Rect  image.Rectangle
 	ID    int
 	Color color.Color
 }
 
 type Layout struct {
-	Body      Rect
-	Next      Rect
+	Body      image.Rectangle
+	Next      image.Rectangle
 	Position  image.Point
 	Size      image.Point
 	Max       image.Point
@@ -84,8 +98,8 @@ type Command struct {
 type Container struct {
 	HeadIdx     int
 	TailIdx     int
-	Rect        Rect
-	Body        Rect
+	Rect        image.Rectangle
+	Body        image.Rectangle
 	ContentSize image.Point
 	Scroll      image.Point
 	Zindex      int
@@ -109,7 +123,7 @@ type Context struct {
 
 	TextWidth  func(font Font, str string) int
 	TextHeight func(font Font) int
-	DrawFrame  func(ctx *Context, rect Rect, colorid int)
+	DrawFrame  func(ctx *Context, rect image.Rectangle, colorid int)
 
 	// core state
 
@@ -117,7 +131,7 @@ type Context struct {
 	Hover         ID
 	Focus         ID
 	LastID        ID
-	LastRect      Rect
+	LastRect      image.Rectangle
 	LastZindex    int
 	UpdatedFocus  bool
 	Frame         int
@@ -132,7 +146,7 @@ type Context struct {
 	CommandList    []*Command
 	RootList       []*Container
 	ContainerStack []*Container
-	ClipStack      []Rect
+	ClipStack      []image.Rectangle
 	IDStack        []ID
 	LayoutStack    []Layout
 

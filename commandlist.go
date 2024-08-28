@@ -56,30 +56,30 @@ func (ctx *Context) PushJump(dstIdx int) int {
 }
 
 // pushes a new clip command
-func (ctx *Context) SetClip(rect Rect) {
+func (ctx *Context) SetClip(rect image.Rectangle) {
 	cmd := ctx.PushCommand(CommandClip)
 	cmd.Clip.Rect = rect
 }
 
 // pushes a new rect command
-func (ctx *Context) DrawRect(rect Rect, color color.Color) {
-	rect2 := intersect_rects(rect, ctx.GetClipRect())
-	if rect2.W > 0 && rect2.H > 0 {
+func (ctx *Context) DrawRect(rect image.Rectangle, color color.Color) {
+	rect2 := rect.Intersect(ctx.GetClipRect())
+	if rect2.Dx() > 0 && rect2.Dy() > 0 {
 		cmd := ctx.PushCommand(CommandRect)
 		cmd.Rect.Rect = rect2
 		cmd.Rect.Color = color
 	}
 }
 
-func (ctx *Context) DrawBox(rect Rect, color color.Color) {
-	ctx.DrawRect(NewRect(rect.X+1, rect.Y, rect.W-2, 1), color)
-	ctx.DrawRect(NewRect(rect.X+1, rect.Y+rect.H-1, rect.W-2, 1), color)
-	ctx.DrawRect(NewRect(rect.X, rect.Y, 1, rect.H), color)
-	ctx.DrawRect(NewRect(rect.X+rect.W-1, rect.Y, 1, rect.H), color)
+func (ctx *Context) DrawBox(rect image.Rectangle, color color.Color) {
+	ctx.DrawRect(image.Rect(rect.Min.X+1, rect.Min.Y, rect.Max.X-1, rect.Min.Y+1), color)
+	ctx.DrawRect(image.Rect(rect.Min.X+1, rect.Max.Y-1, rect.Max.X-1, rect.Max.Y), color)
+	ctx.DrawRect(image.Rect(rect.Min.X, rect.Min.Y, rect.Min.X+1, rect.Max.Y), color)
+	ctx.DrawRect(image.Rect(rect.Max.X-1, rect.Min.Y, rect.Max.X, rect.Max.Y), color)
 }
 
 func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color.Color) {
-	rect := NewRect(pos.X, pos.Y, ctx.TextWidth(font, str), ctx.TextHeight(font))
+	rect := image.Rect(pos.X, pos.Y, pos.X+ctx.TextWidth(font, str), pos.Y+ctx.TextHeight(font))
 	clipped := ctx.CheckClip(rect)
 	if clipped == ClipAll {
 		return
@@ -99,7 +99,7 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color
 	}
 }
 
-func (ctx *Context) DrawIcon(id int, rect Rect, color color.Color) {
+func (ctx *Context) DrawIcon(id int, rect image.Rectangle, color color.Color) {
 	// do clip command if the rect isn't fully contained within the cliprect
 	clipped := ctx.CheckClip(rect)
 	if clipped == ClipAll {

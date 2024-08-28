@@ -53,5 +53,5 @@ var defaultStyle Style = Style{
 }
 
 var (
-	unclippedRect = Rect{0, 0, 0x1000000, 0x1000000}
+	unclippedRect = image.Rect(0, 0, 0x1000000, 0x1000000)
 )

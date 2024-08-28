@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"unsafe"
 
@@ -42,20 +43,20 @@ func WriteLog(text string) {
 }
 
 func TestWindow(ctx *microui.Context) {
-	if ctx.BeginWindow("Demo Window", microui.NewRect(40, 40, 300, 450)) {
+	if ctx.BeginWindow("Demo Window", image.Rect(40, 40, 340, 490)) {
 		defer ctx.EndWindow()
 		win := ctx.GetCurrentContainer()
-		win.Rect.W = max(win.Rect.W, 240)
-		win.Rect.H = max(win.Rect.H, 300)
+		win.Rect.Max.X = win.Rect.Min.X + max(win.Rect.Dx(), 240)
+		win.Rect.Max.Y = win.Rect.Min.Y + max(win.Rect.Dy(), 300)
 
 		/* window info */
 		if ctx.Header("Window Info") {
 			win := ctx.GetCurrentContainer()
 			ctx.LayoutRow(2, []int{54, -1}, 0)
 			ctx.Label("Position:")
-			ctx.Label(fmt.Sprintf("%d, %d", win.Rect.X, win.Rect.Y))
+			ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Min.X, win.Rect.Min.Y))
 			ctx.Label("Size:")
-			ctx.Label(fmt.Sprintf("%d, %d", win.Rect.W, win.Rect.H))
+			ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Dx(), win.Rect.Dy()))
 		}
 
 		/* labels + buttons */
@@ -158,7 +159,7 @@ func TestWindow(ctx *microui.Context) {
 }
 
 func LogWindow(ctx *microui.Context) {
-	if ctx.BeginWindow("Log Window", microui.NewRect(350, 40, 300, 200)) {
+	if ctx.BeginWindow("Log Window", image.Rect(350, 40, 650, 240)) {
 		defer ctx.EndWindow()
 		/* output text panel */
 		ctx.LayoutRow(1, []int{-1}, -25)
@@ -225,8 +226,8 @@ var (
 )
 
 func StyleWindow(ctx *microui.Context) {
-	if ctx.BeginWindow("Style Editor", microui.NewRect(350, 250, 300, 240)) {
-		sw := int(float64(ctx.GetCurrentContainer().Body.W) * 0.14)
+	if ctx.BeginWindow("Style Editor", image.Rect(350, 250, 650, 490)) {
+		sw := int(float64(ctx.GetCurrentContainer().Body.Dx()) * 0.14)
 		ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
 		for _, c := range colors {
 			ctx.Label(c.Label)

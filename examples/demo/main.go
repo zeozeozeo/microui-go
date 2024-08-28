@@ -112,10 +112,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		case microui.CommandRect:
 			vector.DrawFilledRect(
 				target,
-				float32(cmd.Rect.Rect.X),
-				float32(cmd.Rect.Rect.Y),
-				float32(cmd.Rect.Rect.W),
-				float32(cmd.Rect.Rect.H),
+				float32(cmd.Rect.Rect.Min.X),
+				float32(cmd.Rect.Rect.Min.Y),
+				float32(cmd.Rect.Rect.Dx()),
+				float32(cmd.Rect.Rect.Dy()),
 				cmd.Rect.Color,
 				false,
 			)
@@ -136,19 +136,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		case microui.CommandIcon:
 			vector.DrawFilledRect(
 				target,
-				float32(cmd.Icon.Rect.X),
-				float32(cmd.Icon.Rect.Y),
-				float32(cmd.Icon.Rect.W),
-				float32(cmd.Icon.Rect.H),
+				float32(cmd.Icon.Rect.Min.X),
+				float32(cmd.Icon.Rect.Min.Y),
+				float32(cmd.Icon.Rect.Dx()),
+				float32(cmd.Icon.Rect.Dy()),
 				cmd.Icon.Color,
 				false,
 			)
 		case microui.CommandClip:
 			target = screen.SubImage(image.Rect(
-				cmd.Clip.Rect.X,
-				cmd.Clip.Rect.Y,
-				min(cmd.Clip.Rect.X+cmd.Clip.Rect.W, screen.Bounds().Dx()),
-				min(cmd.Clip.Rect.Y+cmd.Clip.Rect.H, screen.Bounds().Dy()),
+				cmd.Clip.Rect.Min.X,
+				cmd.Clip.Rect.Min.Y,
+				min(cmd.Clip.Rect.Max.X, screen.Bounds().Dx()),
+				min(cmd.Clip.Rect.Max.Y, screen.Bounds().Dy()),
 			)).(*ebiten.Image)
 		}
 	}

@@ -9,9 +9,9 @@ import "image"
 ** layout
 **============================================================================*/
 
-func (ctx *Context) PushLayout(body Rect, scroll image.Point) {
+func (ctx *Context) PushLayout(body image.Rectangle, scroll image.Point) {
 	layout := Layout{}
-	layout.Body = NewRect(body.X-scroll.X, body.Y-scroll.Y, body.W, body.H)
+	layout.Body = body.Sub(scroll)
 	layout.Max = image.Pt(-0x1000000, -0x1000000)
 
 	// push()
@@ -31,8 +31,8 @@ func (ctx *Context) LayoutEndColumn() {
 	ctx.LayoutStack = ctx.LayoutStack[:len(ctx.LayoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
 	a := ctx.GetLayout()
-	a.Position.X = mu_max(a.Position.X, b.Position.X+b.Body.X-a.Body.X)
-	a.NextRow = mu_max(a.NextRow, b.NextRow+b.Body.Y-a.Body.Y)
+	a.Position.X = mu_max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)
+	a.NextRow = mu_max(a.NextRow, b.NextRow+b.Body.Min.Y-a.Body.Min.Y)
 	a.Max.X = mu_max(a.Max.X, b.Max.X)
 	a.Max.Y = mu_max(a.Max.Y, b.Max.Y)
 }
@@ -59,7 +59,7 @@ func (ctx *Context) LayoutHeight(height int) {
 	ctx.GetLayout().Size.Y = height
 }
 
-func (ctx *Context) LayoutSetNext(r Rect, relative bool) {
+func (ctx *Context) LayoutSetNext(r image.Rectangle, relative bool) {
 	layout := ctx.GetLayout()
 	layout.Next = r
 	if relative {
@@ -69,19 +69,19 @@ func (ctx *Context) LayoutSetNext(r Rect, relative bool) {
 	}
 }
 
-func (ctx *Context) LayoutNext() Rect {
+func (ctx *Context) LayoutNext() image.Rectangle {
 	layout := ctx.GetLayout()
 	style := ctx.Style
-	var res Rect
+	var res muRect
 
 	if layout.NextType != 0 {
 		// handle rect set by `mu_layout_set_next`
 		next_type := layout.NextType
 		layout.NextType = 0
-		res = layout.Next
+		res = rectFromRectangle(layout.Next)
 
 		if next_type == Absolute {
-			ctx.LastRect = res
+			ctx.LastRect = res.rectangle()
 			return ctx.LastRect
 		}
 	} else {
@@ -108,10 +108,10 @@ func (ctx *Context) LayoutNext() Rect {
 			res.H = style.Size.Y + style.Padding*2
 		}
 		if res.W < 0 {
-			res.W += layout.Body.W - res.X + 1
+			res.W += layout.Body.Dx() - res.X + 1
 		}
 		if res.H < 0 {
-			res.H += layout.Body.H - res.Y + 1
+			res.H += layout.Body.Dy() - res.Y + 1
 		}
 
 		layout.ItemIndex++
@@ -122,13 +122,13 @@ func (ctx *Context) LayoutNext() Rect {
 	layout.NextRow = mu_max(layout.NextRow, res.Y+res.H+style.Spacing)
 
 	// apply body offset
-	res.X += layout.Body.X
-	res.Y += layout.Body.Y
+	res.X += layout.Body.Min.X
+	res.Y += layout.Body.Min.Y
 
 	// update max position
 	layout.Max.X = mu_max(layout.Max.X, res.X+res.W)
 	layout.Max.Y = mu_max(layout.Max.Y, res.Y+res.H)
 
-	ctx.LastRect = res
+	ctx.LastRect = res.rectangle()
 	return ctx.LastRect
 }

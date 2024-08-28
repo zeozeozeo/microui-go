@@ -51,32 +51,6 @@ func mu_clamp_real(x, a, b float32) float32 {
 	return mu_min_real(b, mu_max_real(a, x))
 }
 
-func NewRect(x, y, w, h int) Rect {
-	return Rect{x, y, w, h}
-}
-
-func expand_rect(rect Rect, n int) Rect {
-	return NewRect(rect.X-n, rect.Y-n, rect.W+n*2, rect.H+n*2)
-}
-
-func intersect_rects(r1, r2 Rect) Rect {
-	x1 := mu_max(r1.X, r2.X)
-	y1 := mu_max(r1.Y, r2.Y)
-	x2 := mu_min(r1.X+r1.W, r2.X+r2.W)
-	y2 := mu_min(r1.Y+r1.H, r2.Y+r2.H)
-	if x2 < x1 {
-		x2 = x1
-	}
-	if y2 < y1 {
-		y2 = y1
-	}
-	return NewRect(x1, y1, x2-x1, y2-y1)
-}
-
-func rect_overlaps_vec2(r Rect, p image.Point) bool {
-	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
-}
-
 func hash(hash *ID, data []byte) {
 	for i := 0; i < len(data); i++ {
 		*hash = (*hash ^ ID(data[i])) * 16777619
@@ -115,10 +89,10 @@ func (ctx *Context) PopID() {
 	ctx.IDStack = ctx.IDStack[:len(ctx.IDStack)-1]
 }
 
-func (ctx *Context) PushClipRect(rect Rect) {
+func (ctx *Context) PushClipRect(rect image.Rectangle) {
 	last := ctx.GetClipRect()
 	// push()
-	ctx.ClipStack = append(ctx.ClipStack, intersect_rects(rect, last))
+	ctx.ClipStack = append(ctx.ClipStack, rect.Intersect(last))
 }
 
 func (ctx *Context) PopClipRect() {
@@ -126,19 +100,17 @@ func (ctx *Context) PopClipRect() {
 	ctx.ClipStack = ctx.ClipStack[:len(ctx.ClipStack)-1]
 }
 
-func (ctx *Context) GetClipRect() Rect {
+func (ctx *Context) GetClipRect() image.Rectangle {
 	expect(len(ctx.ClipStack) > 0)
 	return ctx.ClipStack[len(ctx.ClipStack)-1]
 }
 
-func (ctx *Context) CheckClip(r Rect) int {
+func (ctx *Context) CheckClip(r image.Rectangle) int {
 	cr := ctx.GetClipRect()
-	if r.X > cr.X+cr.W || r.X+r.W < cr.X ||
-		r.Y > cr.Y+cr.H || r.Y+r.H < cr.Y {
+	if !r.Overlaps(cr) {
 		return ClipAll
 	}
-	if r.X >= cr.X && r.X+r.W <= cr.X+cr.W &&
-		r.Y >= cr.Y && r.Y+r.H <= cr.Y+cr.H {
+	if r.In(cr) {
 		return 0
 	}
 	return ClipPart
@@ -152,8 +124,8 @@ func (ctx *Context) GetLayout() *Layout {
 func (ctx *Context) PopContainer() {
 	cnt := ctx.GetCurrentContainer()
 	layout := ctx.GetLayout()
-	cnt.ContentSize.X = layout.Max.X - layout.Body.X
-	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Y
+	cnt.ContentSize.X = layout.Max.X - layout.Body.Min.X
+	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Min.Y
 	// pop container, layout and id
 	// pop()
 	expect(len(ctx.ContainerStack) > 0) // TODO: no expect in original impl
