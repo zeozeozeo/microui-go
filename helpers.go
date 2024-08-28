@@ -87,13 +87,18 @@ func PtrToBytes(ptr unsafe.Pointer) []byte {
 	return unsafe.Slice((*byte)(unsafe.Pointer(&ptr)), unsafe.Sizeof(ptr))
 }
 
+// GetID returns a hash value based on the data and the last ID on the stack.
 func (ctx *Context) GetID(data []byte) ID {
+	const (
+		hashInitial = 2166136261 // 32bit fnv-1a hash
+	)
+
 	idx := len(ctx.IDStack)
 	var res ID
 	if idx > 0 {
 		res = ctx.IDStack[len(ctx.IDStack)-1]
 	} else {
-		res = HASH_INITIAL
+		res = hashInitial
 	}
 	hash(&res, data)
 	ctx.LastID = res
