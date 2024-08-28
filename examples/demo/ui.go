@@ -241,10 +241,10 @@ func StyleWindow(ctx *microui.Context) {
 	}
 }
 
-func ProcessFrame(ctx *microui.Context) {
-	ctx.Begin()
-	TestWindow(ctx)
-	LogWindow(ctx)
-	StyleWindow(ctx)
-	ctx.End()
+func (g *Game) ProcessFrame() {
+	g.ctx.Begin()
+	TestWindow(g.ctx)
+	LogWindow(g.ctx)
+	StyleWindow(g.ctx)
+	g.ctx.End()
 }

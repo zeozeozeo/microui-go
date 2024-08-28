@@ -3,7 +3,9 @@
 
 package microui
 
-import "image"
+import (
+	"image"
+)
 
 func drawFrame(ctx *Context, rect image.Rectangle, colorid int) {
 	ctx.DrawRect(rect, ctx.Style.Colors[colorid])

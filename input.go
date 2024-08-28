@@ -13,7 +13,7 @@ import (
 ** input handlers
 **============================================================================*/
 
-func (ctx *Context) InputMouseMove(x, y int) {
+func (ctx *Context) inputMouseMove(x, y int) {
 	ctx.MousePos = image.Pt(x, y)
 }
 
@@ -29,18 +29,18 @@ func mouseButtonToInt(btn ebiten.MouseButton) int {
 	return 0
 }
 
-func (ctx *Context) InputMouseDown(x, y int, btn ebiten.MouseButton) {
-	ctx.InputMouseMove(x, y)
+func (ctx *Context) inputMouseDown(x, y int, btn ebiten.MouseButton) {
+	ctx.inputMouseMove(x, y)
 	ctx.MouseDown |= mouseButtonToInt(btn)
 	ctx.MousePressed |= mouseButtonToInt(btn)
 }
 
-func (ctx *Context) InputMouseUp(x, y int, btn ebiten.MouseButton) {
-	ctx.InputMouseMove(x, y)
+func (ctx *Context) inputMouseUp(x, y int, btn ebiten.MouseButton) {
+	ctx.inputMouseMove(x, y)
 	ctx.MouseDown &= ^mouseButtonToInt(btn)
 }
 
-func (ctx *Context) InputScroll(x, y int) {
+func (ctx *Context) inputScroll(x, y int) {
 	ctx.ScrollDelta.X += x
 	ctx.ScrollDelta.Y += y
 }
@@ -61,15 +61,15 @@ func keyToInt(key ebiten.Key) int {
 	return 0
 }
 
-func (ctx *Context) InputKeyDown(key ebiten.Key) {
+func (ctx *Context) inputKeyDown(key ebiten.Key) {
 	ctx.KeyPressed |= keyToInt(key)
 	ctx.KeyDown |= keyToInt(key)
 }
 
-func (ctx *Context) InputKeyUp(key ebiten.Key) {
+func (ctx *Context) inputKeyUp(key ebiten.Key) {
 	ctx.KeyDown &= ^keyToInt(key)
 }
 
-func (ctx *Context) InputText(text []rune) {
+func (ctx *Context) inputText(text []rune) {
 	ctx.TextInput = text
 }
