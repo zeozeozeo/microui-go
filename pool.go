@@ -7,31 +7,31 @@ package microui
 ** pool
 **============================================================================*/
 
-func (ctx *Context) poolInit(items []PoolItem, id ID) int {
+func (ctx *Context) poolInit(items []poolItem, id ID) int {
 	f := ctx.tick
 	n := -1
 	for i := 0; i < len(items); i++ {
-		if items[i].LastUpdate < f {
-			f = items[i].LastUpdate
+		if items[i].lastUpdate < f {
+			f = items[i].lastUpdate
 			n = i
 		}
 	}
 	expect(n > -1)
-	items[n].ID = id
+	items[n].id = id
 	ctx.poolUpdate(items, n)
 	return n
 }
 
 // returns the index of an ID in the pool. returns -1 if it is not found
-func (ctx *Context) poolGet(items []PoolItem, id ID) int {
+func (ctx *Context) poolGet(items []poolItem, id ID) int {
 	for i := 0; i < len(items); i++ {
-		if items[i].ID == id {
+		if items[i].id == id {
 			return i
 		}
 	}
 	return -1
 }
 
-func (ctx *Context) poolUpdate(items []PoolItem, idx int) {
-	items[idx].LastUpdate = ctx.tick
+func (ctx *Context) poolUpdate(items []poolItem, idx int) {
+	items[idx].lastUpdate = ctx.tick
 }

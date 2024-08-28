@@ -15,11 +15,11 @@ import (
 // adds a new command with type cmd_type to command_list
 func (ctx *Context) pushCommand(cmd_type int) *command {
 	cmd := command{
-		Type: cmd_type,
+		typ: cmd_type,
 	}
 	//expect(uintptr(len(ctx.CommandList))*size+size < MU_COMMANDLIST_SIZE)
-	cmd.Base.Type = cmd_type
-	cmd.Idx = len(ctx.commandList)
+	cmd.base.typ = cmd_type
+	cmd.idx = len(ctx.commandList)
 	ctx.commandList = append(ctx.commandList, &cmd)
 	return &cmd
 }
@@ -32,14 +32,14 @@ func (ctx *Context) nextCommand(cmd **command) bool {
 	if *cmd == nil {
 		*cmd = ctx.commandList[0]
 	} else {
-		*cmd = ctx.commandList[(*cmd).Idx+1]
+		*cmd = ctx.commandList[(*cmd).idx+1]
 	}
 
-	for (*cmd).Idx < len(ctx.commandList) {
-		if (*cmd).Type != CommandJump {
+	for (*cmd).idx < len(ctx.commandList) {
+		if (*cmd).typ != CommandJump {
 			return true
 		}
-		idx := (*cmd).Jump.DstIdx
+		idx := (*cmd).jump.dstIdx
 		if idx > len(ctx.commandList)-1 {
 			break
 		}
@@ -51,14 +51,14 @@ func (ctx *Context) nextCommand(cmd **command) bool {
 // pushes a new jump command to command_list
 func (ctx *Context) pushJump(dstIdx int) int {
 	cmd := ctx.pushCommand(CommandJump)
-	cmd.Jump.DstIdx = dstIdx
+	cmd.jump.dstIdx = dstIdx
 	return len(ctx.commandList) - 1
 }
 
 // pushes a new clip command
 func (ctx *Context) SetClip(rect image.Rectangle) {
 	cmd := ctx.pushCommand(CommandClip)
-	cmd.Clip.Rect = rect
+	cmd.clip.rect = rect
 }
 
 // pushes a new rect command
@@ -66,8 +66,8 @@ func (ctx *Context) DrawRect(rect image.Rectangle, color color.Color) {
 	rect2 := rect.Intersect(ctx.GetClipRect())
 	if rect2.Dx() > 0 && rect2.Dy() > 0 {
 		cmd := ctx.pushCommand(CommandRect)
-		cmd.Rect.Rect = rect2
-		cmd.Rect.Color = color
+		cmd.rect.rect = rect2
+		cmd.rect.color = color
 	}
 }
 
@@ -89,10 +89,10 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color
 	}
 	// add command
 	cmd := ctx.pushCommand(CommandText)
-	cmd.Text.Str = str
-	cmd.Text.Pos = pos
-	cmd.Text.Color = color
-	cmd.Text.Font = font
+	cmd.text.str = str
+	cmd.text.pos = pos
+	cmd.text.color = color
+	cmd.text.font = font
 	// reset clipping if it was set
 	if clipped != 0 {
 		ctx.SetClip(unclippedRect)
@@ -110,9 +110,9 @@ func (ctx *Context) DrawIcon(id int, rect image.Rectangle, color color.Color) {
 	}
 	// do icon command
 	cmd := ctx.pushCommand(CommandIcon)
-	cmd.Icon.ID = id
-	cmd.Icon.Rect = rect
-	cmd.Icon.Color = color
+	cmd.icon.id = id
+	cmd.icon.rect = rect
+	cmd.icon.color = color
 	// reset clipping if it was set
 	if clipped != 0 {
 		ctx.SetClip(unclippedRect)

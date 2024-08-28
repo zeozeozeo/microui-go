@@ -58,7 +58,7 @@ func (ctx *Context) DrawControlText(str string, rect image.Rectangle, colorid in
 }
 
 func (ctx *Context) MouseOver(rect image.Rectangle) bool {
-	return ctx.MousePos.In(rect) && ctx.MousePos.In(ctx.GetClipRect()) && ctx.InHoverRoot()
+	return ctx.mousePos.In(rect) && ctx.mousePos.In(ctx.GetClipRect()) && ctx.InHoverRoot()
 }
 
 func (ctx *Context) UpdateControl(id ID, rect image.Rectangle, opt int) {
@@ -70,21 +70,21 @@ func (ctx *Context) UpdateControl(id ID, rect image.Rectangle, opt int) {
 	if (opt & OptNoInteract) != 0 {
 		return
 	}
-	if mouseover && ctx.MouseDown == 0 {
+	if mouseover && ctx.mouseDown == 0 {
 		ctx.Hover = id
 	}
 
 	if ctx.Focus == id {
-		if ctx.MousePressed != 0 && !mouseover {
+		if ctx.mousePressed != 0 && !mouseover {
 			ctx.SetFocus(0)
 		}
-		if ctx.MouseDown == 0 && (^opt&OptHoldFocus) != 0 {
+		if ctx.mouseDown == 0 && (^opt&OptHoldFocus) != 0 {
 			ctx.SetFocus(0)
 		}
 	}
 
 	if ctx.Hover == id {
-		if ctx.MousePressed != 0 {
+		if ctx.mousePressed != 0 {
 			ctx.SetFocus(id)
 		} else if !mouseover {
 			ctx.Hover = 0
@@ -143,7 +143,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
 	// handle click
-	if ctx.MousePressed == mouseLeft && ctx.Focus == id {
+	if ctx.mousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResSubmit
 	}
 	// draw
@@ -164,7 +164,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
 	ctx.UpdateControl(id, r, 0)
 	// handle click
-	if ctx.MousePressed == mouseLeft && ctx.Focus == id {
+	if ctx.mousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResChange
 		*state = !*state
 	}
@@ -185,17 +185,17 @@ func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt int) i
 
 	if ctx.Focus == id {
 		// handle text input
-		if len(ctx.TextInput) > 0 {
-			*buf += string(ctx.TextInput)
+		if len(ctx.textInput) > 0 {
+			*buf += string(ctx.textInput)
 			res |= ResChange
 		}
 		// handle backspace
-		if (ctx.KeyPressed&keyBackspace) != 0 && buflen > 0 {
+		if (ctx.keyPressed&keyBackspace) != 0 && buflen > 0 {
 			*buf = (*buf)[:buflen-1]
 			res |= ResChange
 		}
 		// handle return
-		if (ctx.KeyPressed & keyReturn) != 0 {
+		if (ctx.keyPressed & keyReturn) != 0 {
 			ctx.SetFocus(0)
 			res |= ResSubmit
 		}
@@ -223,7 +223,7 @@ func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt int) i
 }
 
 func (ctx *Context) NumberTextBox(value *float32, r image.Rectangle, id ID) bool {
-	if ctx.MousePressed == mouseLeft && (ctx.KeyDown&keyShift) != 0 &&
+	if ctx.mousePressed == mouseLeft && (ctx.keyDown&keyShift) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
 		ctx.NumberEditBuf = fmt.Sprintf(realFmt, *value)
@@ -266,8 +266,8 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 	ctx.UpdateControl(id, base, opt)
 
 	// handle input
-	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == mouseLeft {
-		v = low + float32(ctx.MousePos.X-base.Min.X)*(high-low)/float32(base.Dx())
+	if ctx.Focus == id && (ctx.mouseDown|ctx.mousePressed) == mouseLeft {
+		v = low + float32(ctx.mousePos.X-base.Min.X)*(high-low)/float32(base.Dx())
 		if step != 0 {
 			v = ((v + step/2) / step) * step
 		}
@@ -307,8 +307,8 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt in
 	ctx.UpdateControl(id, base, opt)
 
 	// handle input
-	if ctx.Focus == id && ctx.MouseDown == mouseLeft {
-		*value += float32(ctx.MouseDelta.X) * step
+	if ctx.Focus == id && ctx.mouseDown == mouseLeft {
+		*value += float32(ctx.mouseDelta.X) * step
 	}
 	// set flag if value changed
 	if *value != last {
@@ -326,7 +326,7 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt in
 
 func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	id := ctx.GetID([]byte(label))
-	idx := ctx.poolGet(ctx.TreeNodePool[:], id)
+	idx := ctx.poolGet(ctx.treeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
 
 	active := idx >= 0
@@ -340,7 +340,7 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	ctx.UpdateControl(id, r, 0)
 
 	// handle click (TODO (port): check if this is correct)
-	clicked := ctx.MousePressed == mouseLeft && ctx.Focus == id
+	clicked := ctx.mousePressed == mouseLeft && ctx.Focus == id
 	v1, v2 := 0, 0
 	if active {
 		v1 = 1
@@ -353,12 +353,12 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	// update pool ref
 	if idx >= 0 {
 		if active {
-			ctx.poolUpdate(ctx.TreeNodePool[:], idx)
+			ctx.poolUpdate(ctx.treeNodePool[:], idx)
 		} else {
-			ctx.TreeNodePool[idx] = PoolItem{}
+			ctx.treeNodePool[idx] = poolItem{}
 		}
 	} else if active {
-		ctx.poolInit(ctx.TreeNodePool[:], id)
+		ctx.poolInit(ctx.treeNodePool[:], id)
 	}
 
 	// draw
@@ -421,8 +421,8 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs imag
 
 		// handle input
 		ctx.UpdateControl(id, base, 0)
-		if ctx.Focus == id && ctx.MouseDown == mouseLeft {
-			cnt.Scroll.Y += ctx.MouseDelta.Y * cs.Y / base.Dy()
+		if ctx.Focus == id && ctx.mouseDown == mouseLeft {
+			cnt.Scroll.Y += ctx.mouseDelta.Y * cs.Y / base.Dy()
 		}
 		// clamp scroll to limits
 		cnt.Scroll.Y = clamp(cnt.Scroll.Y, 0, maxscroll)
@@ -457,8 +457,8 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs im
 
 		// handle input
 		ctx.UpdateControl(id, base, 0)
-		if ctx.Focus == id && ctx.MouseDown == mouseLeft {
-			cnt.Scroll.X += ctx.MouseDelta.X * cs.X / base.Dx()
+		if ctx.Focus == id && ctx.mouseDown == mouseLeft {
+			cnt.Scroll.X += ctx.mouseDelta.X * cs.X / base.Dx()
 		}
 		// clamp scroll to limits
 		cnt.Scroll.X = clamp(cnt.Scroll.X, 0, maxscroll)
@@ -526,7 +526,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	cnt.HeadIdx = ctx.pushJump(-1)
 	// set as hover root if the mouse is overlapping this container and it has a
 	// higher zindex than the current hover root
-	if ctx.MousePos.In(cnt.Rect) && (ctx.NextHoverRoot == nil || cnt.Zindex > ctx.NextHoverRoot.Zindex) {
+	if ctx.mousePos.In(cnt.Rect) && (ctx.NextHoverRoot == nil || cnt.Zindex > ctx.NextHoverRoot.Zindex) {
 		ctx.NextHoverRoot = cnt
 	}
 	// clipping is reset here in case a root-container is made within
@@ -541,7 +541,7 @@ func (ctx *Context) EndRootContainer() {
 	// on initing these are done in mu_end()
 	cnt := ctx.GetCurrentContainer()
 	cnt.TailIdx = ctx.pushJump(-1)
-	ctx.commandList[cnt.HeadIdx].Jump.DstIdx = len(ctx.commandList) //- 1
+	ctx.commandList[cnt.HeadIdx].jump.dstIdx = len(ctx.commandList) //- 1
 	// pop base clip rect and container
 	ctx.PopClipRect()
 	ctx.PopContainer()
@@ -579,8 +579,8 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt int) i
 			id := ctx.GetID([]byte("!title"))
 			ctx.UpdateControl(id, tr, opt)
 			ctx.DrawControlText(title, tr, ColorTitleText, opt)
-			if id == ctx.Focus && ctx.MouseDown == mouseLeft {
-				cnt.Rect = cnt.Rect.Add(ctx.MouseDelta)
+			if id == ctx.Focus && ctx.mouseDown == mouseLeft {
+				cnt.Rect = cnt.Rect.Add(ctx.mouseDelta)
 			}
 			body.Min.Y += tr.Dy()
 		}
@@ -592,7 +592,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt int) i
 			tr.Max.X -= r.Dx()
 			ctx.DrawIcon(IconClose, r, ctx.Style.Colors[ColorTitleText])
 			ctx.UpdateControl(id, r, opt)
-			if ctx.MousePressed == mouseLeft && id == ctx.Focus {
+			if ctx.mousePressed == mouseLeft && id == ctx.Focus {
 				cnt.Open = false
 			}
 		}
@@ -606,9 +606,9 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt int) i
 		id := ctx.GetID([]byte("!resize"))
 		r := image.Rect(rect.Max.X-sz, rect.Max.Y-sz, rect.Max.X, rect.Max.Y)
 		ctx.UpdateControl(id, r, opt)
-		if id == ctx.Focus && ctx.MouseDown == mouseLeft {
-			cnt.Rect.Max.X = cnt.Rect.Min.X + max(96, cnt.Rect.Dx()+ctx.MouseDelta.X)
-			cnt.Rect.Max.Y = cnt.Rect.Min.Y + max(64, cnt.Rect.Dy()+ctx.MouseDelta.Y)
+		if id == ctx.Focus && ctx.mouseDown == mouseLeft {
+			cnt.Rect.Max.X = cnt.Rect.Min.X + max(96, cnt.Rect.Dx()+ctx.mouseDelta.X)
+			cnt.Rect.Max.Y = cnt.Rect.Min.Y + max(64, cnt.Rect.Dy()+ctx.mouseDelta.Y)
 		}
 	}
 
@@ -620,7 +620,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt int) i
 	}
 
 	// close if this is a popup window and elsewhere was clicked
-	if (opt&OptPopup) != 0 && ctx.MousePressed != 0 && ctx.HoverRoot != cnt {
+	if (opt&OptPopup) != 0 && ctx.mousePressed != 0 && ctx.HoverRoot != cnt {
 		cnt.Open = false
 	}
 
@@ -639,7 +639,7 @@ func (ctx *Context) OpenPopup(name string) {
 	ctx.NextHoverRoot = cnt
 	ctx.HoverRoot = ctx.NextHoverRoot
 	// position at mouse cursor, open and bring-to-front
-	cnt.Rect = image.Rect(ctx.MousePos.X, ctx.MousePos.Y, ctx.MousePos.X+1, ctx.MousePos.Y+1)
+	cnt.Rect = image.Rect(ctx.mousePos.X, ctx.mousePos.Y, ctx.mousePos.X+1, ctx.mousePos.Y+1)
 	cnt.Open = true
 	ctx.BringToFront(cnt)
 }

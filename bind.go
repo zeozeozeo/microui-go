@@ -65,26 +65,26 @@ func (c *Context) updateInput() {
 func (c *Context) Draw(screen *ebiten.Image) {
 	target := screen
 	for _, cmd := range c.commandList {
-		switch cmd.Type {
+		switch cmd.typ {
 		case CommandRect:
 			vector.DrawFilledRect(
 				target,
-				float32(cmd.Rect.Rect.Min.X),
-				float32(cmd.Rect.Rect.Min.Y),
-				float32(cmd.Rect.Rect.Dx()),
-				float32(cmd.Rect.Rect.Dy()),
-				cmd.Rect.Color,
+				float32(cmd.rect.rect.Min.X),
+				float32(cmd.rect.rect.Min.Y),
+				float32(cmd.rect.rect.Dx()),
+				float32(cmd.rect.rect.Dy()),
+				cmd.rect.color,
 				false,
 			)
 		case CommandText:
 			geom := ebiten.GeoM{}
 			geom.Translate(
-				float64(cmd.Text.Pos.X),
-				float64(cmd.Text.Pos.Y),
+				float64(cmd.text.pos.X),
+				float64(cmd.text.pos.Y),
 			)
 			cs := ebiten.ColorScale{}
-			cs.ScaleWithColor(cmd.Text.Color)
-			text.Draw(target, cmd.Text.Str, face, &text.DrawOptions{
+			cs.ScaleWithColor(cmd.text.color)
+			text.Draw(target, cmd.text.str, face, &text.DrawOptions{
 				DrawImageOptions: ebiten.DrawImageOptions{
 					GeoM:       geom,
 					ColorScale: cs,
@@ -94,19 +94,19 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			// TODO: Draw icon images.
 			vector.DrawFilledRect(
 				target,
-				float32(cmd.Icon.Rect.Min.X),
-				float32(cmd.Icon.Rect.Min.Y),
-				float32(cmd.Icon.Rect.Dx()),
-				float32(cmd.Icon.Rect.Dy()),
-				cmd.Icon.Color,
+				float32(cmd.icon.rect.Min.X),
+				float32(cmd.icon.rect.Min.Y),
+				float32(cmd.icon.rect.Dx()),
+				float32(cmd.icon.rect.Dy()),
+				cmd.icon.color,
 				false,
 			)
 		case CommandClip:
 			target = screen.SubImage(image.Rect(
-				cmd.Clip.Rect.Min.X,
-				cmd.Clip.Rect.Min.Y,
-				min(cmd.Clip.Rect.Max.X, screen.Bounds().Dx()),
-				min(cmd.Clip.Rect.Max.Y, screen.Bounds().Dy()),
+				cmd.clip.rect.Min.X,
+				cmd.clip.rect.Min.Y,
+				min(cmd.clip.rect.Max.X, screen.Bounds().Dx()),
+				min(cmd.clip.rect.Max.Y, screen.Bounds().Dy()),
 			)).(*ebiten.Image)
 		}
 	}

@@ -145,19 +145,19 @@ func (ctx *Context) GetCurrentContainer() *Container {
 
 func (ctx *Context) getContainer(id ID, opt int) *Container {
 	// try to get existing container from pool
-	idx := ctx.poolGet(ctx.ContainerPool[:], id)
+	idx := ctx.poolGet(ctx.containerPool[:], id)
 	if idx >= 0 {
-		if ctx.Containers[idx].Open || (^opt&OptClosed) != 0 {
-			ctx.poolUpdate(ctx.ContainerPool[:], idx)
+		if ctx.containers[idx].Open || (^opt&OptClosed) != 0 {
+			ctx.poolUpdate(ctx.containerPool[:], idx)
 		}
-		return &ctx.Containers[idx]
+		return &ctx.containers[idx]
 	}
 	if (opt & OptClosed) != 0 {
 		return nil
 	}
 	// container not found in pool: init new container
-	idx = ctx.poolInit(ctx.ContainerPool[:], id)
-	cnt := &ctx.Containers[idx]
+	idx = ctx.poolInit(ctx.containerPool[:], id)
+	cnt := &ctx.containers[idx]
 	*cnt = Container{}
 	cnt.HeadIdx = -1
 	cnt.TailIdx = -1
@@ -200,8 +200,8 @@ func (ctx *Context) Begin() {
 	ctx.ScrollTarget = nil
 	ctx.HoverRoot = ctx.NextHoverRoot
 	ctx.NextHoverRoot = nil
-	ctx.MouseDelta.X = ctx.MousePos.X - ctx.lastMousePos.X
-	ctx.MouseDelta.Y = ctx.MousePos.Y - ctx.lastMousePos.Y
+	ctx.mouseDelta.X = ctx.mousePos.X - ctx.lastMousePos.X
+	ctx.mouseDelta.Y = ctx.mousePos.Y - ctx.lastMousePos.Y
 	ctx.tick++
 }
 
@@ -214,8 +214,8 @@ func (ctx *Context) End() {
 
 	// handle scroll input
 	if ctx.ScrollTarget != nil {
-		ctx.ScrollTarget.Scroll.X += ctx.ScrollDelta.X
-		ctx.ScrollTarget.Scroll.Y += ctx.ScrollDelta.Y
+		ctx.ScrollTarget.Scroll.X += ctx.scrollDelta.X
+		ctx.ScrollTarget.Scroll.Y += ctx.scrollDelta.Y
 	}
 
 	// unset focus if focus id was not touched this frame
@@ -225,18 +225,18 @@ func (ctx *Context) End() {
 	ctx.UpdatedFocus = false
 
 	// bring hover root to front if mouse was pressed
-	if ctx.MousePressed != 0 && ctx.NextHoverRoot != nil &&
+	if ctx.mousePressed != 0 && ctx.NextHoverRoot != nil &&
 		ctx.NextHoverRoot.Zindex < ctx.LastZindex &&
 		ctx.NextHoverRoot.Zindex >= 0 {
 		ctx.BringToFront(ctx.NextHoverRoot)
 	}
 
 	// reset input state
-	ctx.KeyPressed = 0
-	ctx.TextInput = nil
-	ctx.MousePressed = 0
-	ctx.ScrollDelta = image.Pt(0, 0)
-	ctx.lastMousePos = ctx.MousePos
+	ctx.keyPressed = 0
+	ctx.textInput = nil
+	ctx.mousePressed = 0
+	ctx.scrollDelta = image.Pt(0, 0)
+	ctx.lastMousePos = ctx.mousePos
 
 	// sort root containers by zindex
 	sort.SliceStable(ctx.RootList, func(i, j int) bool {
@@ -250,16 +250,16 @@ func (ctx *Context) End() {
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
 			cmd := ctx.commandList[0]
-			expect(cmd.Type == CommandJump)
-			cmd.Jump.DstIdx = cnt.HeadIdx + 1
-			expect(cmd.Jump.DstIdx < commandListSize)
+			expect(cmd.typ == CommandJump)
+			cmd.jump.dstIdx = cnt.HeadIdx + 1
+			expect(cmd.jump.dstIdx < commandListSize)
 		} else {
 			prev := ctx.RootList[i-1]
-			ctx.commandList[prev.TailIdx].Jump.DstIdx = cnt.HeadIdx + 1
+			ctx.commandList[prev.TailIdx].jump.dstIdx = cnt.HeadIdx + 1
 		}
 		// make the last container's tail jump to the end of command list
 		if i == len(ctx.RootList)-1 {
-			ctx.commandList[cnt.TailIdx].Jump.DstIdx = len(ctx.commandList)
+			ctx.commandList[cnt.TailIdx].jump.dstIdx = len(ctx.commandList)
 		}
 	}
 }

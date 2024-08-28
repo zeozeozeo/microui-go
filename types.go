@@ -10,46 +10,41 @@ import (
 
 type ID uintptr
 
-type PoolItem struct {
-	ID         ID
-	LastUpdate int
+type poolItem struct {
+	id         ID
+	lastUpdate int
 }
 
 type baseCommand struct {
-	Type int
+	typ int
 }
 
 type jumpCommand struct {
-	Base   baseCommand
-	DstIdx int
+	dstIdx int
 }
 
 type clipCommand struct {
-	Base baseCommand
-	Rect image.Rectangle
+	rect image.Rectangle
 }
 
 type rectCommand struct {
-	Base  baseCommand
-	Rect  image.Rectangle
-	Color color.Color
+	rect  image.Rectangle
+	color color.Color
 }
 
 type Font interface{} // Font is interface{}, microui does not manage fonts
 
 type textCommand struct {
-	Base  baseCommand
-	Font  Font
-	Pos   image.Point
-	Color color.Color
-	Str   string
+	font  Font
+	pos   image.Point
+	color color.Color
+	str   string
 }
 
 type iconCommand struct {
-	Base  baseCommand
-	Rect  image.Rectangle
-	ID    int
-	Color color.Color
+	rect  image.Rectangle
+	id    int
+	color color.Color
 }
 
 type Layout struct {
@@ -67,14 +62,14 @@ type Layout struct {
 }
 
 type command struct {
-	Type int
-	Idx  int
-	Base baseCommand // type 0 (TODO)
-	Jump jumpCommand // type 1
-	Clip clipCommand // type 2
-	Rect rectCommand // type 3
-	Text textCommand // type 4
-	Icon iconCommand // type 5
+	typ  int
+	idx  int
+	base baseCommand // type 0 (TODO)
+	jump jumpCommand // type 1
+	clip clipCommand // type 2
+	rect rectCommand // type 3
+	text textCommand // type 4
+	icon iconCommand // type 5
 }
 
 type Container struct {
@@ -134,19 +129,19 @@ type Context struct {
 
 	// retained state pools
 
-	ContainerPool [containerPoolSize]PoolItem
-	Containers    [containerPoolSize]Container
-	TreeNodePool  [treeNodePoolSize]PoolItem
+	containerPool [containerPoolSize]poolItem
+	containers    [containerPoolSize]Container
+	treeNodePool  [treeNodePoolSize]poolItem
 
 	// input state
 
-	MousePos     image.Point
+	mousePos     image.Point
 	lastMousePos image.Point
-	MouseDelta   image.Point
-	ScrollDelta  image.Point
-	MouseDown    int
-	MousePressed int
-	KeyDown      int
-	KeyPressed   int
-	TextInput    []rune
+	mouseDelta   image.Point
+	scrollDelta  image.Point
+	mouseDown    int
+	mousePressed int
+	keyDown      int
+	keyPressed   int
+	textInput    []rune
 }

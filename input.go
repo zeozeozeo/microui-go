@@ -14,7 +14,7 @@ import (
 **============================================================================*/
 
 func (ctx *Context) inputMouseMove(x, y int) {
-	ctx.MousePos = image.Pt(x, y)
+	ctx.mousePos = image.Pt(x, y)
 }
 
 func mouseButtonToInt(btn ebiten.MouseButton) int {
@@ -31,18 +31,18 @@ func mouseButtonToInt(btn ebiten.MouseButton) int {
 
 func (ctx *Context) inputMouseDown(x, y int, btn ebiten.MouseButton) {
 	ctx.inputMouseMove(x, y)
-	ctx.MouseDown |= mouseButtonToInt(btn)
-	ctx.MousePressed |= mouseButtonToInt(btn)
+	ctx.mouseDown |= mouseButtonToInt(btn)
+	ctx.mousePressed |= mouseButtonToInt(btn)
 }
 
 func (ctx *Context) inputMouseUp(x, y int, btn ebiten.MouseButton) {
 	ctx.inputMouseMove(x, y)
-	ctx.MouseDown &= ^mouseButtonToInt(btn)
+	ctx.mouseDown &= ^mouseButtonToInt(btn)
 }
 
 func (ctx *Context) inputScroll(x, y int) {
-	ctx.ScrollDelta.X += x
-	ctx.ScrollDelta.Y += y
+	ctx.scrollDelta.X += x
+	ctx.scrollDelta.Y += y
 }
 
 func keyToInt(key ebiten.Key) int {
@@ -62,14 +62,14 @@ func keyToInt(key ebiten.Key) int {
 }
 
 func (ctx *Context) inputKeyDown(key ebiten.Key) {
-	ctx.KeyPressed |= keyToInt(key)
-	ctx.KeyDown |= keyToInt(key)
+	ctx.keyPressed |= keyToInt(key)
+	ctx.keyDown |= keyToInt(key)
 }
 
 func (ctx *Context) inputKeyUp(key ebiten.Key) {
-	ctx.KeyDown &= ^keyToInt(key)
+	ctx.keyDown &= ^keyToInt(key)
 }
 
 func (ctx *Context) inputText(text []rune) {
-	ctx.TextInput = text
+	ctx.textInput = text
 }
