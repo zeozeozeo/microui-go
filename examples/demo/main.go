@@ -136,7 +136,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	target := screen
 	for _, cmd := range g.commands {
 		switch cmd.Type {
-		case microui.MU_COMMAND_RECT:
+		case microui.CommandRect:
 			vector.DrawFilledRect(
 				target,
 				float32(cmd.Rect.Rect.X),
@@ -146,7 +146,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				cmd.Rect.Color,
 				false,
 			)
-		case microui.MU_COMMAND_TEXT:
+		case microui.CommandText:
 			geom := ebiten.GeoM{}
 			geom.Translate(
 				float64(cmd.Text.Pos.X),
@@ -160,7 +160,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 					ColorScale: cs,
 				},
 			})
-		case microui.MU_COMMAND_ICON:
+		case microui.CommandIcon:
 			vector.DrawFilledRect(
 				target,
 				float32(cmd.Icon.Rect.X),
@@ -170,7 +170,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				cmd.Icon.Color,
 				false,
 			)
-		case microui.MU_COMMAND_CLIP:
+		case microui.CommandClip:
 			target = screen.SubImage(image.Rect(
 				cmd.Clip.Rect.X,
 				cmd.Clip.Rect.Y,

@@ -101,7 +101,7 @@ type Style struct {
 	TitleHeight   int
 	ScrollbarSize int
 	ThumbSize     int
-	Colors        [MU_COLOR_MAX]color.RGBA
+	Colors        [ColorMax]color.RGBA
 }
 
 type Context struct {

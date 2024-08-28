@@ -130,13 +130,13 @@ func (ctx *Context) CheckClip(r Rect) int {
 	cr := ctx.GetClipRect()
 	if r.X > cr.X+cr.W || r.X+r.W < cr.X ||
 		r.Y > cr.Y+cr.H || r.Y+r.H < cr.Y {
-		return MU_CLIP_ALL
+		return ClipAll
 	}
 	if r.X >= cr.X && r.X+r.W <= cr.X+cr.W &&
 		r.Y >= cr.Y && r.Y+r.H <= cr.Y+cr.H {
 		return 0
 	}
-	return MU_CLIP_PART
+	return ClipPart
 }
 
 func (ctx *Context) GetLayout() *Layout {
@@ -168,12 +168,12 @@ func (ctx *Context) getContainer(id mu_Id, opt int) *Container {
 	// try to get existing container from pool
 	idx := ctx.PoolGet(ctx.ContainerPool[:], id)
 	if idx >= 0 {
-		if ctx.Containers[idx].Open || (^opt&MU_OPT_CLOSED) != 0 {
+		if ctx.Containers[idx].Open || (^opt&OptClosed) != 0 {
 			ctx.PoolUpdate(ctx.ContainerPool[:], idx)
 		}
 		return &ctx.Containers[idx]
 	}
-	if (opt & MU_OPT_CLOSED) != 0 {
+	if (opt & OptClosed) != 0 {
 		return nil
 	}
 	// container not found in pool: init new container
@@ -259,7 +259,7 @@ func (ctx *Context) End() {
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
 			cmd := ctx.CommandList[0]
-			expect(cmd.Type == MU_COMMAND_JUMP)
+			expect(cmd.Type == CommandJump)
 			cmd.Jump.DstIdx = cnt.HeadIdx + 1
 			expect(cmd.Jump.DstIdx < MU_COMMANDLIST_SIZE)
 		} else {

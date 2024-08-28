@@ -4,7 +4,7 @@
 package microui
 
 func (ctx *Context) Button(label string) bool {
-	return ctx.ButtonEx(label, 0, MU_OPT_ALIGNCENTER) != 0
+	return ctx.ButtonEx(label, 0, OptAlignCenter) != 0
 }
 
 func (ctx *Context) TextBox(buf *string) int {
@@ -12,11 +12,11 @@ func (ctx *Context) TextBox(buf *string) int {
 }
 
 func (ctx *Context) Slider(value *float32, lo, hi float32) int {
-	return ctx.SliderEx(value, lo, hi, 0, MU_SLIDER_FMT, MU_OPT_ALIGNCENTER)
+	return ctx.SliderEx(value, lo, hi, 0, MU_SLIDER_FMT, OptAlignCenter)
 }
 
 func (ctx *Context) Number(value *float32, step float32) int {
-	return ctx.NumberEx(value, step, MU_SLIDER_FMT, MU_OPT_ALIGNCENTER)
+	return ctx.NumberEx(value, step, MU_SLIDER_FMT, OptAlignCenter)
 }
 
 func (ctx *Context) Header(label string) bool {

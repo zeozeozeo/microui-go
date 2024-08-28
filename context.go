@@ -5,15 +5,15 @@ package microui
 
 func drawFrame(ctx *Context, rect Rect, colorid int) {
 	ctx.DrawRect(rect, ctx.Style.Colors[colorid])
-	if colorid == MU_COLOR_SCROLLBASE ||
-		colorid == MU_COLOR_SCROLLTHUMB ||
-		colorid == MU_COLOR_TITLEBG {
+	if colorid == ColorScrollBase ||
+		colorid == ColorScrollThumb ||
+		colorid == ColorTitleBG {
 		return
 	}
 
 	// draw border
-	if ctx.Style.Colors[MU_COLOR_BORDER].A != 0 {
-		ctx.DrawBox(expand_rect(rect, 1), ctx.Style.Colors[MU_COLOR_BORDER])
+	if ctx.Style.Colors[ColorBorder].A != 0 {
+		ctx.DrawBox(expand_rect(rect, 1), ctx.Style.Colors[ColorBorder])
 	}
 }
 

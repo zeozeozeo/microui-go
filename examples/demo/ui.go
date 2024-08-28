@@ -59,7 +59,7 @@ func TestWindow(ctx *microui.Context) {
 		}
 
 		/* labels + buttons */
-		if ctx.HeaderEx("Test Buttons", microui.MU_OPT_EXPANDED) != 0 {
+		if ctx.HeaderEx("Test Buttons", microui.OptExpanded) != 0 {
 			ctx.LayoutRow(3, []int{86, -110, -1}, 0)
 			ctx.Label("Test buttons 1:")
 			if ctx.Button("Button 1") {
@@ -83,7 +83,7 @@ func TestWindow(ctx *microui.Context) {
 		}
 
 		/* tree */
-		if ctx.HeaderEx("Tree and Text", microui.MU_OPT_EXPANDED) != 0 {
+		if ctx.HeaderEx("Tree and Text", microui.OptExpanded) != 0 {
 			ctx.LayoutRow(2, []int{140, -1}, 0)
 			ctx.LayoutBeginColumn()
 			if ctx.BeginTreeNode("Test 1") {
@@ -136,7 +136,7 @@ func TestWindow(ctx *microui.Context) {
 		}
 
 		/* background color sliders */
-		if ctx.HeaderEx("Background Color", microui.MU_OPT_EXPANDED) != 0 {
+		if ctx.HeaderEx("Background Color", microui.OptExpanded) != 0 {
 			ctx.LayoutRow(2, []int{-78, -1}, 74)
 			/* sliders */
 			ctx.LayoutBeginColumn()
@@ -152,7 +152,7 @@ func TestWindow(ctx *microui.Context) {
 			r := ctx.LayoutNext()
 			ctx.DrawRect(r, color.RGBA{byte(bg[0]), byte(bg[1]), byte(bg[2]), 255})
 			clr := fmt.Sprintf("#%02X%02X%02X", int(bg[0]), int(bg[1]), int(bg[2]))
-			ctx.DrawControlText(clr, r, microui.MU_COLOR_TEXT, microui.MU_OPT_ALIGNCENTER)
+			ctx.DrawControlText(clr, r, microui.ColorText, microui.OptAlignCenter)
 		}
 	}
 }
@@ -175,7 +175,7 @@ func LogWindow(ctx *microui.Context) {
 		/* input textbox + submit button */
 		var submitted bool
 		ctx.LayoutRow(2, []int{-70, -1}, 0)
-		if ctx.TextBox(&logSubmitBuf)&microui.MU_RES_SUBMIT != 0 {
+		if ctx.TextBox(&logSubmitBuf)&microui.ResSubmit != 0 {
 			ctx.SetFocus(ctx.LastID)
 			submitted = true
 		}
@@ -192,7 +192,7 @@ func LogWindow(ctx *microui.Context) {
 func uint8Slider(ctx *microui.Context, fvalue *float32, value *uint8, low, high uint8) int {
 	*fvalue = float32(*value)
 	ctx.PushID(microui.PtrToBytes(unsafe.Pointer(fvalue)))
-	res := ctx.SliderEx(fvalue, float32(low), float32(high), 0, "%.0f", microui.MU_OPT_ALIGNCENTER)
+	res := ctx.SliderEx(fvalue, float32(low), float32(high), 0, "%.0f", microui.OptAlignCenter)
 	*value = uint8(*fvalue)
 	ctx.PopID()
 
@@ -207,20 +207,20 @@ var (
 		Label   string
 		ColorID int
 	}{
-		{"text:", microui.MU_COLOR_TEXT},
-		{"border:", microui.MU_COLOR_BORDER},
-		{"windowbg:", microui.MU_COLOR_WINDOWBG},
-		{"titlebg:", microui.MU_COLOR_TITLEBG},
-		{"titletext:", microui.MU_COLOR_TITLETEXT},
-		{"panelbg:", microui.MU_COLOR_PANELBG},
-		{"button:", microui.MU_COLOR_BUTTON},
-		{"buttonhover:", microui.MU_COLOR_BUTTONHOVER},
-		{"buttonfocus:", microui.MU_COLOR_BUTTONFOCUS},
-		{"base:", microui.MU_COLOR_BASE},
-		{"basehover:", microui.MU_COLOR_BASEHOVER},
-		{"basefocus:", microui.MU_COLOR_BASEFOCUS},
-		{"scrollbase:", microui.MU_COLOR_SCROLLBASE},
-		{"scrollthumb:", microui.MU_COLOR_SCROLLTHUMB},
+		{"text:", microui.ColorText},
+		{"border:", microui.ColorBorder},
+		{"windowbg:", microui.ColorWindowBG},
+		{"titlebg:", microui.ColorTitleBG},
+		{"titletext:", microui.ColorTitleText},
+		{"panelbg:", microui.ColorPanelBG},
+		{"button:", microui.ColorButton},
+		{"buttonhover:", microui.ColorButtonHover},
+		{"buttonfocus:", microui.ColorButtonFocus},
+		{"base:", microui.ColorBase},
+		{"basehover:", microui.ColorBaseHover},
+		{"basefocus:", microui.ColorBaseFocus},
+		{"scrollbase:", microui.ColorScrollBase},
+		{"scrollthumb:", microui.ColorScrollThumb},
 	}
 )
 

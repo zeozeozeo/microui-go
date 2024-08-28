@@ -63,9 +63,9 @@ func (ctx *Context) LayoutSetNext(r Rect, relative bool) {
 	layout := ctx.GetLayout()
 	layout.Next = r
 	if relative {
-		layout.NextType = RELATIVE
+		layout.NextType = Relative
 	} else {
-		layout.NextType = ABSOLUTE
+		layout.NextType = Absolute
 	}
 }
 
@@ -80,7 +80,7 @@ func (ctx *Context) LayoutNext() Rect {
 		layout.NextType = 0
 		res = layout.Next
 
-		if next_type == ABSOLUTE {
+		if next_type == Absolute {
 			ctx.LastRect = res
 			return ctx.LastRect
 		}

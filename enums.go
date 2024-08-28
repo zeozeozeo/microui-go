@@ -4,65 +4,63 @@
 package microui
 
 const (
-	MU_CLIP_PART = 1 + iota
-	MU_CLIP_ALL
+	ClipPart = 1 + iota
+	ClipAll
 )
 
 const (
-	MU_COMMAND_JUMP = 1 + iota
-	MU_COMMAND_CLIP
-	MU_COMMAND_RECT
-	MU_COMMAND_TEXT
-	MU_COMMAND_ICON
-	MU_COMMAND_MAX
+	CommandJump = 1 + iota
+	CommandClip
+	CommandRect
+	CommandText
+	CommandIcon
 )
 
 const (
-	MU_COLOR_TEXT = iota
-	MU_COLOR_BORDER
-	MU_COLOR_WINDOWBG
-	MU_COLOR_TITLEBG
-	MU_COLOR_TITLETEXT
-	MU_COLOR_PANELBG
-	MU_COLOR_BUTTON
-	MU_COLOR_BUTTONHOVER
-	MU_COLOR_BUTTONFOCUS
-	MU_COLOR_BASE
-	MU_COLOR_BASEHOVER
-	MU_COLOR_BASEFOCUS
-	MU_COLOR_SCROLLBASE
-	MU_COLOR_SCROLLTHUMB
-	MU_COLOR_MAX
+	ColorText = iota
+	ColorBorder
+	ColorWindowBG
+	ColorTitleBG
+	ColorTitleText
+	ColorPanelBG
+	ColorButton
+	ColorButtonHover
+	ColorButtonFocus
+	ColorBase
+	ColorBaseHover
+	ColorBaseFocus
+	ColorScrollBase
+	ColorScrollThumb
+	ColorMax = ColorScrollThumb
 )
 
 const (
-	MU_ICON_CLOSE = 1 + iota
-	MU_ICON_CHECK
-	MU_ICON_COLLAPSED
-	MU_ICON_EXPANDED
-	MU_ICON_MAX
+	IconClose = 1 + iota
+	IconCheck
+	IconCollapsed
+	IconExpanded
 )
 
 const (
-	MU_RES_ACTIVE = (1 << 0)
-	MU_RES_SUBMIT = (1 << 1)
-	MU_RES_CHANGE = (1 << 2)
+	ResActive = (1 << 0)
+	ResSubmit = (1 << 1)
+	ResChange = (1 << 2)
 )
 
 const (
-	MU_OPT_ALIGNCENTER = (1 << 0)
-	MU_OPT_ALIGNRIGHT  = (1 << 1)
-	MU_OPT_NOINTERACT  = (1 << 2)
-	MU_OPT_NOFRAME     = (1 << 3)
-	MU_OPT_NORESIZE    = (1 << 4)
-	MU_OPT_NOSCROLL    = (1 << 5)
-	MU_OPT_NOCLOSE     = (1 << 6)
-	MU_OPT_NOTITLE     = (1 << 7)
-	MU_OPT_HOLDFOCUS   = (1 << 8)
-	MU_OPT_AUTOSIZE    = (1 << 9)
-	MU_OPT_POPUP       = (1 << 10)
-	MU_OPT_CLOSED      = (1 << 11)
-	MU_OPT_EXPANDED    = (1 << 12)
+	OptAlignCenter = (1 << 0)
+	OptAlignRight  = (1 << 1)
+	OptNoInteract  = (1 << 2)
+	OptNoFrame     = (1 << 3)
+	OptNoResize    = (1 << 4)
+	OptNoScroll    = (1 << 5)
+	OptNoClose     = (1 << 6)
+	OptNoTitle     = (1 << 7)
+	OptHoldFocus   = (1 << 8)
+	OptAutoSize    = (1 << 9)
+	OptPopup       = (1 << 10)
+	OptClosed      = (1 << 11)
+	OptExpanded    = (1 << 12)
 )
 
 const (
@@ -80,6 +78,6 @@ const (
 )
 
 const (
-	RELATIVE = 1 + iota
-	ABSOLUTE
+	Relative = 1 + iota
+	Absolute
 )
