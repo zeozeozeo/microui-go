@@ -100,23 +100,10 @@ func (g *Game) Update() error {
 		g.ctx.InputMouseUp(cx, cy, ebiten.MouseButtonRight)
 	}
 	for _, k := range []ebiten.Key{ebiten.KeyAlt, ebiten.KeyBackspace, ebiten.KeyControl, ebiten.KeyEnter, ebiten.KeyShift} {
-		var mk int
-		switch k {
-		case ebiten.KeyAlt:
-			mk = microui.MU_KEY_ALT
-		case ebiten.KeyBackspace:
-			mk = microui.MU_KEY_BACKSPACE
-		case ebiten.KeyControl:
-			mk = microui.MU_KEY_CTRL
-		case ebiten.KeyEnter:
-			mk = microui.MU_KEY_RETURN
-		case ebiten.KeyShift:
-			mk = microui.MU_KEY_SHIFT
-		}
 		if inpututil.IsKeyJustPressed(k) {
-			g.ctx.InputKeyDown(mk)
+			g.ctx.InputKeyDown(k)
 		} else if inpututil.IsKeyJustReleased(k) {
-			g.ctx.InputKeyUp(mk)
+			g.ctx.InputKeyUp(k)
 		}
 	}
 

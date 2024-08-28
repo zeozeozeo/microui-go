@@ -45,13 +45,29 @@ func (ctx *Context) InputScroll(x, y int) {
 	ctx.ScrollDelta.Y += y
 }
 
-func (ctx *Context) InputKeyDown(key int) {
-	ctx.KeyPressed |= key
-	ctx.KeyDown |= key
+func keyToInt(key ebiten.Key) int {
+	switch key {
+	case ebiten.KeyShift:
+		return keyShift
+	case ebiten.KeyControl:
+		return keyControl
+	case ebiten.KeyAlt:
+		return keyAlt
+	case ebiten.KeyBackspace:
+		return keyBackspace
+	case ebiten.KeyEnter:
+		return keyReturn
+	}
+	return 0
 }
 
-func (ctx *Context) InputKeyUp(key int) {
-	ctx.KeyDown &= ^key
+func (ctx *Context) InputKeyDown(key ebiten.Key) {
+	ctx.KeyPressed |= keyToInt(key)
+	ctx.KeyDown |= keyToInt(key)
+}
+
+func (ctx *Context) InputKeyUp(key ebiten.Key) {
+	ctx.KeyDown &= ^keyToInt(key)
 }
 
 func (ctx *Context) InputText(text []rune) {

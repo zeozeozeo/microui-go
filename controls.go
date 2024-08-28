@@ -192,12 +192,12 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 			res |= ResChange
 		}
 		// handle backspace
-		if (ctx.KeyPressed&MU_KEY_BACKSPACE) != 0 && buflen > 0 {
+		if (ctx.KeyPressed&keyBackspace) != 0 && buflen > 0 {
 			*buf = (*buf)[:buflen-1]
 			res |= ResChange
 		}
 		// handle return
-		if (ctx.KeyPressed & MU_KEY_RETURN) != 0 {
+		if (ctx.KeyPressed & keyReturn) != 0 {
 			ctx.SetFocus(0)
 			res |= ResSubmit
 		}
@@ -225,7 +225,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 }
 
 func (ctx *Context) NumberTextBox(value *float32, r Rect, id mu_Id) bool {
-	if ctx.MousePressed == mouseLeft && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
+	if ctx.MousePressed == mouseLeft && (ctx.KeyDown&keyShift) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
 		ctx.NumberEditBuf = fmt.Sprintf(MU_REAL_FMT, *value)
