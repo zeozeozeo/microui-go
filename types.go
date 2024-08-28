@@ -16,10 +16,6 @@ type muRect struct {
 	X, Y, W, H int
 }
 
-func newMuRect(x, y, w, h int) muRect {
-	return muRect{x, y, w, h}
-}
-
 func rectFromRectangle(r image.Rectangle) muRect {
 	return muRect{r.Min.X, r.Min.Y, r.Dx(), r.Dy()}
 }
