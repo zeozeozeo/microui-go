@@ -55,7 +55,3 @@ var defaultStyle Style = Style{
 var (
 	unclippedRect = Rect{0, 0, 0x1000000, 0x1000000}
 )
-
-const (
-	HASH_INITIAL = 2166136261 // 32bit fnv-1a hash
-)
