@@ -62,7 +62,7 @@ type Layout struct {
 	Position  image.Point
 	Size      image.Point
 	Max       image.Point
-	Widths    [MU_MAX_WIDTHS]int
+	Widths    [maxWidths]int
 	Items     int
 	ItemIndex int
 	NextRow   int
@@ -139,9 +139,9 @@ type Context struct {
 
 	// retained state pools
 
-	ContainerPool [MU_CONTAINERPOOL_SIZE]MuPoolItem
-	Containers    [MU_CONTAINERPOOL_SIZE]Container
-	TreeNodePool  [MU_TREENODEPOOL_SIZE]MuPoolItem
+	ContainerPool [containerPoolSize]MuPoolItem
+	Containers    [containerPoolSize]Container
+	TreeNodePool  [treeNodePoolSize]MuPoolItem
 
 	// input state
 

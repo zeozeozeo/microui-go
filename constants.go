@@ -8,27 +8,24 @@ import (
 	"image/color"
 )
 
-const MU_VERSION = "2.01"
-
 const (
-	MU_COMMANDLIST_SIZE    = 256 * 1024
-	MU_ROOTLIST_SIZE       = 32
-	MU_CONTAINERSTACK_SIZE = 32
-	MU_CLIPSTACK_SIZE      = 32
-	MU_IDSTACK_SIZE        = 32
-	MU_LAYOUTSTACK_SIZE    = 16
-	MU_CONTAINERPOOL_SIZE  = 48
-	MU_TREENODEPOOL_SIZE   = 48
-	MU_MAX_WIDTHS          = 16
+	commandListSize    = 256 * 1024
+	rootListSize       = 32
+	containerStackSize = 32
+	clipStackSize      = 32
+	idStackSize        = 32
+	layoutStackSize    = 16
+	containerPoolSize  = 48
+	treeNodePoolSize   = 48
+	maxWidths          = 16
 )
 
 const (
-	MU_REAL_FMT   = "%.3g"
-	MU_SLIDER_FMT = "%.2f"
-	MU_MAX_FMT    = 127
+	realFmt   = "%.3g"
+	sliderFmt = "%.2f"
 )
 
-var default_style Style = Style{
+var defaultStyle Style = Style{
 	Font:          nil,
 	Size:          image.Pt(68, 10),
 	Padding:       5,
@@ -56,7 +53,7 @@ var default_style Style = Style{
 }
 
 var (
-	UnclippedRect = Rect{0, 0, 0x1000000, 0x1000000}
+	unclippedRect = Rect{0, 0, 0x1000000, 0x1000000}
 )
 
 const (

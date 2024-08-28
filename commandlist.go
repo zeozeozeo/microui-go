@@ -95,7 +95,7 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color
 	cmd.Text.Font = font
 	// reset clipping if it was set
 	if clipped != 0 {
-		ctx.SetClip(UnclippedRect)
+		ctx.SetClip(unclippedRect)
 	}
 }
 
@@ -115,6 +115,6 @@ func (ctx *Context) DrawIcon(id int, rect Rect, color color.Color) {
 	cmd.Icon.Color = color
 	// reset clipping if it was set
 	if clipped != 0 {
-		ctx.SetClip(UnclippedRect)
+		ctx.SetClip(unclippedRect)
 	}
 }

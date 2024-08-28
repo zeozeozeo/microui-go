@@ -228,7 +228,7 @@ func (ctx *Context) NumberTextBox(value *float32, r Rect, id mu_Id) bool {
 	if ctx.MousePressed == mouseLeft && (ctx.KeyDown&keyShift) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
-		ctx.NumberEditBuf = fmt.Sprintf(MU_REAL_FMT, *value)
+		ctx.NumberEditBuf = fmt.Sprintf(realFmt, *value)
 	}
 	if ctx.NumberEdit == id {
 		res := ctx.TextboxRaw(&ctx.NumberEditBuf, id, r, 0)
@@ -541,7 +541,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	// another root-containers's begin/end block; this prevents the inner
 	// root-container being clipped to the outer
 	// push()
-	ctx.ClipStack = append(ctx.ClipStack, UnclippedRect)
+	ctx.ClipStack = append(ctx.ClipStack, unclippedRect)
 }
 
 func (ctx *Context) EndRootContainer() {

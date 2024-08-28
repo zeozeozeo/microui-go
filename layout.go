@@ -40,7 +40,7 @@ func (ctx *Context) LayoutEndColumn() {
 func (ctx *Context) LayoutRow(items int, widths []int, height int) {
 	layout := ctx.GetLayout()
 
-	expect(len(widths) <= MU_MAX_WIDTHS)
+	expect(len(widths) <= maxWidths)
 	copy(layout.Widths[:], widths)
 
 	layout.Items = items

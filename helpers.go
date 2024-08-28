@@ -261,7 +261,7 @@ func (ctx *Context) End() {
 			cmd := ctx.CommandList[0]
 			expect(cmd.Type == CommandJump)
 			cmd.Jump.DstIdx = cnt.HeadIdx + 1
-			expect(cmd.Jump.DstIdx < MU_COMMANDLIST_SIZE)
+			expect(cmd.Jump.DstIdx < commandListSize)
 		} else {
 			prev := ctx.RootList[i-1]
 			ctx.CommandList[prev.TailIdx].Jump.DstIdx = cnt.HeadIdx + 1

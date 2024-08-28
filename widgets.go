@@ -12,11 +12,11 @@ func (ctx *Context) TextBox(buf *string) int {
 }
 
 func (ctx *Context) Slider(value *float32, lo, hi float32) int {
-	return ctx.SliderEx(value, lo, hi, 0, MU_SLIDER_FMT, OptAlignCenter)
+	return ctx.SliderEx(value, lo, hi, 0, sliderFmt, OptAlignCenter)
 }
 
 func (ctx *Context) Number(value *float32, step float32) int {
-	return ctx.NumberEx(value, step, MU_SLIDER_FMT, OptAlignCenter)
+	return ctx.NumberEx(value, step, sliderFmt, OptAlignCenter)
 }
 
 func (ctx *Context) Header(label string) bool {

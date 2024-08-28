@@ -19,7 +19,7 @@ func drawFrame(ctx *Context, rect Rect, colorid int) {
 
 func initContext(ctx *Context) {
 	ctx.DrawFrame = drawFrame
-	ctx._style = default_style
+	ctx._style = defaultStyle
 	ctx.Style = &ctx._style
 }
 
