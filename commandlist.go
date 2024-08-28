@@ -35,7 +35,7 @@ func (ctx *Context) nextCommand(cmd **command) bool {
 	}
 
 	for (*cmd).idx < len(ctx.commandList) {
-		if (*cmd).typ != CommandJump {
+		if (*cmd).typ != commandJump {
 			return true
 		}
 		idx := (*cmd).jump.dstIdx
@@ -49,14 +49,14 @@ func (ctx *Context) nextCommand(cmd **command) bool {
 
 // pushes a new jump command to command_list
 func (ctx *Context) pushJump(dstIdx int) int {
-	cmd := ctx.pushCommand(CommandJump)
+	cmd := ctx.pushCommand(commandJump)
 	cmd.jump.dstIdx = dstIdx
 	return len(ctx.commandList) - 1
 }
 
 // pushes a new clip command
 func (ctx *Context) SetClip(rect image.Rectangle) {
-	cmd := ctx.pushCommand(CommandClip)
+	cmd := ctx.pushCommand(commandClip)
 	cmd.clip.rect = rect
 }
 
@@ -64,7 +64,7 @@ func (ctx *Context) SetClip(rect image.Rectangle) {
 func (ctx *Context) DrawRect(rect image.Rectangle, color color.Color) {
 	rect2 := rect.Intersect(ctx.GetClipRect())
 	if rect2.Dx() > 0 && rect2.Dy() > 0 {
-		cmd := ctx.pushCommand(CommandRect)
+		cmd := ctx.pushCommand(commandRect)
 		cmd.rect.rect = rect2
 		cmd.rect.color = color
 	}
@@ -87,7 +87,7 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color
 		ctx.SetClip(ctx.GetClipRect())
 	}
 	// add command
-	cmd := ctx.pushCommand(CommandText)
+	cmd := ctx.pushCommand(commandText)
 	cmd.text.str = str
 	cmd.text.pos = pos
 	cmd.text.color = color
@@ -108,7 +108,7 @@ func (ctx *Context) DrawIcon(icon Icon, rect image.Rectangle, color color.Color)
 		ctx.SetClip(ctx.GetClipRect())
 	}
 	// do icon command
-	cmd := ctx.pushCommand(CommandIcon)
+	cmd := ctx.pushCommand(commandIcon)
 	cmd.icon.icon = icon
 	cmd.icon.rect = rect
 	cmd.icon.color = color

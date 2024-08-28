@@ -250,7 +250,7 @@ func (ctx *Context) End() {
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
 			cmd := ctx.commandList[0]
-			expect(cmd.typ == CommandJump)
+			expect(cmd.typ == commandJump)
 			cmd.jump.dstIdx = cnt.HeadIdx + 1
 			expect(cmd.jump.dstIdx < commandListSize)
 		} else {

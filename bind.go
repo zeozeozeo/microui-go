@@ -107,7 +107,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 	var cmd *command
 	for c.nextCommand(&cmd) {
 		switch cmd.typ {
-		case CommandRect:
+		case commandRect:
 			vector.DrawFilledRect(
 				target,
 				float32(cmd.rect.rect.Min.X),
@@ -117,7 +117,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 				cmd.rect.color,
 				false,
 			)
-		case CommandText:
+		case commandText:
 			op := &text.DrawOptions{}
 			op.GeoM.Translate(
 				float64(cmd.text.pos.X),
@@ -125,7 +125,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			)
 			op.ColorScale.ScaleWithColor(cmd.text.color)
 			text.Draw(target, cmd.text.str, face, op)
-		case CommandIcon:
+		case commandIcon:
 			img := iconImage(cmd.icon.icon)
 			if img == nil {
 				continue
@@ -136,7 +136,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			op.GeoM.Translate(float64(x), float64(y))
 			op.ColorScale.ScaleWithColor(cmd.icon.color)
 			screen.DrawImage(img, op)
-		case CommandClip:
+		case commandClip:
 			target = screen.SubImage(image.Rect(
 				cmd.clip.rect.Min.X,
 				cmd.clip.rect.Min.Y,

@@ -9,11 +9,11 @@ const (
 )
 
 const (
-	CommandJump = 1 + iota
-	CommandClip
-	CommandRect
-	CommandText
-	CommandIcon
+	commandJump = 1 + iota
+	commandClip
+	commandRect
+	commandText
+	commandIcon
 )
 
 const (
