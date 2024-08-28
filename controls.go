@@ -570,26 +570,26 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt int) i
 
 	// do title bar
 	if (^opt & OptNoTitle) != 0 {
-		tr := rectFromRectangle(rect)
-		tr.H = ctx.Style.TitleHeight
-		ctx.DrawFrame(ctx, tr.rectangle(), ColorTitleBG)
+		tr := rect
+		tr.Max.Y = tr.Min.Y + ctx.Style.TitleHeight
+		ctx.DrawFrame(ctx, tr, ColorTitleBG)
 
 		// do title text
 		if (^opt & OptNoTitle) != 0 {
 			id := ctx.GetID([]byte("!title"))
-			ctx.UpdateControl(id, tr.rectangle(), opt)
-			ctx.DrawControlText(title, tr.rectangle(), ColorTitleText, opt)
+			ctx.UpdateControl(id, tr, opt)
+			ctx.DrawControlText(title, tr, ColorTitleText, opt)
 			if id == ctx.Focus && ctx.MouseDown == mouseLeft {
 				cnt.Rect = cnt.Rect.Add(ctx.MouseDelta)
 			}
-			body.Min.Y += tr.H
+			body.Min.Y += tr.Dy()
 		}
 
 		// do `close` button
 		if (^opt & OptNoClose) != 0 {
 			id := ctx.GetID([]byte("!close"))
-			r := image.Rect(tr.X+tr.W-tr.H, tr.Y, tr.X+tr.W, tr.Y+tr.H)
-			tr.W -= r.Dx()
+			r := image.Rect(tr.Max.X-tr.Dy(), tr.Min.Y, tr.Max.X, tr.Max.Y)
+			tr.Max.X -= r.Dx()
 			ctx.DrawIcon(IconClose, r, ctx.Style.Colors[ColorTitleText])
 			ctx.UpdateControl(id, r, opt)
 			if ctx.MousePressed == mouseLeft && id == ctx.Focus {

@@ -72,16 +72,16 @@ func (ctx *Context) LayoutSetNext(r image.Rectangle, relative bool) {
 func (ctx *Context) LayoutNext() image.Rectangle {
 	layout := ctx.GetLayout()
 	style := ctx.Style
-	var res muRect
+	var res image.Rectangle
 
 	if layout.NextType != 0 {
 		// handle rect set by `mu_layout_set_next`
 		next_type := layout.NextType
 		layout.NextType = 0
-		res = rectFromRectangle(layout.Next)
+		res = layout.Next
 
 		if next_type == Absolute {
-			ctx.LastRect = res.rectangle()
+			ctx.LastRect = res
 			return ctx.LastRect
 		}
 	} else {
@@ -91,44 +91,42 @@ func (ctx *Context) LayoutNext() image.Rectangle {
 		}
 
 		// position
-		res.X = layout.Position.X
-		res.Y = layout.Position.Y
+		res = image.Rect(layout.Position.X, layout.Position.Y, layout.Position.X+res.Dx(), layout.Position.Y+res.Dy())
 
 		// size
 		if layout.Items > 0 {
-			res.W = layout.Widths[layout.ItemIndex]
+			res.Max.X = res.Min.X + layout.Widths[layout.ItemIndex]
 		} else {
-			res.W = layout.Size.X
+			res.Max.X = res.Min.X + layout.Size.X
 		}
-		res.H = layout.Size.Y
-		if res.W == 0 {
-			res.W = style.Size.X + style.Padding*2
+		res.Max.Y = res.Min.Y + layout.Size.Y
+		if res.Dx() == 0 {
+			res.Max.X = res.Min.X + style.Size.X + style.Padding*2
 		}
-		if res.H == 0 {
-			res.H = style.Size.Y + style.Padding*2
+		if res.Dy() == 0 {
+			res.Max.Y = res.Min.Y + style.Size.Y + style.Padding*2
 		}
-		if res.W < 0 {
-			res.W += layout.Body.Dx() - res.X + 1
+		if res.Dx() < 0 {
+			res.Max.X += layout.Body.Dx() - res.Min.X + 1
 		}
-		if res.H < 0 {
-			res.H += layout.Body.Dy() - res.Y + 1
+		if res.Dy() < 0 {
+			res.Max.Y += layout.Body.Dy() - res.Min.Y + 1
 		}
 
 		layout.ItemIndex++
 	}
 
 	// update position
-	layout.Position.X += res.W + style.Spacing
-	layout.NextRow = max(layout.NextRow, res.Y+res.H+style.Spacing)
+	layout.Position.X += res.Dx() + style.Spacing
+	layout.NextRow = max(layout.NextRow, res.Max.Y+style.Spacing)
 
 	// apply body offset
-	res.X += layout.Body.Min.X
-	res.Y += layout.Body.Min.Y
+	res = res.Add(layout.Body.Min)
 
 	// update max position
-	layout.Max.X = max(layout.Max.X, res.X+res.W)
-	layout.Max.Y = max(layout.Max.Y, res.Y+res.H)
+	layout.Max.X = max(layout.Max.X, res.Max.X)
+	layout.Max.Y = max(layout.Max.Y, res.Max.Y)
 
-	ctx.LastRect = res.rectangle()
+	ctx.LastRect = res
 	return ctx.LastRect
 }

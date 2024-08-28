@@ -10,20 +10,6 @@ import (
 
 type ID uintptr
 
-// TODO: Replace muRect with image.Rectangle.
-
-type muRect struct {
-	X, Y, W, H int
-}
-
-func rectFromRectangle(r image.Rectangle) muRect {
-	return muRect{r.Min.X, r.Min.Y, r.Dx(), r.Dy()}
-}
-
-func (r muRect) rectangle() image.Rectangle {
-	return image.Rect(r.X, r.Y, r.X+r.W, r.Y+r.H)
-}
-
 type PoolItem struct {
 	ID         ID
 	LastUpdate int
