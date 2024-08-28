@@ -195,7 +195,7 @@ func (ctx *Context) Begin() {
 		}
 	}
 
-	ctx.CommandList = ctx.CommandList[:0]
+	ctx.commandList = ctx.commandList[:0]
 	ctx.RootList = ctx.RootList[:0]
 	ctx.ScrollTarget = nil
 	ctx.HoverRoot = ctx.NextHoverRoot
@@ -249,17 +249,17 @@ func (ctx *Context) End() {
 		// if this is the first container then make the first command jump to it.
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
-			cmd := ctx.CommandList[0]
+			cmd := ctx.commandList[0]
 			expect(cmd.Type == CommandJump)
 			cmd.Jump.DstIdx = cnt.HeadIdx + 1
 			expect(cmd.Jump.DstIdx < commandListSize)
 		} else {
 			prev := ctx.RootList[i-1]
-			ctx.CommandList[prev.TailIdx].Jump.DstIdx = cnt.HeadIdx + 1
+			ctx.commandList[prev.TailIdx].Jump.DstIdx = cnt.HeadIdx + 1
 		}
 		// make the last container's tail jump to the end of command list
 		if i == len(ctx.RootList)-1 {
-			ctx.CommandList[cnt.TailIdx].Jump.DstIdx = len(ctx.CommandList)
+			ctx.commandList[cnt.TailIdx].Jump.DstIdx = len(ctx.commandList)
 		}
 	}
 }

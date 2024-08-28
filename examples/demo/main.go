@@ -13,9 +13,6 @@ import (
 
 type Game struct {
 	ctx *microui.Context
-
-	cx, cy   int
-	commands []*microui.Command
 }
 
 func New() *Game {

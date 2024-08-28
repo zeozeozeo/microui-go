@@ -523,7 +523,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	// push container to roots list and push head command
 	// push()
 	ctx.RootList = append(ctx.RootList, cnt)
-	cnt.HeadIdx = ctx.PushJump(-1)
+	cnt.HeadIdx = ctx.pushJump(-1)
 	// set as hover root if the mouse is overlapping this container and it has a
 	// higher zindex than the current hover root
 	if ctx.MousePos.In(cnt.Rect) && (ctx.NextHoverRoot == nil || cnt.Zindex > ctx.NextHoverRoot.Zindex) {
@@ -540,8 +540,8 @@ func (ctx *Context) EndRootContainer() {
 	// push tail 'goto' jump command and set head 'skip' command. the final steps
 	// on initing these are done in mu_end()
 	cnt := ctx.GetCurrentContainer()
-	cnt.TailIdx = ctx.PushJump(-1)
-	ctx.CommandList[cnt.HeadIdx].Jump.DstIdx = len(ctx.CommandList) //- 1
+	cnt.TailIdx = ctx.pushJump(-1)
+	ctx.commandList[cnt.HeadIdx].Jump.DstIdx = len(ctx.commandList) //- 1
 	// pop base clip rect and container
 	ctx.PopClipRect()
 	ctx.PopContainer()

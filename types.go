@@ -15,38 +15,38 @@ type PoolItem struct {
 	LastUpdate int
 }
 
-type BaseCommand struct {
+type baseCommand struct {
 	Type int
 }
 
-type JumpCommand struct {
-	Base   BaseCommand
+type jumpCommand struct {
+	Base   baseCommand
 	DstIdx int
 }
 
-type ClipCommand struct {
-	Base BaseCommand
+type clipCommand struct {
+	Base baseCommand
 	Rect image.Rectangle
 }
 
-type RectCommand struct {
-	Base  BaseCommand
+type rectCommand struct {
+	Base  baseCommand
 	Rect  image.Rectangle
 	Color color.Color
 }
 
 type Font interface{} // Font is interface{}, microui does not manage fonts
 
-type TextCommand struct {
-	Base  BaseCommand
+type textCommand struct {
+	Base  baseCommand
 	Font  Font
 	Pos   image.Point
 	Color color.Color
 	Str   string
 }
 
-type IconCommand struct {
-	Base  BaseCommand
+type iconCommand struct {
+	Base  baseCommand
 	Rect  image.Rectangle
 	ID    int
 	Color color.Color
@@ -66,15 +66,15 @@ type Layout struct {
 	Indent    int
 }
 
-type Command struct {
+type command struct {
 	Type int
 	Idx  int
-	Base BaseCommand // type 0 (TODO)
-	Jump JumpCommand // type 1
-	Clip ClipCommand // type 2
-	Rect RectCommand // type 3
-	Text TextCommand // type 4
-	Icon IconCommand // type 5
+	Base baseCommand // type 0 (TODO)
+	Jump jumpCommand // type 1
+	Clip clipCommand // type 2
+	Rect rectCommand // type 3
+	Text textCommand // type 4
+	Icon iconCommand // type 5
 }
 
 type Container struct {
@@ -125,7 +125,7 @@ type Context struct {
 
 	// stacks
 
-	CommandList    []*Command
+	commandList    []*command
 	RootList       []*Container
 	ContainerStack []*Container
 	ClipStack      []image.Rectangle
