@@ -24,30 +24,6 @@ func (ctx *Context) pushCommand(cmd_type int) *command {
 	return &cmd
 }
 
-// sets cmd to the next command in command_list, returns true if success
-func (ctx *Context) nextCommand(cmd **command) bool {
-	if len(ctx.commandList) == 0 {
-		return false
-	}
-	if *cmd == nil {
-		*cmd = ctx.commandList[0]
-	} else {
-		*cmd = ctx.commandList[(*cmd).idx+1]
-	}
-
-	for (*cmd).idx < len(ctx.commandList) {
-		if (*cmd).typ != CommandJump {
-			return true
-		}
-		idx := (*cmd).jump.dstIdx
-		if idx > len(ctx.commandList)-1 {
-			break
-		}
-		*cmd = ctx.commandList[idx]
-	}
-	return false
-}
-
 // pushes a new jump command to command_list
 func (ctx *Context) pushJump(dstIdx int) int {
 	cmd := ctx.pushCommand(CommandJump)
