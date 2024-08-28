@@ -28,7 +28,7 @@ func (ctx *Context) InHoverRoot() bool {
 	return false
 }
 
-func (ctx *Context) DrawControlFrame(id mu_Id, rect Rect, colorid int, opt int) {
+func (ctx *Context) DrawControlFrame(id ID, rect Rect, colorid int, opt int) {
 	if (opt & OptNoFrame) != 0 {
 		return
 	}
@@ -63,7 +63,7 @@ func (ctx *Context) MouseOver(rect Rect) bool {
 		ctx.InHoverRoot()
 }
 
-func (ctx *Context) UpdateControl(id mu_Id, rect Rect, opt int) {
+func (ctx *Context) UpdateControl(id ID, rect Rect, opt int) {
 	mouseover := ctx.MouseOver(rect)
 
 	if ctx.Focus == id {
@@ -132,7 +132,7 @@ func (ctx *Context) Label(text string) {
 
 func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	var res int = 0
-	var id mu_Id
+	var id ID
 	if len(label) > 0 {
 		id = ctx.GetID([]byte(label))
 	} else {
@@ -180,7 +180,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	return res
 }
 
-func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
+func (ctx *Context) TextboxRaw(buf *string, id ID, r Rect, opt int) int {
 	var res int = 0
 	ctx.UpdateControl(id, r, opt|OptHoldFocus)
 	buflen := len(*buf)
@@ -224,7 +224,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *float32, r Rect, id mu_Id) bool {
+func (ctx *Context) NumberTextBox(value *float32, r Rect, id ID) bool {
 	if ctx.MousePressed == mouseLeft && (ctx.KeyDown&keyShift) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -359,7 +359,7 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 		if active {
 			ctx.PoolUpdate(ctx.TreeNodePool[:], idx)
 		} else {
-			ctx.TreeNodePool[idx] = MuPoolItem{}
+			ctx.TreeNodePool[idx] = PoolItem{}
 		}
 	} else if active {
 		ctx.PoolInit(ctx.TreeNodePool[:], id)

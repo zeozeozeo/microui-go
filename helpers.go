@@ -77,9 +77,9 @@ func rect_overlaps_vec2(r Rect, p image.Point) bool {
 	return p.X >= r.X && p.X < r.X+r.W && p.Y >= r.Y && p.Y < r.Y+r.H
 }
 
-func hash(hash *mu_Id, data []byte) {
+func hash(hash *ID, data []byte) {
 	for i := 0; i < len(data); i++ {
-		*hash = (*hash ^ mu_Id(data[i])) * 16777619
+		*hash = (*hash ^ ID(data[i])) * 16777619
 	}
 }
 
@@ -87,9 +87,9 @@ func PtrToBytes(ptr unsafe.Pointer) []byte {
 	return unsafe.Slice((*byte)(unsafe.Pointer(&ptr)), unsafe.Sizeof(ptr))
 }
 
-func (ctx *Context) GetID(data []byte) mu_Id {
+func (ctx *Context) GetID(data []byte) ID {
 	idx := len(ctx.IdStack)
-	var res mu_Id
+	var res ID
 	if idx > 0 {
 		res = ctx.IdStack[len(ctx.IdStack)-1]
 	} else {
@@ -164,7 +164,7 @@ func (ctx *Context) GetCurrentContainer() *Container {
 	return ctx.ContainerStack[len(ctx.ContainerStack)-1]
 }
 
-func (ctx *Context) getContainer(id mu_Id, opt int) *Container {
+func (ctx *Context) getContainer(id ID, opt int) *Container {
 	// try to get existing container from pool
 	idx := ctx.PoolGet(ctx.ContainerPool[:], id)
 	if idx >= 0 {
@@ -197,7 +197,7 @@ func (ctx *Context) BringToFront(cnt *Container) {
 	cnt.Zindex = ctx.LastZindex
 }
 
-func (ctx *Context) SetFocus(id mu_Id) {
+func (ctx *Context) SetFocus(id ID) {
 	ctx.Focus = id
 	ctx.UpdatedFocus = true
 }

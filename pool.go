@@ -7,7 +7,7 @@ package microui
 ** pool
 **============================================================================*/
 
-func (ctx *Context) PoolInit(items []MuPoolItem, id mu_Id) int {
+func (ctx *Context) PoolInit(items []PoolItem, id ID) int {
 	f := ctx.Frame
 	n := -1
 	for i := 0; i < len(items); i++ {
@@ -23,7 +23,7 @@ func (ctx *Context) PoolInit(items []MuPoolItem, id mu_Id) int {
 }
 
 // returns the index of an ID in the pool. returns -1 if it is not found
-func (ctx *Context) PoolGet(items []MuPoolItem, id mu_Id) int {
+func (ctx *Context) PoolGet(items []PoolItem, id ID) int {
 	for i := 0; i < len(items); i++ {
 		if items[i].ID == id {
 			return i
@@ -32,6 +32,6 @@ func (ctx *Context) PoolGet(items []MuPoolItem, id mu_Id) int {
 	return -1
 }
 
-func (ctx *Context) PoolUpdate(items []MuPoolItem, idx int) {
+func (ctx *Context) PoolUpdate(items []PoolItem, idx int) {
 	items[idx].LastUpdate = ctx.Frame
 }

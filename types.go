@@ -8,14 +8,14 @@ import (
 	"image/color"
 )
 
-type mu_Id uintptr
+type ID uintptr
 
 type Rect struct {
 	X, Y, W, H int
 }
 
-type MuPoolItem struct {
-	ID         mu_Id
+type PoolItem struct {
+	ID         ID
 	LastUpdate int
 }
 
@@ -115,9 +115,9 @@ type Context struct {
 
 	_style        Style
 	Style         *Style
-	Hover         mu_Id
-	Focus         mu_Id
-	LastID        mu_Id
+	Hover         ID
+	Focus         ID
+	LastID        ID
 	LastRect      Rect
 	LastZindex    int
 	UpdatedFocus  bool
@@ -126,7 +126,7 @@ type Context struct {
 	NextHoverRoot *Container
 	ScrollTarget  *Container
 	NumberEditBuf string
-	NumberEdit    mu_Id
+	NumberEdit    ID
 
 	// stacks
 
@@ -134,14 +134,14 @@ type Context struct {
 	RootList       []*Container
 	ContainerStack []*Container
 	ClipStack      []Rect
-	IdStack        []mu_Id
+	IdStack        []ID
 	LayoutStack    []Layout
 
 	// retained state pools
 
-	ContainerPool [containerPoolSize]MuPoolItem
+	ContainerPool [containerPoolSize]PoolItem
 	Containers    [containerPoolSize]Container
-	TreeNodePool  [treeNodePoolSize]MuPoolItem
+	TreeNodePool  [treeNodePoolSize]PoolItem
 
 	// input state
 
