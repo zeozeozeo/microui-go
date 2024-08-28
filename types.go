@@ -116,7 +116,7 @@ type Context struct {
 	LastRect      image.Rectangle
 	LastZindex    int
 	UpdatedFocus  bool
-	Frame         int
+	tick          int
 	HoverRoot     *Container
 	NextHoverRoot *Container
 	ScrollTarget  *Container

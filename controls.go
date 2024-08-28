@@ -326,7 +326,7 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt in
 
 func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	id := ctx.GetID([]byte(label))
-	idx := ctx.PoolGet(ctx.TreeNodePool[:], id)
+	idx := ctx.poolGet(ctx.TreeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
 
 	active := idx >= 0
@@ -353,12 +353,12 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	// update pool ref
 	if idx >= 0 {
 		if active {
-			ctx.PoolUpdate(ctx.TreeNodePool[:], idx)
+			ctx.poolUpdate(ctx.TreeNodePool[:], idx)
 		} else {
 			ctx.TreeNodePool[idx] = PoolItem{}
 		}
 	} else if active {
-		ctx.PoolInit(ctx.TreeNodePool[:], id)
+		ctx.poolInit(ctx.TreeNodePool[:], id)
 	}
 
 	// draw

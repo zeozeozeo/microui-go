@@ -145,10 +145,10 @@ func (ctx *Context) GetCurrentContainer() *Container {
 
 func (ctx *Context) getContainer(id ID, opt int) *Container {
 	// try to get existing container from pool
-	idx := ctx.PoolGet(ctx.ContainerPool[:], id)
+	idx := ctx.poolGet(ctx.ContainerPool[:], id)
 	if idx >= 0 {
 		if ctx.Containers[idx].Open || (^opt&OptClosed) != 0 {
-			ctx.PoolUpdate(ctx.ContainerPool[:], idx)
+			ctx.poolUpdate(ctx.ContainerPool[:], idx)
 		}
 		return &ctx.Containers[idx]
 	}
@@ -156,7 +156,7 @@ func (ctx *Context) getContainer(id ID, opt int) *Container {
 		return nil
 	}
 	// container not found in pool: init new container
-	idx = ctx.PoolInit(ctx.ContainerPool[:], id)
+	idx = ctx.poolInit(ctx.ContainerPool[:], id)
 	cnt := &ctx.Containers[idx]
 	*cnt = Container{}
 	cnt.HeadIdx = -1
@@ -202,7 +202,7 @@ func (ctx *Context) Begin() {
 	ctx.NextHoverRoot = nil
 	ctx.MouseDelta.X = ctx.MousePos.X - ctx.lastMousePos.X
 	ctx.MouseDelta.Y = ctx.MousePos.Y - ctx.lastMousePos.Y
-	ctx.Frame++
+	ctx.tick++
 }
 
 func (ctx *Context) End() {

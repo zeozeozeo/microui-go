@@ -7,8 +7,8 @@ package microui
 ** pool
 **============================================================================*/
 
-func (ctx *Context) PoolInit(items []PoolItem, id ID) int {
-	f := ctx.Frame
+func (ctx *Context) poolInit(items []PoolItem, id ID) int {
+	f := ctx.tick
 	n := -1
 	for i := 0; i < len(items); i++ {
 		if items[i].LastUpdate < f {
@@ -18,12 +18,12 @@ func (ctx *Context) PoolInit(items []PoolItem, id ID) int {
 	}
 	expect(n > -1)
 	items[n].ID = id
-	ctx.PoolUpdate(items, n)
+	ctx.poolUpdate(items, n)
 	return n
 }
 
 // returns the index of an ID in the pool. returns -1 if it is not found
-func (ctx *Context) PoolGet(items []PoolItem, id ID) int {
+func (ctx *Context) poolGet(items []PoolItem, id ID) int {
 	for i := 0; i < len(items); i++ {
 		if items[i].ID == id {
 			return i
@@ -32,6 +32,6 @@ func (ctx *Context) PoolGet(items []PoolItem, id ID) int {
 	return -1
 }
 
-func (ctx *Context) PoolUpdate(items []PoolItem, idx int) {
-	items[idx].LastUpdate = ctx.Frame
+func (ctx *Context) poolUpdate(items []PoolItem, idx int) {
+	items[idx].LastUpdate = ctx.tick
 }
