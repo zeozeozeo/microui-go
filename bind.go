@@ -77,19 +77,13 @@ func (c *Context) Draw(screen *ebiten.Image) {
 				false,
 			)
 		case CommandText:
-			geom := ebiten.GeoM{}
-			geom.Translate(
+			op := &text.DrawOptions{}
+			op.GeoM.Translate(
 				float64(cmd.text.pos.X),
 				float64(cmd.text.pos.Y),
 			)
-			cs := ebiten.ColorScale{}
-			cs.ScaleWithColor(cmd.text.color)
-			text.Draw(target, cmd.text.str, face, &text.DrawOptions{
-				DrawImageOptions: ebiten.DrawImageOptions{
-					GeoM:       geom,
-					ColorScale: cs,
-				},
-			})
+			op.ColorScale.ScaleWithColor(cmd.text.color)
+			text.Draw(target, cmd.text.str, face, op)
 		case CommandIcon:
 			// TODO: Draw icon images.
 			vector.DrawFilledRect(
