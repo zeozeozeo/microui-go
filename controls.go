@@ -270,6 +270,7 @@ func (ctx *Context) SliderEx(value *float32, low float32, high float32, step flo
 	}
 	// clamp and store value, update res
 	*value = mu_clamp_real(v, low, high)
+	v = *value
 	if last != v {
 		res |= MU_RES_CHANGE
 	}
