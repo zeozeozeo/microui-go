@@ -160,21 +160,21 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 func (ctx *Context) Checkbox(label string, state *bool) int {
 	var res int = 0
 	id := ctx.GetID(PtrToBytes(unsafe.Pointer(state)))
-	r := rectFromRectangle(ctx.LayoutNext())
-	box := newMuRect(r.X, r.Y, r.H, r.H)
-	ctx.UpdateControl(id, r.rectangle(), 0)
+	r := ctx.LayoutNext()
+	box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
+	ctx.UpdateControl(id, r, 0)
 	// handle click
 	if ctx.MousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResChange
 		*state = !*state
 	}
 	// draw
-	ctx.DrawControlFrame(id, box.rectangle(), ColorBase, 0)
+	ctx.DrawControlFrame(id, box, ColorBase, 0)
 	if *state {
-		ctx.DrawIcon(IconCheck, box.rectangle(), ctx.Style.Colors[ColorText])
+		ctx.DrawIcon(IconCheck, box, ctx.Style.Colors[ColorText])
 	}
-	r = newMuRect(r.X+box.W, r.Y, r.W-box.W, r.H)
-	ctx.DrawControlText(label, r.rectangle(), ColorText, 0)
+	r = image.Rect(r.Min.X+box.Dx(), r.Min.Y, r.Max.X, r.Max.Y)
+	ctx.DrawControlText(label, r, ColorText, 0)
 	return res
 }
 
@@ -378,7 +378,7 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	}
 	ctx.DrawIcon(
 		icon_id,
-		newMuRect(r.X, r.Y, r.H, r.H).rectangle(),
+		image.Rect(r.X, r.Y, r.X+r.H, r.Y+r.H),
 		ctx.Style.Colors[ColorText],
 	)
 	r.X += r.H - ctx.Style.Padding
