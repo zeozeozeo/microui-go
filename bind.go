@@ -104,7 +104,8 @@ func (c *Context) updateInput() {
 
 func (c *Context) Draw(screen *ebiten.Image) {
 	target := screen
-	for _, cmd := range c.commandList {
+	var cmd *command
+	for c.nextCommand(&cmd) {
 		switch cmd.typ {
 		case CommandRect:
 			vector.DrawFilledRect(
