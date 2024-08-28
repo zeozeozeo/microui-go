@@ -90,14 +90,14 @@ func (g *Game) Update() error {
 		g.ctx.InputText(chars)
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		g.ctx.InputMouseDown(cx, cy, microui.MU_MOUSE_LEFT)
+		g.ctx.InputMouseDown(cx, cy, ebiten.MouseButtonLeft)
 	} else if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
-		g.ctx.InputMouseUp(cx, cy, microui.MU_MOUSE_LEFT)
+		g.ctx.InputMouseUp(cx, cy, ebiten.MouseButtonLeft)
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
-		g.ctx.InputMouseDown(cx, cy, microui.MU_MOUSE_RIGHT)
+		g.ctx.InputMouseDown(cx, cy, ebiten.MouseButtonRight)
 	} else if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonRight) {
-		g.ctx.InputMouseUp(cx, cy, microui.MU_MOUSE_RIGHT)
+		g.ctx.InputMouseUp(cx, cy, ebiten.MouseButtonRight)
 	}
 	for _, k := range []ebiten.Key{ebiten.KeyAlt, ebiten.KeyBackspace, ebiten.KeyControl, ebiten.KeyEnter, ebiten.KeyShift} {
 		var mk int

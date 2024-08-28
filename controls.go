@@ -145,7 +145,7 @@ func (ctx *Context) ButtonEx(label string, icon int, opt int) int {
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
 	// handle click
-	if ctx.MousePressed == MU_MOUSE_LEFT && ctx.Focus == id {
+	if ctx.MousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResSubmit
 	}
 	// draw
@@ -166,7 +166,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	box := NewRect(r.X, r.Y, r.H, r.H)
 	ctx.UpdateControl(id, r, 0)
 	// handle click
-	if ctx.MousePressed == MU_MOUSE_LEFT && ctx.Focus == id {
+	if ctx.MousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResChange
 		*state = !*state
 	}
@@ -225,7 +225,7 @@ func (ctx *Context) TextboxRaw(buf *string, id mu_Id, r Rect, opt int) int {
 }
 
 func (ctx *Context) NumberTextBox(value *float32, r Rect, id mu_Id) bool {
-	if ctx.MousePressed == MU_MOUSE_LEFT && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
+	if ctx.MousePressed == mouseLeft && (ctx.KeyDown&MU_KEY_SHIFT) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
 		ctx.NumberEditBuf = fmt.Sprintf(MU_REAL_FMT, *value)
@@ -269,7 +269,7 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 	ctx.UpdateControl(id, base, opt)
 
 	// handle input
-	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == MU_MOUSE_LEFT {
+	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == mouseLeft {
 		v = low + float32(ctx.MousePos.X-base.X)*(high-low)/float32(base.W)
 		if step != 0 {
 			v = ((v + step/2) / step) * step
@@ -310,7 +310,7 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt in
 	ctx.UpdateControl(id, base, opt)
 
 	// handle input
-	if ctx.Focus == id && ctx.MouseDown == MU_MOUSE_LEFT {
+	if ctx.Focus == id && ctx.MouseDown == mouseLeft {
 		*value += float32(ctx.MouseDelta.X) * step
 	}
 	// set flag if value changed
@@ -344,7 +344,7 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 	ctx.UpdateControl(id, r, 0)
 
 	// handle click (TODO (port): check if this is correct)
-	clicked := ctx.MousePressed == MU_MOUSE_LEFT && ctx.Focus == id
+	clicked := ctx.MousePressed == mouseLeft && ctx.Focus == id
 	v1, v2 := 0, 0
 	if active {
 		v1 = 1
@@ -427,7 +427,7 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b *Rect, cs image.Point) {
 
 		// handle input
 		ctx.UpdateControl(id, base, 0)
-		if ctx.Focus == id && ctx.MouseDown == MU_MOUSE_LEFT {
+		if ctx.Focus == id && ctx.MouseDown == mouseLeft {
 			cnt.Scroll.Y += ctx.MouseDelta.Y * cs.Y / base.H
 		}
 		// clamp scroll to limits
@@ -464,7 +464,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b *Rect, cs image.Point)
 
 		// handle input
 		ctx.UpdateControl(id, base, 0)
-		if ctx.Focus == id && ctx.MouseDown == MU_MOUSE_LEFT {
+		if ctx.Focus == id && ctx.MouseDown == mouseLeft {
 			cnt.Scroll.X += ctx.MouseDelta.X * cs.X / base.W
 		}
 		// clamp scroll to limits
@@ -588,7 +588,7 @@ func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
 			id := ctx.GetID([]byte("!title"))
 			ctx.UpdateControl(id, tr, opt)
 			ctx.DrawControlText(title, tr, ColorTitleText, opt)
-			if id == ctx.Focus && ctx.MouseDown == MU_MOUSE_LEFT {
+			if id == ctx.Focus && ctx.MouseDown == mouseLeft {
 				cnt.Rect.X += ctx.MouseDelta.X
 				cnt.Rect.Y += ctx.MouseDelta.Y
 			}
@@ -603,7 +603,7 @@ func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
 			tr.W -= r.W
 			ctx.DrawIcon(IconClose, r, ctx.Style.Colors[ColorTitleText])
 			ctx.UpdateControl(id, r, opt)
-			if ctx.MousePressed == MU_MOUSE_LEFT && id == ctx.Focus {
+			if ctx.MousePressed == mouseLeft && id == ctx.Focus {
 				cnt.Open = false
 			}
 		}
@@ -617,7 +617,7 @@ func (ctx *Context) BeginWindowEx(title string, rect Rect, opt int) int {
 		id := ctx.GetID([]byte("!resize"))
 		r := NewRect(rect.X+rect.W-sz, rect.Y+rect.H-sz, sz, sz)
 		ctx.UpdateControl(id, r, opt)
-		if id == ctx.Focus && ctx.MouseDown == MU_MOUSE_LEFT {
+		if id == ctx.Focus && ctx.MouseDown == mouseLeft {
 			cnt.Rect.W = mu_max(96, cnt.Rect.W+ctx.MouseDelta.X)
 			cnt.Rect.H = mu_max(64, cnt.Rect.H+ctx.MouseDelta.Y)
 		}

@@ -3,7 +3,11 @@
 
 package microui
 
-import "image"
+import (
+	"image"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 /*============================================================================
 ** input handlers
@@ -13,15 +17,27 @@ func (ctx *Context) InputMouseMove(x, y int) {
 	ctx.MousePos = image.Pt(x, y)
 }
 
-func (ctx *Context) InputMouseDown(x, y int, btn int) {
-	ctx.InputMouseMove(x, y)
-	ctx.MouseDown |= btn
-	ctx.MousePressed |= btn
+func mouseButtonToInt(btn ebiten.MouseButton) int {
+	switch btn {
+	case ebiten.MouseButtonLeft:
+		return mouseLeft
+	case ebiten.MouseButtonRight:
+		return mouseRight
+	case ebiten.MouseButtonMiddle:
+		return mouseMiddle
+	}
+	return 0
 }
 
-func (ctx *Context) InputMouseUp(x, y int, btn int) {
+func (ctx *Context) InputMouseDown(x, y int, btn ebiten.MouseButton) {
 	ctx.InputMouseMove(x, y)
-	ctx.MouseDown &= ^btn
+	ctx.MouseDown |= mouseButtonToInt(btn)
+	ctx.MousePressed |= mouseButtonToInt(btn)
+}
+
+func (ctx *Context) InputMouseUp(x, y int, btn ebiten.MouseButton) {
+	ctx.InputMouseMove(x, y)
+	ctx.MouseDown &= ^mouseButtonToInt(btn)
 }
 
 func (ctx *Context) InputScroll(x, y int) {

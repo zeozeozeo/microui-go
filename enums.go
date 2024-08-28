@@ -64,9 +64,9 @@ const (
 )
 
 const (
-	MU_MOUSE_LEFT   = (1 << 0)
-	MU_MOUSE_RIGHT  = (1 << 1)
-	MU_MOUSE_MIDDLE = (1 << 2)
+	mouseLeft   = (1 << 0)
+	mouseRight  = (1 << 1)
+	mouseMiddle = (1 << 2)
 )
 
 const (
