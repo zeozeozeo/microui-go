@@ -113,7 +113,6 @@ type Context struct {
 
 	// core state
 
-	_style        Style
 	Style         *Style
 	Hover         ID
 	Focus         ID
