@@ -51,20 +51,6 @@ func New() *Game {
 	ctx.TextHeight = func(font microui.Font) int {
 		return 14
 	}
-	/*ctx.Style = &microui.Style{
-		Font:          nil,
-		Size:          microui.Vec2{},
-		Padding:       0,
-		Spacing:       0,
-		Indent:        0,
-		TitleHeight:   0,
-		ScrollbarSize: 0,
-		ThumbSize:     0,
-		Colors:        [14]microui.Color{
-			microui.MU_COLOR_BUTTONHOVER: microui.NewColor(255,0,0,255),
-		},
-	}*/
-
 	return &Game{
 		ctx: ctx,
 	}
