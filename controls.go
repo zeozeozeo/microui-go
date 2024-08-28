@@ -325,7 +325,7 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt in
 	return res
 }
 
-func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
+func (ctx *Context) header(label string, istreenode bool, opt int) int {
 	id := ctx.GetID([]byte(label))
 	idx := ctx.poolGet(ctx.treeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
@@ -391,11 +391,11 @@ func (ctx *Context) MuHeader(label string, istreenode bool, opt int) int {
 }
 
 func (ctx *Context) HeaderEx(label string, opt int) int {
-	return ctx.MuHeader(label, false, opt)
+	return ctx.header(label, false, opt)
 }
 
 func (ctx *Context) BeginTreeNodeEx(label string, opt int) int {
-	res := ctx.MuHeader(label, true, opt)
+	res := ctx.header(label, true, opt)
 	if (res & ResActive) != 0 {
 		ctx.GetLayout().Indent += ctx.Style.Indent
 		// push()
