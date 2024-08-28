@@ -31,10 +31,10 @@ func (ctx *Context) LayoutEndColumn() {
 	ctx.LayoutStack = ctx.LayoutStack[:len(ctx.LayoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
 	a := ctx.GetLayout()
-	a.Position.X = mu_max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)
-	a.NextRow = mu_max(a.NextRow, b.NextRow+b.Body.Min.Y-a.Body.Min.Y)
-	a.Max.X = mu_max(a.Max.X, b.Max.X)
-	a.Max.Y = mu_max(a.Max.Y, b.Max.Y)
+	a.Position.X = max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)
+	a.NextRow = max(a.NextRow, b.NextRow+b.Body.Min.Y-a.Body.Min.Y)
+	a.Max.X = max(a.Max.X, b.Max.X)
+	a.Max.Y = max(a.Max.Y, b.Max.Y)
 }
 
 func (ctx *Context) LayoutRow(items int, widths []int, height int) {
@@ -119,15 +119,15 @@ func (ctx *Context) LayoutNext() image.Rectangle {
 
 	// update position
 	layout.Position.X += res.W + style.Spacing
-	layout.NextRow = mu_max(layout.NextRow, res.Y+res.H+style.Spacing)
+	layout.NextRow = max(layout.NextRow, res.Y+res.H+style.Spacing)
 
 	// apply body offset
 	res.X += layout.Body.Min.X
 	res.Y += layout.Body.Min.Y
 
 	// update max position
-	layout.Max.X = mu_max(layout.Max.X, res.X+res.W)
-	layout.Max.Y = mu_max(layout.Max.Y, res.Y+res.H)
+	layout.Max.X = max(layout.Max.X, res.X+res.W)
+	layout.Max.Y = max(layout.Max.Y, res.Y+res.H)
 
 	ctx.LastRect = res.rectangle()
 	return ctx.LastRect

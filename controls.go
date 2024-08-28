@@ -209,7 +209,7 @@ func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt int) i
 		textw := ctx.TextWidth(font, *buf)
 		texth := ctx.TextHeight(font)
 		ofx := r.Dx() - ctx.Style.Padding - textw - 1
-		textx := r.Min.X + mu_min(ofx, ctx.Style.Padding)
+		textx := r.Min.X + min(ofx, ctx.Style.Padding)
 		texty := r.Min.Y + (r.Dy()-texth)/2
 		ctx.PushClipRect(r)
 		ctx.DrawText(font, *buf, image.Pt(textx, texty), color)
@@ -273,7 +273,7 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 		}
 	}
 	// clamp and store value, update res
-	*value = mu_clamp_real(v, low, high)
+	*value = clampF(v, low, high)
 	if last != v {
 		res |= ResChange
 	}
@@ -428,12 +428,12 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b *image.Rectangle, cs ima
 			cnt.Scroll.Y += ctx.MouseDelta.Y * cs.Y / base.H
 		}
 		// clamp scroll to limits
-		cnt.Scroll.Y = mu_clamp(cnt.Scroll.Y, 0, maxscroll)
+		cnt.Scroll.Y = clamp(cnt.Scroll.Y, 0, maxscroll)
 
 		// draw base and thumb
 		ctx.DrawFrame(ctx, base.rectangle(), ColorScrollBase)
 		thumb = base
-		thumb.H = mu_max(ctx.Style.ThumbSize, base.H*b.Dy()/cs.Y)
+		thumb.H = max(ctx.Style.ThumbSize, base.H*b.Dy()/cs.Y)
 		thumb.Y += cnt.Scroll.Y * (base.H - thumb.H) / maxscroll
 		ctx.DrawFrame(ctx, thumb.rectangle(), ColorScrollThumb)
 
@@ -465,12 +465,12 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b *image.Rectangle, cs i
 			cnt.Scroll.X += ctx.MouseDelta.X * cs.X / base.W
 		}
 		// clamp scroll to limits
-		cnt.Scroll.X = mu_clamp(cnt.Scroll.X, 0, maxscroll)
+		cnt.Scroll.X = clamp(cnt.Scroll.X, 0, maxscroll)
 
 		// draw base and thumb
 		ctx.DrawFrame(ctx, base.rectangle(), ColorScrollBase)
 		thumb = base
-		thumb.W = mu_max(ctx.Style.ThumbSize, base.W*b.Dx()/cs.X)
+		thumb.W = max(ctx.Style.ThumbSize, base.W*b.Dx()/cs.X)
 		thumb.X += cnt.Scroll.X * (base.W - thumb.W) / maxscroll
 		ctx.DrawFrame(ctx, thumb.rectangle(), ColorScrollThumb)
 
@@ -613,8 +613,8 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt int) i
 		r := image.Rect(rect.Max.X-sz, rect.Max.Y-sz, rect.Max.X, rect.Max.Y)
 		ctx.UpdateControl(id, r, opt)
 		if id == ctx.Focus && ctx.MouseDown == mouseLeft {
-			cnt.Rect.Max.X = cnt.Rect.Min.X + mu_max(96, cnt.Rect.Dx()+ctx.MouseDelta.X)
-			cnt.Rect.Max.Y = cnt.Rect.Min.Y + mu_max(64, cnt.Rect.Dy()+ctx.MouseDelta.Y)
+			cnt.Rect.Max.X = cnt.Rect.Min.X + max(96, cnt.Rect.Dx()+ctx.MouseDelta.X)
+			cnt.Rect.Max.Y = cnt.Rect.Min.Y + max(64, cnt.Rect.Dy()+ctx.MouseDelta.Y)
 		}
 	}
 

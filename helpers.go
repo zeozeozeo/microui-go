@@ -15,40 +15,40 @@ func expect(x bool) {
 	}
 }
 
-func mu_min(a, b int) int {
+func min(a, b int) int {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func mu_max(a, b int) int {
+func max(a, b int) int {
 	if a > b {
 		return a
 	}
 	return b
 }
 
-func mu_min_real(a, b float32) float32 {
+func minF(a, b float32) float32 {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func mu_max_real(a, b float32) float32 {
+func maxF(a, b float32) float32 {
 	if a > b {
 		return a
 	}
 	return b
 }
 
-func mu_clamp(x, a, b int) int {
-	return mu_min(b, mu_max(a, x))
+func clamp(x, a, b int) int {
+	return min(b, max(a, x))
 }
 
-func mu_clamp_real(x, a, b float32) float32 {
-	return mu_min_real(b, mu_max_real(a, x))
+func clampF(x, a, b float32) float32 {
+	return minF(b, maxF(a, x))
 }
 
 func hash(hash *ID, data []byte) {
