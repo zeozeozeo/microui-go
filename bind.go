@@ -18,6 +18,14 @@ import (
 
 var face = text.NewGoXFace(bitmapfont.Face)
 
+func textWidth(str string) int {
+	return int(text.Advance(str, face))
+}
+
+func textHeight() int {
+	return int(face.Metrics().HAscent + face.Metrics().HDescent)
+}
+
 var (
 	//go:embed icon/*.png
 	iconFS  embed.FS

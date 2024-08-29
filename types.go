@@ -32,10 +32,7 @@ type rectCommand struct {
 	color color.Color
 }
 
-type Font interface{} // Font is interface{}, microui does not manage fonts
-
 type textCommand struct {
-	font  Font
 	pos   image.Point
 	color color.Color
 	str   string
@@ -84,7 +81,6 @@ type Container struct {
 }
 
 type Style struct {
-	Font          Font
 	Size          image.Point
 	Padding       int
 	Spacing       int
@@ -98,9 +94,7 @@ type Style struct {
 type Context struct {
 	// callbacks
 
-	TextWidth  func(font Font, str string) int
-	TextHeight func(font Font) int
-	DrawFrame  func(ctx *Context, rect image.Rectangle, colorid int)
+	DrawFrame func(ctx *Context, rect image.Rectangle, colorid int)
 
 	// core state
 

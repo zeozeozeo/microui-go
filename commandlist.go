@@ -73,8 +73,8 @@ func (ctx *Context) DrawBox(rect image.Rectangle, color color.Color) {
 	ctx.DrawRect(image.Rect(rect.Max.X-1, rect.Min.Y, rect.Max.X, rect.Max.Y), color)
 }
 
-func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color.Color) {
-	rect := image.Rect(pos.X, pos.Y, pos.X+ctx.TextWidth(font, str), pos.Y+ctx.TextHeight(font))
+func (ctx *Context) DrawText(str string, pos image.Point, color color.Color) {
+	rect := image.Rect(pos.X, pos.Y, pos.X+textWidth(str), pos.Y+textHeight())
 	clipped := ctx.CheckClip(rect)
 	if clipped == ClipAll {
 		return
@@ -87,7 +87,6 @@ func (ctx *Context) DrawText(font Font, str string, pos image.Point, color color
 	cmd.text.str = str
 	cmd.text.pos = pos
 	cmd.text.color = color
-	cmd.text.font = font
 	// reset clipping if it was set
 	if clipped != 0 {
 		ctx.SetClip(unclippedRect)

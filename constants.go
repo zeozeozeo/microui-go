@@ -26,7 +26,6 @@ const (
 )
 
 var defaultStyle Style = Style{
-	Font:          nil,
 	Size:          image.Pt(68, 10),
 	Padding:       5,
 	Spacing:       4,

@@ -38,10 +38,9 @@ func (ctx *Context) DrawControlFrame(id ID, rect image.Rectangle, colorid int, o
 
 func (ctx *Context) DrawControlText(str string, rect image.Rectangle, colorid int, opt Option) {
 	var pos image.Point
-	font := ctx.Style.Font
-	tw := ctx.TextWidth(font, str)
+	tw := textWidth(str)
 	ctx.PushClipRect(rect)
-	pos.Y = rect.Min.Y + (rect.Dy()-ctx.TextHeight(font))/2
+	pos.Y = rect.Min.Y + (rect.Dy()-textHeight())/2
 	if (opt & OptAlignCenter) != 0 {
 		pos.X = rect.Min.X + (rect.Dx()-tw)/2
 	} else if (opt & OptAlignRight) != 0 {
@@ -49,7 +48,7 @@ func (ctx *Context) DrawControlText(str string, rect image.Rectangle, colorid in
 	} else {
 		pos.X = rect.Min.X + ctx.Style.Padding
 	}
-	ctx.DrawText(font, str, pos, ctx.Style.Colors[colorid])
+	ctx.DrawText(str, pos, ctx.Style.Colors[colorid])
 	ctx.PopClipRect()
 }
 
@@ -90,10 +89,9 @@ func (ctx *Context) UpdateControl(id ID, rect image.Rectangle, opt Option) {
 
 func (ctx *Context) Text(text string) {
 	var start_idx, end_idx, p int
-	font := ctx.Style.Font
 	color := ctx.Style.Colors[ColorText]
 	ctx.LayoutBeginColumn()
-	ctx.LayoutRow(1, []int{-1}, ctx.TextHeight(font))
+	ctx.LayoutRow(1, []int{-1}, textHeight())
 	for end_idx < len(text) {
 		r := ctx.LayoutNext()
 		w := 0
@@ -104,17 +102,17 @@ func (ctx *Context) Text(text string) {
 			for p < len(text) && text[p] != ' ' && text[p] != '\n' {
 				p++
 			}
-			w += ctx.TextWidth(font, text[word:p])
+			w += textWidth(text[word:p])
 			if w > r.Dx() && end_idx != start_idx {
 				break
 			}
 			if p < len(text) {
-				w += ctx.TextWidth(font, string(text[p]))
+				w += textWidth(string(text[p]))
 			}
 			end_idx = p
 			p++
 		}
-		ctx.DrawText(font, text[start_idx:end_idx], r.Min, color)
+		ctx.DrawText(text[start_idx:end_idx], r.Min, color)
 		p = end_idx + 1
 	}
 	ctx.LayoutEndColumn()
@@ -201,14 +199,13 @@ func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt Option
 	ctx.DrawControlFrame(id, r, ColorBase, opt)
 	if ctx.Focus == id {
 		color := ctx.Style.Colors[ColorText]
-		font := ctx.Style.Font
-		textw := ctx.TextWidth(font, *buf)
-		texth := ctx.TextHeight(font)
+		textw := textWidth(*buf)
+		texth := textHeight()
 		ofx := r.Dx() - ctx.Style.Padding - textw - 1
 		textx := r.Min.X + min(ofx, ctx.Style.Padding)
 		texty := r.Min.Y + (r.Dy()-texth)/2
 		ctx.PushClipRect(r)
-		ctx.DrawText(font, *buf, image.Pt(textx, texty), color)
+		ctx.DrawText(*buf, image.Pt(textx, texty), color)
 		ctx.DrawRect(image.Rect(textx+textw, texty, textx+textw+1, texty+texth), color)
 		ctx.PopClipRect()
 	} else {

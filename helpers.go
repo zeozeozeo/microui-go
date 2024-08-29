@@ -7,8 +7,6 @@ import (
 	"image"
 	"sort"
 	"unsafe"
-
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 func expect(x bool) {
@@ -183,17 +181,6 @@ func (ctx *Context) SetFocus(id ID) {
 
 func (ctx *Context) Begin() {
 	ctx.updateInput()
-
-	if ctx.TextWidth == nil {
-		ctx.TextWidth = func(font Font, str string) int {
-			return int(text.Advance(str, face))
-		}
-	}
-	if ctx.TextHeight == nil {
-		ctx.TextHeight = func(font Font) int {
-			return 14
-		}
-	}
 
 	ctx.commandList = ctx.commandList[:0]
 	ctx.rootList = ctx.rootList[:0]
