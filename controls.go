@@ -61,7 +61,7 @@ func (ctx *Context) mouseOver(rect image.Rectangle) bool {
 	return ctx.mousePos.In(rect) && ctx.mousePos.In(ctx.GetClipRect()) && ctx.inHoverRoot()
 }
 
-func (ctx *Context) updateControl(id ID, rect image.Rectangle, opt Option) {
+func (ctx *Context) UpdateControl(id ID, rect image.Rectangle, opt Option) {
 	mouseover := ctx.mouseOver(rect)
 
 	if ctx.Focus == id {
@@ -141,7 +141,7 @@ func (ctx *Context) ButtonEx(label string, icon Icon, opt Option) int {
 		id = ctx.GetID(PtrToBytes(unsafe.Pointer(iconPtr)))
 	}
 	r := ctx.LayoutNext()
-	ctx.updateControl(id, r, opt)
+	ctx.UpdateControl(id, r, opt)
 	// handle click
 	if ctx.mousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResSubmit
@@ -162,7 +162,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	id := ctx.GetID(PtrToBytes(unsafe.Pointer(state)))
 	r := ctx.LayoutNext()
 	box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
-	ctx.updateControl(id, r, 0)
+	ctx.UpdateControl(id, r, 0)
 	// handle click
 	if ctx.mousePressed == mouseLeft && ctx.Focus == id {
 		res |= ResChange
@@ -180,7 +180,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 
 func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt Option) int {
 	var res int = 0
-	ctx.updateControl(id, r, opt|OptHoldFocus)
+	ctx.UpdateControl(id, r, opt|OptHoldFocus)
 	buflen := len(*buf)
 
 	if ctx.Focus == id {
@@ -263,7 +263,7 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 	}
 
 	// handle normal mode
-	ctx.updateControl(id, base, opt)
+	ctx.UpdateControl(id, base, opt)
 
 	// handle input
 	if ctx.Focus == id && (ctx.mouseDown|ctx.mousePressed) == mouseLeft {
@@ -305,7 +305,7 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt Op
 	}
 
 	// handle normal mode
-	ctx.updateControl(id, base, opt)
+	ctx.UpdateControl(id, base, opt)
 
 	// handle input
 	if ctx.Focus == id && ctx.mouseDown == mouseLeft {
@@ -338,7 +338,7 @@ func (ctx *Context) header(label string, istreenode bool, opt Option) int {
 		expanded = active
 	}
 	r := ctx.LayoutNext()
-	ctx.updateControl(id, r, 0)
+	ctx.UpdateControl(id, r, 0)
 
 	// handle click (TODO (port): check if this is correct)
 	clicked := ctx.mousePressed == mouseLeft && ctx.Focus == id
@@ -421,7 +421,7 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs imag
 		base.Max.X = base.Min.X + ctx.Style.ScrollbarSize
 
 		// handle input
-		ctx.updateControl(id, base, 0)
+		ctx.UpdateControl(id, base, 0)
 		if ctx.Focus == id && ctx.mouseDown == mouseLeft {
 			cnt.Scroll.Y += ctx.mouseDelta.Y * cs.Y / base.Dy()
 		}
@@ -457,7 +457,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs im
 		base.Max.Y = base.Min.Y + ctx.Style.ScrollbarSize
 
 		// handle input
-		ctx.updateControl(id, base, 0)
+		ctx.UpdateControl(id, base, 0)
 		if ctx.Focus == id && ctx.mouseDown == mouseLeft {
 			cnt.Scroll.X += ctx.mouseDelta.X * cs.X / base.Dx()
 		}
@@ -578,7 +578,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 		// do title text
 		if (^opt & OptNoTitle) != 0 {
 			id := ctx.GetID([]byte("!title"))
-			ctx.updateControl(id, tr, opt)
+			ctx.UpdateControl(id, tr, opt)
 			ctx.DrawControlText(title, tr, ColorTitleText, opt)
 			if id == ctx.Focus && ctx.mouseDown == mouseLeft {
 				cnt.Rect = cnt.Rect.Add(ctx.mouseDelta)
@@ -592,7 +592,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 			r := image.Rect(tr.Max.X-tr.Dy(), tr.Min.Y, tr.Max.X, tr.Max.Y)
 			tr.Max.X -= r.Dx()
 			ctx.DrawIcon(IconClose, r, ctx.Style.Colors[ColorTitleText])
-			ctx.updateControl(id, r, opt)
+			ctx.UpdateControl(id, r, opt)
 			if ctx.mousePressed == mouseLeft && id == ctx.Focus {
 				cnt.Open = false
 			}
@@ -606,7 +606,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 		sz := ctx.Style.TitleHeight
 		id := ctx.GetID([]byte("!resize"))
 		r := image.Rect(rect.Max.X-sz, rect.Max.Y-sz, rect.Max.X, rect.Max.Y)
-		ctx.updateControl(id, r, opt)
+		ctx.UpdateControl(id, r, opt)
 		if id == ctx.Focus && ctx.mouseDown == mouseLeft {
 			cnt.Rect.Max.X = cnt.Rect.Min.X + max(96, cnt.Rect.Dx()+ctx.mouseDelta.X)
 			cnt.Rect.Max.Y = cnt.Rect.Min.Y + max(64, cnt.Rect.Dy()+ctx.mouseDelta.Y)
