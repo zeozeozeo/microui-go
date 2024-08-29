@@ -518,7 +518,7 @@ func (ctx *Context) PushContainerBody(cnt *Container, body image.Rectangle, opt 
 	cnt.Body = body
 }
 
-func (ctx *Context) BeginRootContainer(cnt *Container) {
+func (ctx *Context) beginRootContainer(cnt *Container) {
 	// push()
 	ctx.containerStack = append(ctx.containerStack, cnt)
 	// push container to roots list and push head command
@@ -537,7 +537,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	ctx.clipStack = append(ctx.clipStack, unclippedRect)
 }
 
-func (ctx *Context) EndRootContainer() {
+func (ctx *Context) endRootContainer() {
 	// push tail 'goto' jump command and set head 'skip' command. the final steps
 	// on initing these are done in mu_end()
 	cnt := ctx.GetCurrentContainer()
@@ -560,7 +560,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 	if cnt.Rect.Dx() == 0 {
 		cnt.Rect = rect
 	}
-	ctx.BeginRootContainer(cnt)
+	ctx.beginRootContainer(cnt)
 	body := cnt.Rect
 	rect = body
 
@@ -631,7 +631,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 
 func (ctx *Context) EndWindow() {
 	ctx.PopClipRect()
-	ctx.EndRootContainer()
+	ctx.endRootContainer()
 }
 
 func (ctx *Context) OpenPopup(name string) {
