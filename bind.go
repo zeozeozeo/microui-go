@@ -126,7 +126,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			y := cmd.icon.rect.Min.Y + (cmd.icon.rect.Dy()-img.Bounds().Dy())/2
 			op.GeoM.Translate(float64(x), float64(y))
 			op.ColorScale.ScaleWithColor(cmd.icon.color)
-			screen.DrawImage(img, op)
+			target.DrawImage(img, op)
 		case commandClip:
 			target = screen.SubImage(cmd.clip.rect).(*ebiten.Image)
 		}
