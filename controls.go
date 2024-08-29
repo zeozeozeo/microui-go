@@ -10,10 +10,6 @@ import (
 	"unsafe"
 )
 
-/*============================================================================
-** controls
-**============================================================================*/
-
 func (ctx *Context) inHoverRoot() bool {
 	for i := len(ctx.containerStack) - 1; i >= 0; i-- {
 		if ctx.containerStack[i] == ctx.HoverRoot {

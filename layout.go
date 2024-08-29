@@ -5,10 +5,6 @@ package microui
 
 import "image"
 
-/*============================================================================
-** layout
-**============================================================================*/
-
 func (ctx *Context) pushLayout(body image.Rectangle, scroll image.Point) {
 	layout := Layout{}
 	layout.Body = body.Sub(scroll)
@@ -49,12 +45,12 @@ func (ctx *Context) LayoutRow(items int, widths []int, height int) {
 	layout.ItemIndex = 0
 }
 
-// sets layout size.x
+// LayoutWidth sets layout size.x
 func (ctx *Context) LayoutWidth(width int) {
 	ctx.GetLayout().Size.X = width
 }
 
-// sets layout size.y
+// LayoutHeight sets layout size.y
 func (ctx *Context) LayoutHeight(height int) {
 	ctx.GetLayout().Size.Y = height
 }

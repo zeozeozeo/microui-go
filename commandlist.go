@@ -8,11 +8,7 @@ import (
 	"image/color"
 )
 
-/*============================================================================
-** commandlist
-**============================================================================*/
-
-// adds a new command with type cmd_type to command_list
+// pushCommand adds a new command with type cmd_type to command_list
 func (ctx *Context) pushCommand(cmd_type int) *command {
 	cmd := command{
 		typ: cmd_type,
@@ -47,20 +43,20 @@ func (ctx *Context) nextCommand(cmd **command) bool {
 	return false
 }
 
-// pushes a new jump command to command_list
+// pushJump pushes a new jump command to command_list
 func (ctx *Context) pushJump(dstIdx int) int {
 	cmd := ctx.pushCommand(commandJump)
 	cmd.jump.dstIdx = dstIdx
 	return len(ctx.commandList) - 1
 }
 
-// pushes a new clip command
+// SetClip pushes a new clip command
 func (ctx *Context) SetClip(rect image.Rectangle) {
 	cmd := ctx.pushCommand(commandClip)
 	cmd.clip.rect = rect
 }
 
-// pushes a new rect command
+// DrawRect pushes a new rect command
 func (ctx *Context) DrawRect(rect image.Rectangle, color color.Color) {
 	rect2 := rect.Intersect(ctx.GetClipRect())
 	if rect2.Dx() > 0 && rect2.Dy() > 0 {

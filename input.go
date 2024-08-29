@@ -9,10 +9,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-/*============================================================================
-** input handlers
-**============================================================================*/
-
 func (ctx *Context) inputMouseMove(x, y int) {
 	ctx.mousePos = image.Pt(x, y)
 }
