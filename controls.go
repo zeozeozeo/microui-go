@@ -14,7 +14,7 @@ import (
 ** controls
 **============================================================================*/
 
-func (ctx *Context) InHoverRoot() bool {
+func (ctx *Context) inHoverRoot() bool {
 	for i := len(ctx.containerStack) - 1; i >= 0; i-- {
 		if ctx.containerStack[i] == ctx.HoverRoot {
 			return true
@@ -58,7 +58,7 @@ func (ctx *Context) DrawControlText(str string, rect image.Rectangle, colorid in
 }
 
 func (ctx *Context) mouseOver(rect image.Rectangle) bool {
-	return ctx.mousePos.In(rect) && ctx.mousePos.In(ctx.GetClipRect()) && ctx.InHoverRoot()
+	return ctx.mousePos.In(rect) && ctx.mousePos.In(ctx.GetClipRect()) && ctx.inHoverRoot()
 }
 
 func (ctx *Context) updateControl(id ID, rect image.Rectangle, opt Option) {
@@ -482,7 +482,7 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs im
 }
 
 // if `swap` is true, X = Y, Y = X, W = H, H = W
-func (ctx *Context) AddScrollbar(cnt *Container, b image.Rectangle, cs image.Point, swap bool) {
+func (ctx *Context) scrollbar(cnt *Container, b image.Rectangle, cs image.Point, swap bool) {
 	if swap {
 		ctx.scrollbarHorizontal(cnt, b, cs)
 	} else {
@@ -505,12 +505,12 @@ func (ctx *Context) Scrollbars(cnt *Container, body *image.Rectangle) {
 	}
 	// to create a horizontal or vertical scrollbar almost-identical code is
 	// used; only the references to `x|y` `w|h` need to be switched
-	ctx.AddScrollbar(cnt, *body, cs, false)
-	ctx.AddScrollbar(cnt, *body, cs, true)
+	ctx.scrollbar(cnt, *body, cs, false)
+	ctx.scrollbar(cnt, *body, cs, true)
 	ctx.PopClipRect()
 }
 
-func (ctx *Context) PushContainerBody(cnt *Container, body image.Rectangle, opt Option) {
+func (ctx *Context) pushContainerBody(cnt *Container, body image.Rectangle, opt Option) {
 	if (^opt & OptNoScroll) != 0 {
 		ctx.Scrollbars(cnt, &body)
 	}
@@ -545,7 +545,7 @@ func (ctx *Context) endRootContainer() {
 	ctx.commandList[cnt.HeadIdx].jump.dstIdx = len(ctx.commandList) //- 1
 	// pop base clip rect and container
 	ctx.PopClipRect()
-	ctx.PopContainer()
+	ctx.popContainer()
 }
 
 func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option) int {
@@ -599,7 +599,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 		}
 	}
 
-	ctx.PushContainerBody(cnt, body, opt)
+	ctx.pushContainerBody(cnt, body, opt)
 
 	// do `resize` handle
 	if (^opt & OptNoResize) != 0 {
@@ -665,11 +665,11 @@ func (ctx *Context) BeginPanelEx(name string, opt Option) {
 	}
 	// push()
 	ctx.containerStack = append(ctx.containerStack, cnt)
-	ctx.PushContainerBody(cnt, cnt.Rect, opt)
+	ctx.pushContainerBody(cnt, cnt.Rect, opt)
 	ctx.PushClipRect(cnt.Body)
 }
 
 func (ctx *Context) EndPanel() {
 	ctx.PopClipRect()
-	ctx.PopContainer()
+	ctx.popContainer()
 }

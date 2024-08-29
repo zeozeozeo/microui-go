@@ -123,7 +123,7 @@ func (ctx *Context) GetLayout() *Layout {
 	return &ctx.layoutStack[len(ctx.layoutStack)-1]
 }
 
-func (ctx *Context) PopContainer() {
+func (ctx *Context) popContainer() {
 	cnt := ctx.GetCurrentContainer()
 	layout := ctx.GetLayout()
 	cnt.ContentSize.X = layout.Max.X - layout.Body.Min.X
