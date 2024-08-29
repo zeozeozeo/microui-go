@@ -119,10 +119,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			)
 		case commandText:
 			op := &text.DrawOptions{}
-			op.GeoM.Translate(
-				float64(cmd.text.pos.X),
-				float64(cmd.text.pos.Y),
-			)
+			op.GeoM.Translate(float64(cmd.text.pos.X), float64(cmd.text.pos.Y))
 			op.ColorScale.ScaleWithColor(cmd.text.color)
 			text.Draw(target, cmd.text.str, face, op)
 		case commandIcon:
@@ -137,12 +134,7 @@ func (c *Context) Draw(screen *ebiten.Image) {
 			op.ColorScale.ScaleWithColor(cmd.icon.color)
 			screen.DrawImage(img, op)
 		case commandClip:
-			target = screen.SubImage(image.Rect(
-				cmd.clip.rect.Min.X,
-				cmd.clip.rect.Min.Y,
-				min(cmd.clip.rect.Max.X, screen.Bounds().Dx()),
-				min(cmd.clip.rect.Max.Y, screen.Bounds().Dy()),
-			)).(*ebiten.Image)
+			target = screen.SubImage(cmd.clip.rect).(*ebiten.Image)
 		}
 	}
 }
