@@ -13,11 +13,19 @@ import (
 
 type Game struct {
 	ctx *microui.Context
+
+	logBuf       string
+	logSubmitBuf string
+	logUpdated   bool
+	bg           [3]float32
+	checks       [3]bool
 }
 
 func New() *Game {
 	return &Game{
-		ctx: microui.NewContext(),
+		ctx:    microui.NewContext(),
+		bg:     [3]float32{90, 95, 100},
+		checks: [3]bool{true, false, true},
 	}
 }
 

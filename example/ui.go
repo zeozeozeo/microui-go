@@ -19,176 +19,168 @@ func max(a, b int) int {
 	return b
 }
 
-var (
-	logBuf       string
-	logSubmitBuf string
-	logUpdated   bool
-	bg           = [3]float32{90, 95, 100}
-	checks       = [3]bool{true, false, true}
-)
-
-func WriteLog(text string) {
-	if len(logBuf) > 0 {
-		logBuf += "\n"
+func (g *Game) WriteLog(text string) {
+	if len(g.logBuf) > 0 {
+		g.logBuf += "\n"
 	}
-	logBuf += text
-	logUpdated = true
+	g.logBuf += text
+	g.logUpdated = true
 }
 
-func TestWindow(ctx *microui.Context) {
-	if ctx.BeginWindow("Demo Window", image.Rect(40, 40, 340, 490)) {
-		defer ctx.EndWindow()
-		win := ctx.GetCurrentContainer()
+func (g *Game) TestWindow() {
+	if g.ctx.BeginWindow("Demo Window", image.Rect(40, 40, 340, 490)) {
+		defer g.ctx.EndWindow()
+		win := g.ctx.GetCurrentContainer()
 		win.Rect.Max.X = win.Rect.Min.X + max(win.Rect.Dx(), 240)
 		win.Rect.Max.Y = win.Rect.Min.Y + max(win.Rect.Dy(), 300)
 
 		/* window info */
-		if ctx.Header("Window Info") {
-			win := ctx.GetCurrentContainer()
-			ctx.LayoutRow(2, []int{54, -1}, 0)
-			ctx.Label("Position:")
-			ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Min.X, win.Rect.Min.Y))
-			ctx.Label("Size:")
-			ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Dx(), win.Rect.Dy()))
+		if g.ctx.Header("Window Info") {
+			win := g.ctx.GetCurrentContainer()
+			g.ctx.LayoutRow(2, []int{54, -1}, 0)
+			g.ctx.Label("Position:")
+			g.ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Min.X, win.Rect.Min.Y))
+			g.ctx.Label("Size:")
+			g.ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Dx(), win.Rect.Dy()))
 		}
 
 		/* labels + buttons */
-		if ctx.HeaderEx("Test Buttons", microui.OptExpanded) != 0 {
-			ctx.LayoutRow(3, []int{86, -110, -1}, 0)
-			ctx.Label("Test buttons 1:")
-			if ctx.Button("Button 1") {
-				WriteLog("Pressed button 1")
+		if g.ctx.HeaderEx("Test Buttons", microui.OptExpanded) != 0 {
+			g.ctx.LayoutRow(3, []int{86, -110, -1}, 0)
+			g.ctx.Label("Test buttons 1:")
+			if g.ctx.Button("Button 1") {
+				g.WriteLog("Pressed button 1")
 			}
-			if ctx.Button("Button 2") {
-				WriteLog("Pressed button 2")
+			if g.ctx.Button("Button 2") {
+				g.WriteLog("Pressed button 2")
 			}
-			ctx.Label("Test buttons 2:")
-			if ctx.Button("Button 3") {
-				WriteLog("Pressed button 3")
+			g.ctx.Label("Test buttons 2:")
+			if g.ctx.Button("Button 3") {
+				g.WriteLog("Pressed button 3")
 			}
-			if ctx.Button("Popup") {
-				ctx.OpenPopup("Test Popup")
+			if g.ctx.Button("Popup") {
+				g.ctx.OpenPopup("Test Popup")
 			}
-			if ctx.BeginPopup("Test Popup") != 0 {
-				ctx.Button("Hello")
-				ctx.Button("World")
-				ctx.EndPopup()
+			if g.ctx.BeginPopup("Test Popup") != 0 {
+				g.ctx.Button("Hello")
+				g.ctx.Button("World")
+				g.ctx.EndPopup()
 			}
 		}
 
 		/* tree */
-		if ctx.HeaderEx("Tree and Text", microui.OptExpanded) != 0 {
-			ctx.LayoutRow(2, []int{140, -1}, 0)
-			ctx.LayoutBeginColumn()
-			if ctx.BeginTreeNode("Test 1") {
-				if ctx.BeginTreeNode("Test 1a") {
-					ctx.Label("Hello")
-					ctx.Label("World")
-					ctx.EndTreeNode()
+		if g.ctx.HeaderEx("Tree and Text", microui.OptExpanded) != 0 {
+			g.ctx.LayoutRow(2, []int{140, -1}, 0)
+			g.ctx.LayoutBeginColumn()
+			if g.ctx.BeginTreeNode("Test 1") {
+				if g.ctx.BeginTreeNode("Test 1a") {
+					g.ctx.Label("Hello")
+					g.ctx.Label("World")
+					g.ctx.EndTreeNode()
 				}
-				if ctx.BeginTreeNode("Test 1b") {
-					if ctx.Button("Button 1") {
-						WriteLog("Pressed button 1")
+				if g.ctx.BeginTreeNode("Test 1b") {
+					if g.ctx.Button("Button 1") {
+						g.WriteLog("Pressed button 1")
 					}
-					if ctx.Button("Button 2") {
-						WriteLog("Pressed button 2")
+					if g.ctx.Button("Button 2") {
+						g.WriteLog("Pressed button 2")
 					}
-					ctx.EndTreeNode()
+					g.ctx.EndTreeNode()
 				}
-				ctx.EndTreeNode()
+				g.ctx.EndTreeNode()
 			}
-			if ctx.BeginTreeNode("Test 2") {
-				ctx.LayoutRow(2, []int{54, 54}, 0)
-				if ctx.Button("Button 3") {
-					WriteLog("Pressed button 3")
+			if g.ctx.BeginTreeNode("Test 2") {
+				g.ctx.LayoutRow(2, []int{54, 54}, 0)
+				if g.ctx.Button("Button 3") {
+					g.WriteLog("Pressed button 3")
 				}
-				if ctx.Button("Button 4") {
-					WriteLog("Pressed button 4")
+				if g.ctx.Button("Button 4") {
+					g.WriteLog("Pressed button 4")
 				}
-				if ctx.Button("Button 5") {
-					WriteLog("Pressed button 5")
+				if g.ctx.Button("Button 5") {
+					g.WriteLog("Pressed button 5")
 				}
-				if ctx.Button("Button 6") {
-					WriteLog("Pressed button 6")
+				if g.ctx.Button("Button 6") {
+					g.WriteLog("Pressed button 6")
 				}
-				ctx.EndTreeNode()
+				g.ctx.EndTreeNode()
 			}
-			if ctx.BeginTreeNode("Test 3") {
-				ctx.Checkbox("Checkbox 1", &checks[0])
-				ctx.Checkbox("Checkbox 2", &checks[1])
-				ctx.Checkbox("Checkbox 3", &checks[2])
-				ctx.EndTreeNode()
+			if g.ctx.BeginTreeNode("Test 3") {
+				g.ctx.Checkbox("Checkbox 1", &g.checks[0])
+				g.ctx.Checkbox("Checkbox 2", &g.checks[1])
+				g.ctx.Checkbox("Checkbox 3", &g.checks[2])
+				g.ctx.EndTreeNode()
 			}
-			ctx.LayoutEndColumn()
+			g.ctx.LayoutEndColumn()
 
-			ctx.LayoutBeginColumn()
-			ctx.LayoutRow(1, []int{-1}, 0)
-			ctx.Text("Lorem ipsum dolor sit amet, consectetur adipiscing " +
+			g.ctx.LayoutBeginColumn()
+			g.ctx.LayoutRow(1, []int{-1}, 0)
+			g.ctx.Text("Lorem ipsum dolor sit amet, consectetur adipiscing " +
 				"elit. Maecenas lacinia, sem eu lacinia molestie, mi risus faucibus " +
 				"ipsum, eu varius magna felis a nulla.")
-			ctx.LayoutEndColumn()
+			g.ctx.LayoutEndColumn()
 		}
 
 		/* background color sliders */
-		if ctx.HeaderEx("Background Color", microui.OptExpanded) != 0 {
-			ctx.LayoutRow(2, []int{-78, -1}, 74)
+		if g.ctx.HeaderEx("Background Color", microui.OptExpanded) != 0 {
+			g.ctx.LayoutRow(2, []int{-78, -1}, 74)
 			/* sliders */
-			ctx.LayoutBeginColumn()
-			ctx.LayoutRow(2, []int{46, -1}, 0)
-			ctx.Label("Red:")
-			ctx.Slider(&bg[0], 0, 255)
-			ctx.Label("Green:")
-			ctx.Slider(&bg[1], 0, 255)
-			ctx.Label("Blue:")
-			ctx.Slider(&bg[2], 0, 255)
-			ctx.LayoutEndColumn()
+			g.ctx.LayoutBeginColumn()
+			g.ctx.LayoutRow(2, []int{46, -1}, 0)
+			g.ctx.Label("Red:")
+			g.ctx.Slider(&g.bg[0], 0, 255)
+			g.ctx.Label("Green:")
+			g.ctx.Slider(&g.bg[1], 0, 255)
+			g.ctx.Label("Blue:")
+			g.ctx.Slider(&g.bg[2], 0, 255)
+			g.ctx.LayoutEndColumn()
 			/* color preview */
-			r := ctx.LayoutNext()
-			ctx.DrawRect(r, color.RGBA{byte(bg[0]), byte(bg[1]), byte(bg[2]), 255})
-			clr := fmt.Sprintf("#%02X%02X%02X", int(bg[0]), int(bg[1]), int(bg[2]))
-			ctx.DrawControlText(clr, r, microui.ColorText, microui.OptAlignCenter)
+			r := g.ctx.LayoutNext()
+			g.ctx.DrawRect(r, color.RGBA{byte(g.bg[0]), byte(g.bg[1]), byte(g.bg[2]), 255})
+			clr := fmt.Sprintf("#%02X%02X%02X", int(g.bg[0]), int(g.bg[1]), int(g.bg[2]))
+			g.ctx.DrawControlText(clr, r, microui.ColorText, microui.OptAlignCenter)
 		}
 	}
 }
 
-func LogWindow(ctx *microui.Context) {
-	if ctx.BeginWindow("Log Window", image.Rect(350, 40, 650, 240)) {
-		defer ctx.EndWindow()
+func (g *Game) LogWindow() {
+	if g.ctx.BeginWindow("Log Window", image.Rect(350, 40, 650, 240)) {
+		defer g.ctx.EndWindow()
 		/* output text panel */
-		ctx.LayoutRow(1, []int{-1}, -25)
-		ctx.BeginPanel("Log Output")
-		panel := ctx.GetCurrentContainer()
-		ctx.LayoutRow(1, []int{-1}, -1)
-		ctx.Text(logBuf)
-		ctx.EndPanel()
-		if logUpdated {
+		g.ctx.LayoutRow(1, []int{-1}, -25)
+		g.ctx.BeginPanel("Log Output")
+		panel := g.ctx.GetCurrentContainer()
+		g.ctx.LayoutRow(1, []int{-1}, -1)
+		g.ctx.Text(g.logBuf)
+		g.ctx.EndPanel()
+		if g.logUpdated {
 			panel.Scroll.Y = panel.ContentSize.Y
-			logUpdated = false
+			g.logUpdated = false
 		}
 
 		/* input textbox + submit button */
 		var submitted bool
-		ctx.LayoutRow(2, []int{-70, -1}, 0)
-		if ctx.TextBox(&logSubmitBuf)&microui.ResSubmit != 0 {
-			ctx.SetFocus(ctx.LastID)
+		g.ctx.LayoutRow(2, []int{-70, -1}, 0)
+		if g.ctx.TextBox(&g.logSubmitBuf)&microui.ResSubmit != 0 {
+			g.ctx.SetFocus(g.ctx.LastID)
 			submitted = true
 		}
-		if ctx.Button("Submit") {
+		if g.ctx.Button("Submit") {
 			submitted = true
 		}
 		if submitted {
-			WriteLog(logSubmitBuf)
-			logSubmitBuf = ""
+			g.WriteLog(g.logSubmitBuf)
+			g.logSubmitBuf = ""
 		}
 	}
 }
 
-func uint8Slider(ctx *microui.Context, fvalue *float32, value *uint8, low, high uint8) int {
+func (g *Game) uint8Slider(fvalue *float32, value *uint8, low, high uint8) int {
 	*fvalue = float32(*value)
-	ctx.PushID(microui.PtrToBytes(unsafe.Pointer(fvalue)))
-	res := ctx.SliderEx(fvalue, float32(low), float32(high), 0, "%.0f", microui.OptAlignCenter)
+	g.ctx.PushID(microui.PtrToBytes(unsafe.Pointer(fvalue)))
+	res := g.ctx.SliderEx(fvalue, float32(low), float32(high), 0, "%.0f", microui.OptAlignCenter)
 	*value = uint8(*fvalue)
-	ctx.PopID()
+	g.ctx.PopID()
 
 	return res
 }
@@ -218,26 +210,26 @@ var (
 	}
 )
 
-func StyleWindow(ctx *microui.Context) {
-	if ctx.BeginWindow("Style Editor", image.Rect(350, 250, 650, 490)) {
-		sw := int(float64(ctx.GetCurrentContainer().Body.Dx()) * 0.14)
-		ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
+func (g *Game) StyleWindow() {
+	if g.ctx.BeginWindow("Style Editor", image.Rect(350, 250, 650, 490)) {
+		sw := int(float64(g.ctx.GetCurrentContainer().Body.Dx()) * 0.14)
+		g.ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
 		for _, c := range colors {
-			ctx.Label(c.Label)
-			uint8Slider(ctx, &fcolors[c.ColorID].R, &ctx.Style.Colors[c.ColorID].R, 0, 255)
-			uint8Slider(ctx, &fcolors[c.ColorID].G, &ctx.Style.Colors[c.ColorID].G, 0, 255)
-			uint8Slider(ctx, &fcolors[c.ColorID].B, &ctx.Style.Colors[c.ColorID].B, 0, 255)
-			uint8Slider(ctx, &fcolors[c.ColorID].A, &ctx.Style.Colors[c.ColorID].A, 0, 255)
-			ctx.DrawRect(ctx.LayoutNext(), ctx.Style.Colors[c.ColorID])
+			g.ctx.Label(c.Label)
+			g.uint8Slider(&fcolors[c.ColorID].R, &g.ctx.Style.Colors[c.ColorID].R, 0, 255)
+			g.uint8Slider(&fcolors[c.ColorID].G, &g.ctx.Style.Colors[c.ColorID].G, 0, 255)
+			g.uint8Slider(&fcolors[c.ColorID].B, &g.ctx.Style.Colors[c.ColorID].B, 0, 255)
+			g.uint8Slider(&fcolors[c.ColorID].A, &g.ctx.Style.Colors[c.ColorID].A, 0, 255)
+			g.ctx.DrawRect(g.ctx.LayoutNext(), g.ctx.Style.Colors[c.ColorID])
 		}
-		ctx.EndWindow()
+		g.ctx.EndWindow()
 	}
 }
 
 func (g *Game) ProcessFrame() {
 	g.ctx.Begin()
-	TestWindow(g.ctx)
-	LogWindow(g.ctx)
-	StyleWindow(g.ctx)
+	g.TestWindow()
+	g.LogWindow()
+	g.StyleWindow()
 	g.ctx.End()
 }
