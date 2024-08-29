@@ -46,7 +46,7 @@ func (g *Game) TestWindow() {
 
 		/* labels + buttons */
 		if g.ctx.HeaderEx("Test Buttons", microui.OptExpanded) != 0 {
-			g.ctx.LayoutRow(3, []int{86, -110, -1}, 0)
+			g.ctx.LayoutRow(3, []int{100, -110, -1}, 0)
 			g.ctx.Label("Test buttons 1:")
 			if g.ctx.Button("Button 1") {
 				g.WriteLog("Pressed button 1")
