@@ -121,11 +121,11 @@ type Context struct {
 	// stacks
 
 	commandList    []*command
-	RootList       []*Container
-	ContainerStack []*Container
-	ClipStack      []image.Rectangle
-	IDStack        []ID
-	LayoutStack    []Layout
+	rootList       []*Container
+	containerStack []*Container
+	clipStack      []image.Rectangle
+	idStack        []ID
+	layoutStack    []Layout
 
 	// retained state pools
 

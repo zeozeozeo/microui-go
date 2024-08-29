@@ -15,7 +15,7 @@ func (ctx *Context) PushLayout(body image.Rectangle, scroll image.Point) {
 	layout.Max = image.Pt(-0x1000000, -0x1000000)
 
 	// push()
-	ctx.LayoutStack = append(ctx.LayoutStack, layout)
+	ctx.layoutStack = append(ctx.layoutStack, layout)
 
 	ctx.LayoutRow(1, []int{0}, 0)
 }
@@ -27,8 +27,8 @@ func (ctx *Context) LayoutBeginColumn() {
 func (ctx *Context) LayoutEndColumn() {
 	b := ctx.GetLayout()
 	// pop()
-	expect(len(ctx.LayoutStack) > 0)
-	ctx.LayoutStack = ctx.LayoutStack[:len(ctx.LayoutStack)-1]
+	expect(len(ctx.layoutStack) > 0)
+	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
 	a := ctx.GetLayout()
 	a.Position.X = max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)

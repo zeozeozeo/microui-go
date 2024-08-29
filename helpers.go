@@ -69,10 +69,10 @@ func (ctx *Context) GetID(data []byte) ID {
 		hashInitial = 2166136261 // 32bit fnv-1a hash
 	)
 
-	idx := len(ctx.IDStack)
+	idx := len(ctx.idStack)
 	var res ID
 	if idx > 0 {
-		res = ctx.IDStack[len(ctx.IDStack)-1]
+		res = ctx.idStack[len(ctx.idStack)-1]
 	} else {
 		res = hashInitial
 	}
@@ -83,28 +83,28 @@ func (ctx *Context) GetID(data []byte) ID {
 
 func (ctx *Context) PushID(data []byte) {
 	// push()
-	ctx.IDStack = append(ctx.IDStack, ctx.GetID(data))
+	ctx.idStack = append(ctx.idStack, ctx.GetID(data))
 }
 
 func (ctx *Context) PopID() {
-	expect(len(ctx.IDStack) > 0)
-	ctx.IDStack = ctx.IDStack[:len(ctx.IDStack)-1]
+	expect(len(ctx.idStack) > 0)
+	ctx.idStack = ctx.idStack[:len(ctx.idStack)-1]
 }
 
 func (ctx *Context) PushClipRect(rect image.Rectangle) {
 	last := ctx.GetClipRect()
 	// push()
-	ctx.ClipStack = append(ctx.ClipStack, rect.Intersect(last))
+	ctx.clipStack = append(ctx.clipStack, rect.Intersect(last))
 }
 
 func (ctx *Context) PopClipRect() {
-	expect(len(ctx.ClipStack) > 0)
-	ctx.ClipStack = ctx.ClipStack[:len(ctx.ClipStack)-1]
+	expect(len(ctx.clipStack) > 0)
+	ctx.clipStack = ctx.clipStack[:len(ctx.clipStack)-1]
 }
 
 func (ctx *Context) GetClipRect() image.Rectangle {
-	expect(len(ctx.ClipStack) > 0)
-	return ctx.ClipStack[len(ctx.ClipStack)-1]
+	expect(len(ctx.clipStack) > 0)
+	return ctx.clipStack[len(ctx.clipStack)-1]
 }
 
 func (ctx *Context) CheckClip(r image.Rectangle) int {
@@ -119,8 +119,8 @@ func (ctx *Context) CheckClip(r image.Rectangle) int {
 }
 
 func (ctx *Context) GetLayout() *Layout {
-	expect(len(ctx.LayoutStack) > 0)
-	return &ctx.LayoutStack[len(ctx.LayoutStack)-1]
+	expect(len(ctx.layoutStack) > 0)
+	return &ctx.layoutStack[len(ctx.layoutStack)-1]
 }
 
 func (ctx *Context) PopContainer() {
@@ -130,17 +130,17 @@ func (ctx *Context) PopContainer() {
 	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Min.Y
 	// pop container, layout and id
 	// pop()
-	expect(len(ctx.ContainerStack) > 0) // TODO: no expect in original impl
-	ctx.ContainerStack = ctx.ContainerStack[:len(ctx.ContainerStack)-1]
+	expect(len(ctx.containerStack) > 0) // TODO: no expect in original impl
+	ctx.containerStack = ctx.containerStack[:len(ctx.containerStack)-1]
 	// pop()
-	expect(len(ctx.LayoutStack) > 0) // TODO: no expect in original impl
-	ctx.LayoutStack = ctx.LayoutStack[:len(ctx.LayoutStack)-1]
+	expect(len(ctx.layoutStack) > 0) // TODO: no expect in original impl
+	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
 	ctx.PopID()
 }
 
 func (ctx *Context) GetCurrentContainer() *Container {
-	expect(len(ctx.ContainerStack) > 0)
-	return ctx.ContainerStack[len(ctx.ContainerStack)-1]
+	expect(len(ctx.containerStack) > 0)
+	return ctx.containerStack[len(ctx.containerStack)-1]
 }
 
 func (ctx *Context) getContainer(id ID, opt Option) *Container {
@@ -196,7 +196,7 @@ func (ctx *Context) Begin() {
 	}
 
 	ctx.commandList = ctx.commandList[:0]
-	ctx.RootList = ctx.RootList[:0]
+	ctx.rootList = ctx.rootList[:0]
 	ctx.ScrollTarget = nil
 	ctx.HoverRoot = ctx.NextHoverRoot
 	ctx.NextHoverRoot = nil
@@ -207,10 +207,10 @@ func (ctx *Context) Begin() {
 
 func (ctx *Context) End() {
 	// check stacks
-	expect(len(ctx.ContainerStack) == 0)
-	expect(len(ctx.ClipStack) == 0)
-	expect(len(ctx.IDStack) == 0)
-	expect(len(ctx.LayoutStack) == 0)
+	expect(len(ctx.containerStack) == 0)
+	expect(len(ctx.clipStack) == 0)
+	expect(len(ctx.idStack) == 0)
+	expect(len(ctx.layoutStack) == 0)
 
 	// handle scroll input
 	if ctx.ScrollTarget != nil {
@@ -239,13 +239,13 @@ func (ctx *Context) End() {
 	ctx.lastMousePos = ctx.mousePos
 
 	// sort root containers by zindex
-	sort.SliceStable(ctx.RootList, func(i, j int) bool {
-		return ctx.RootList[i].Zindex < ctx.RootList[j].Zindex
+	sort.SliceStable(ctx.rootList, func(i, j int) bool {
+		return ctx.rootList[i].Zindex < ctx.rootList[j].Zindex
 	})
 
 	// set root container jump commands
-	for i := 0; i < len(ctx.RootList); i++ {
-		cnt := ctx.RootList[i]
+	for i := 0; i < len(ctx.rootList); i++ {
+		cnt := ctx.rootList[i]
 		// if this is the first container then make the first command jump to it.
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
@@ -254,11 +254,11 @@ func (ctx *Context) End() {
 			cmd.jump.dstIdx = cnt.HeadIdx + 1
 			expect(cmd.jump.dstIdx < commandListSize)
 		} else {
-			prev := ctx.RootList[i-1]
+			prev := ctx.rootList[i-1]
 			ctx.commandList[prev.TailIdx].jump.dstIdx = cnt.HeadIdx + 1
 		}
 		// make the last container's tail jump to the end of command list
-		if i == len(ctx.RootList)-1 {
+		if i == len(ctx.rootList)-1 {
 			ctx.commandList[cnt.TailIdx].jump.dstIdx = len(ctx.commandList)
 		}
 	}

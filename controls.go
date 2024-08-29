@@ -15,13 +15,13 @@ import (
 **============================================================================*/
 
 func (ctx *Context) InHoverRoot() bool {
-	for i := len(ctx.ContainerStack) - 1; i >= 0; i-- {
-		if ctx.ContainerStack[i] == ctx.HoverRoot {
+	for i := len(ctx.containerStack) - 1; i >= 0; i-- {
+		if ctx.containerStack[i] == ctx.HoverRoot {
 			return true
 		}
 		// only root containers have their `head` field set; stop searching if we've
 		// reached the current root container
-		if ctx.ContainerStack[i].HeadIdx >= 0 {
+		if ctx.containerStack[i].HeadIdx >= 0 {
 			break
 		}
 	}
@@ -399,7 +399,7 @@ func (ctx *Context) BeginTreeNodeEx(label string, opt Option) int {
 	if (res & ResActive) != 0 {
 		ctx.GetLayout().Indent += ctx.Style.Indent
 		// push()
-		ctx.IDStack = append(ctx.IDStack, ctx.LastID)
+		ctx.idStack = append(ctx.idStack, ctx.LastID)
 	}
 	return res
 }
@@ -520,10 +520,10 @@ func (ctx *Context) PushContainerBody(cnt *Container, body image.Rectangle, opt 
 
 func (ctx *Context) BeginRootContainer(cnt *Container) {
 	// push()
-	ctx.ContainerStack = append(ctx.ContainerStack, cnt)
+	ctx.containerStack = append(ctx.containerStack, cnt)
 	// push container to roots list and push head command
 	// push()
-	ctx.RootList = append(ctx.RootList, cnt)
+	ctx.rootList = append(ctx.rootList, cnt)
 	cnt.HeadIdx = ctx.pushJump(-1)
 	// set as hover root if the mouse is overlapping this container and it has a
 	// higher zindex than the current hover root
@@ -534,7 +534,7 @@ func (ctx *Context) BeginRootContainer(cnt *Container) {
 	// another root-containers's begin/end block; this prevents the inner
 	// root-container being clipped to the outer
 	// push()
-	ctx.ClipStack = append(ctx.ClipStack, unclippedRect)
+	ctx.clipStack = append(ctx.clipStack, unclippedRect)
 }
 
 func (ctx *Context) EndRootContainer() {
@@ -555,7 +555,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 		return 0
 	}
 	// push()
-	ctx.IDStack = append(ctx.IDStack, id)
+	ctx.idStack = append(ctx.idStack, id)
 
 	if cnt.Rect.Dx() == 0 {
 		cnt.Rect = rect
@@ -664,7 +664,7 @@ func (ctx *Context) BeginPanelEx(name string, opt Option) {
 		ctx.DrawFrame(ctx, cnt.Rect, ColorPanelBG)
 	}
 	// push()
-	ctx.ContainerStack = append(ctx.ContainerStack, cnt)
+	ctx.containerStack = append(ctx.containerStack, cnt)
 	ctx.PushContainerBody(cnt, cnt.Rect, opt)
 	ctx.PushClipRect(cnt.Body)
 }
