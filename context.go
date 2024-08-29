@@ -7,7 +7,7 @@ import (
 	"image"
 )
 
-func drawFrame(ctx *Context, rect image.Rectangle, colorid int) {
+func (ctx *Context) drawFrame(rect image.Rectangle, colorid int) {
 	ctx.DrawRect(rect, ctx.Style.Colors[colorid])
 	if colorid == ColorScrollBase ||
 		colorid == ColorScrollThumb ||
@@ -22,7 +22,6 @@ func drawFrame(ctx *Context, rect image.Rectangle, colorid int) {
 }
 
 func initContext(ctx *Context) {
-	ctx.DrawFrame = drawFrame
 	ctx.Style = &defaultStyle
 }
 

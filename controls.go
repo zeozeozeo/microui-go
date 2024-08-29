@@ -33,7 +33,7 @@ func (ctx *Context) DrawControlFrame(id ID, rect image.Rectangle, colorid int, o
 	} else if ctx.Hover == id {
 		colorid++
 	}
-	ctx.DrawFrame(ctx, rect, colorid)
+	ctx.drawFrame(rect, colorid)
 }
 
 func (ctx *Context) DrawControlText(str string, rect image.Rectangle, colorid int, opt Option) {
@@ -358,7 +358,7 @@ func (ctx *Context) header(label string, istreenode bool, opt Option) int {
 	// draw
 	if istreenode {
 		if ctx.Hover == id {
-			ctx.DrawFrame(ctx, r, ColorButtonHover)
+			ctx.drawFrame(r, ColorButtonHover)
 		}
 	} else {
 		ctx.DrawControlFrame(id, r, ColorButton, 0)
@@ -422,11 +422,11 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs imag
 		cnt.Scroll.Y = clamp(cnt.Scroll.Y, 0, maxscroll)
 
 		// draw base and thumb
-		ctx.DrawFrame(ctx, base, ColorScrollBase)
+		ctx.drawFrame(base, ColorScrollBase)
 		thumb := base
 		thumb.Max.Y = thumb.Min.Y + max(ctx.Style.ThumbSize, base.Dy()*b.Dy()/cs.Y)
 		thumb = thumb.Add(image.Pt(0, cnt.Scroll.Y*(base.Dy()-thumb.Dy())/maxscroll))
-		ctx.DrawFrame(ctx, thumb, ColorScrollThumb)
+		ctx.drawFrame(thumb, ColorScrollThumb)
 
 		// set this as the scroll_target (will get scrolled on mousewheel)
 		// if the mouse is over it
@@ -458,11 +458,11 @@ func (ctx *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs im
 		cnt.Scroll.X = clamp(cnt.Scroll.X, 0, maxscroll)
 
 		// draw base and thumb
-		ctx.DrawFrame(ctx, base, ColorScrollBase)
+		ctx.drawFrame(base, ColorScrollBase)
 		thumb := base
 		thumb.Max.X = thumb.Min.X + max(ctx.Style.ThumbSize, base.Dx()*b.Dx()/cs.X)
 		thumb = thumb.Add(image.Pt(cnt.Scroll.X*(base.Dx()-thumb.Dx())/maxscroll, 0))
-		ctx.DrawFrame(ctx, thumb, ColorScrollThumb)
+		ctx.drawFrame(thumb, ColorScrollThumb)
 
 		// set this as the scroll_target (will get scrolled on mousewheel)
 		// if the mouse is over it
@@ -559,14 +559,14 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 
 	// draw frame
 	if (^opt & OptNoFrame) != 0 {
-		ctx.DrawFrame(ctx, rect, ColorWindowBG)
+		ctx.drawFrame(rect, ColorWindowBG)
 	}
 
 	// do title bar
 	if (^opt & OptNoTitle) != 0 {
 		tr := rect
 		tr.Max.Y = tr.Min.Y + ctx.Style.TitleHeight
-		ctx.DrawFrame(ctx, tr, ColorTitleBG)
+		ctx.drawFrame(tr, ColorTitleBG)
 
 		// do title text
 		if (^opt & OptNoTitle) != 0 {
@@ -654,7 +654,7 @@ func (ctx *Context) BeginPanelEx(name string, opt Option) {
 	cnt = ctx.getContainer(ctx.LastID, opt)
 	cnt.Rect = ctx.LayoutNext()
 	if (^opt & OptNoFrame) != 0 {
-		ctx.DrawFrame(ctx, cnt.Rect, ColorPanelBG)
+		ctx.drawFrame(cnt.Rect, ColorPanelBG)
 	}
 	// push()
 	ctx.containerStack = append(ctx.containerStack, cnt)

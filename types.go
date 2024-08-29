@@ -92,10 +92,6 @@ type Style struct {
 }
 
 type Context struct {
-	// callbacks
-
-	DrawFrame func(ctx *Context, rect image.Rectangle, colorid int)
-
 	// core state
 
 	Style         *Style
