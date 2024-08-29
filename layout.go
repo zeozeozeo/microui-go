@@ -9,7 +9,7 @@ import "image"
 ** layout
 **============================================================================*/
 
-func (ctx *Context) PushLayout(body image.Rectangle, scroll image.Point) {
+func (ctx *Context) pushLayout(body image.Rectangle, scroll image.Point) {
 	layout := Layout{}
 	layout.Body = body.Sub(scroll)
 	layout.Max = image.Pt(-0x1000000, -0x1000000)
@@ -21,7 +21,7 @@ func (ctx *Context) PushLayout(body image.Rectangle, scroll image.Point) {
 }
 
 func (ctx *Context) LayoutBeginColumn() {
-	ctx.PushLayout(ctx.LayoutNext(), image.Pt(0, 0))
+	ctx.pushLayout(ctx.LayoutNext(), image.Pt(0, 0))
 }
 
 func (ctx *Context) LayoutEndColumn() {

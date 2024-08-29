@@ -514,7 +514,7 @@ func (ctx *Context) pushContainerBody(cnt *Container, body image.Rectangle, opt 
 	if (^opt & OptNoScroll) != 0 {
 		ctx.Scrollbars(cnt, &body)
 	}
-	ctx.PushLayout(body.Inset(ctx.Style.Padding), cnt.Scroll)
+	ctx.pushLayout(body.Inset(ctx.Style.Padding), cnt.Scroll)
 	cnt.Body = body
 }
 
