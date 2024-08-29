@@ -9,28 +9,14 @@ import (
 	"image"
 	"sync"
 
+	"github.com/hajimehoshi/bitmapfont/v3"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"golang.org/x/image/font/gofont/goregular"
 )
 
-var (
-	face text.Face
-)
-
-func init() {
-	var err error
-	src, err := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
-	if err != nil {
-		panic(err)
-	}
-	face = &text.GoTextFace{
-		Source: src,
-		Size:   14,
-	}
-}
+var face = text.NewGoXFace(bitmapfont.Face)
 
 var (
 	//go:embed icon/*.png
