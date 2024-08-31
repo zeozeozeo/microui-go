@@ -105,12 +105,9 @@ func (g *Game) testWindow() {
 				})
 			})
 
-			g.ctx.LayoutColumn(func() {
-				g.ctx.LayoutRow(1, []int{-1}, 0)
-				g.ctx.Text("Lorem ipsum dolor sit amet, consectetur adipiscing " +
-					"elit. Maecenas lacinia, sem eu lacinia molestie, mi risus faucibus " +
-					"ipsum, eu varius magna felis a nulla.")
-			})
+			g.ctx.Text("Lorem ipsum dolor sit amet, consectetur adipiscing " +
+				"elit. Maecenas lacinia, sem eu lacinia molestie, mi risus faucibus " +
+				"ipsum, eu varius magna felis a nulla.")
 		}
 
 		// background color sliders
