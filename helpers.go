@@ -113,15 +113,15 @@ func (c *Context) CheckClip(r image.Rectangle) int {
 	return ClipPart
 }
 
-func (c *Context) Layout() *Layout {
+func (c *Context) layout() *layout {
 	return &c.layoutStack[len(c.layoutStack)-1]
 }
 
 func (c *Context) popContainer() {
 	cnt := c.CurrentContainer()
-	layout := c.Layout()
-	cnt.ContentSize.X = layout.Max.X - layout.Body.Min.X
-	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Min.Y
+	layout := c.layout()
+	cnt.ContentSize.X = layout.max.X - layout.body.Min.X
+	cnt.ContentSize.Y = layout.max.Y - layout.body.Min.Y
 	// pop container, layout and id
 	// pop()
 	c.containerStack = c.containerStack[:len(c.containerStack)-1]

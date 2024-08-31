@@ -6,9 +6,9 @@ package microui
 import "image"
 
 func (c *Context) pushLayout(body image.Rectangle, scroll image.Point) {
-	layout := Layout{}
-	layout.Body = body.Sub(scroll)
-	layout.Max = image.Pt(-0x1000000, -0x1000000)
+	layout := layout{}
+	layout.body = body.Sub(scroll)
+	layout.max = image.Pt(-0x1000000, -0x1000000)
 
 	// push()
 	c.layoutStack = append(c.layoutStack, layout)
@@ -27,59 +27,59 @@ func (c *Context) layoutBeginColumn() {
 }
 
 func (c *Context) layoutEndColumn() {
-	b := c.Layout()
+	b := c.layout()
 	// pop()
 	c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
-	a := c.Layout()
-	a.Position.X = max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)
-	a.NextRow = max(a.NextRow, b.NextRow+b.Body.Min.Y-a.Body.Min.Y)
-	a.Max.X = max(a.Max.X, b.Max.X)
-	a.Max.Y = max(a.Max.Y, b.Max.Y)
+	a := c.layout()
+	a.position.X = max(a.position.X, b.position.X+b.body.Min.X-a.body.Min.X)
+	a.nextRow = max(a.nextRow, b.nextRow+b.body.Min.Y-a.body.Min.Y)
+	a.max.X = max(a.max.X, b.max.X)
+	a.max.Y = max(a.max.Y, b.max.Y)
 }
 
 func (c *Context) LayoutRow(items int, widths []int, height int) {
-	layout := c.Layout()
+	layout := c.layout()
 
 	expect(len(widths) <= maxWidths)
-	copy(layout.Widths[:], widths)
+	copy(layout.widths[:], widths)
 
-	layout.Items = items
-	layout.Position = image.Pt(layout.Indent, layout.NextRow)
-	layout.Size.Y = height
-	layout.ItemIndex = 0
+	layout.items = items
+	layout.position = image.Pt(layout.indent, layout.nextRow)
+	layout.size.Y = height
+	layout.itemIndex = 0
 }
 
 // LayoutWidth sets layout size.x
 func (c *Context) LayoutWidth(width int) {
-	c.Layout().Size.X = width
+	c.layout().size.X = width
 }
 
 // LayoutHeight sets layout size.y
 func (c *Context) LayoutHeight(height int) {
-	c.Layout().Size.Y = height
+	c.layout().size.Y = height
 }
 
 func (c *Context) LayoutNext() image.Rectangle {
-	layout := c.Layout()
+	layout := c.layout()
 	style := c.Style
 	var res image.Rectangle
 
 	// handle next row
-	if layout.ItemIndex == layout.Items {
-		c.LayoutRow(layout.Items, nil, layout.Size.Y)
+	if layout.itemIndex == layout.items {
+		c.LayoutRow(layout.items, nil, layout.size.Y)
 	}
 
 	// position
-	res = image.Rect(layout.Position.X, layout.Position.Y, layout.Position.X+res.Dx(), layout.Position.Y+res.Dy())
+	res = image.Rect(layout.position.X, layout.position.Y, layout.position.X+res.Dx(), layout.position.Y+res.Dy())
 
 	// size
-	if layout.Items > 0 {
-		res.Max.X = res.Min.X + layout.Widths[layout.ItemIndex]
+	if layout.items > 0 {
+		res.Max.X = res.Min.X + layout.widths[layout.itemIndex]
 	} else {
-		res.Max.X = res.Min.X + layout.Size.X
+		res.Max.X = res.Min.X + layout.size.X
 	}
-	res.Max.Y = res.Min.Y + layout.Size.Y
+	res.Max.Y = res.Min.Y + layout.size.Y
 	if res.Dx() == 0 {
 		res.Max.X = res.Min.X + style.Size.X + style.Padding*2
 	}
@@ -87,24 +87,24 @@ func (c *Context) LayoutNext() image.Rectangle {
 		res.Max.Y = res.Min.Y + style.Size.Y + style.Padding*2
 	}
 	if res.Dx() < 0 {
-		res.Max.X += layout.Body.Dx() - res.Min.X + 1
+		res.Max.X += layout.body.Dx() - res.Min.X + 1
 	}
 	if res.Dy() < 0 {
-		res.Max.Y += layout.Body.Dy() - res.Min.Y + 1
+		res.Max.Y += layout.body.Dy() - res.Min.Y + 1
 	}
 
-	layout.ItemIndex++
+	layout.itemIndex++
 
 	// update position
-	layout.Position.X += res.Dx() + style.Spacing
-	layout.NextRow = max(layout.NextRow, res.Max.Y+style.Spacing)
+	layout.position.X += res.Dx() + style.Spacing
+	layout.nextRow = max(layout.nextRow, res.Max.Y+style.Spacing)
 
 	// apply body offset
-	res = res.Add(layout.Body.Min)
+	res = res.Add(layout.body.Min)
 
 	// update max position
-	layout.Max.X = max(layout.Max.X, res.Max.X)
-	layout.Max.Y = max(layout.Max.Y, res.Max.Y)
+	layout.max.X = max(layout.max.X, res.Max.X)
+	layout.max.Y = max(layout.max.Y, res.Max.Y)
 
 	c.LastRect = res
 	return c.LastRect

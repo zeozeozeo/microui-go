@@ -44,17 +44,16 @@ type iconCommand struct {
 	color color.Color
 }
 
-type Layout struct {
-	Body      image.Rectangle
-	Next      image.Rectangle
-	Position  image.Point
-	Size      image.Point
-	Max       image.Point
-	Widths    [maxWidths]int
-	Items     int
-	ItemIndex int
-	NextRow   int
-	Indent    int
+type layout struct {
+	body      image.Rectangle
+	position  image.Point
+	size      image.Point
+	max       image.Point
+	widths    [maxWidths]int
+	items     int
+	itemIndex int
+	nextRow   int
+	indent    int
 }
 
 type command struct {
@@ -114,7 +113,7 @@ type Context struct {
 	containerStack []*Container
 	clipStack      []image.Rectangle
 	idStack        []ID
-	layoutStack    []Layout
+	layoutStack    []layout
 
 	// retained state pools
 

@@ -397,7 +397,7 @@ func (c *Context) TreeNodeEx(label string, opt Option, f func(res Res)) {
 func (c *Context) beginTreeNodeEx(label string, opt Option) Res {
 	res := c.header(label, true, opt)
 	if (res & ResActive) != 0 {
-		c.Layout().Indent += c.Style.Indent
+		c.layout().indent += c.Style.Indent
 		// push()
 		c.idStack = append(c.idStack, c.LastID)
 	}
@@ -405,7 +405,7 @@ func (c *Context) beginTreeNodeEx(label string, opt Option) Res {
 }
 
 func (c *Context) endTreeNode() {
-	c.Layout().Indent -= c.Style.Indent
+	c.layout().indent -= c.Style.Indent
 	c.popID()
 }
 
@@ -622,7 +622,7 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 
 	// resize to content size
 	if (opt & OptAutoSize) != 0 {
-		r := c.Layout().Body
+		r := c.layout().body
 		cnt.Rect.Max.X = cnt.Rect.Min.X + cnt.ContentSize.X + (cnt.Rect.Dx() - r.Dx())
 		cnt.Rect.Max.Y = cnt.Rect.Min.Y + cnt.ContentSize.Y + (cnt.Rect.Dy() - r.Dy())
 	}
