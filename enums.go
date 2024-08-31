@@ -80,8 +80,3 @@ const (
 	keyBackspace = (1 << 3)
 	keyReturn    = (1 << 4)
 )
-
-const (
-	Relative = 1 + iota
-	Absolute
-)

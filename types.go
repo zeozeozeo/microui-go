@@ -54,7 +54,6 @@ type Layout struct {
 	Items     int
 	ItemIndex int
 	NextRow   int
-	NextType  int
 	Indent    int
 }
 

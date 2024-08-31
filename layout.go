@@ -54,62 +54,40 @@ func (ctx *Context) LayoutHeight(height int) {
 	ctx.GetLayout().Size.Y = height
 }
 
-func (ctx *Context) LayoutSetNext(r image.Rectangle, relative bool) {
-	layout := ctx.GetLayout()
-	layout.Next = r
-	if relative {
-		layout.NextType = Relative
-	} else {
-		layout.NextType = Absolute
-	}
-}
-
 func (ctx *Context) LayoutNext() image.Rectangle {
 	layout := ctx.GetLayout()
 	style := ctx.Style
 	var res image.Rectangle
 
-	if layout.NextType != 0 {
-		// handle rect set by `LayoutSetNext`
-		next_type := layout.NextType
-		layout.NextType = 0
-		res = layout.Next
-
-		if next_type == Absolute {
-			ctx.LastRect = res
-			return ctx.LastRect
-		}
-	} else {
-		// handle next row
-		if layout.ItemIndex == layout.Items {
-			ctx.LayoutRow(layout.Items, nil, layout.Size.Y)
-		}
-
-		// position
-		res = image.Rect(layout.Position.X, layout.Position.Y, layout.Position.X+res.Dx(), layout.Position.Y+res.Dy())
-
-		// size
-		if layout.Items > 0 {
-			res.Max.X = res.Min.X + layout.Widths[layout.ItemIndex]
-		} else {
-			res.Max.X = res.Min.X + layout.Size.X
-		}
-		res.Max.Y = res.Min.Y + layout.Size.Y
-		if res.Dx() == 0 {
-			res.Max.X = res.Min.X + style.Size.X + style.Padding*2
-		}
-		if res.Dy() == 0 {
-			res.Max.Y = res.Min.Y + style.Size.Y + style.Padding*2
-		}
-		if res.Dx() < 0 {
-			res.Max.X += layout.Body.Dx() - res.Min.X + 1
-		}
-		if res.Dy() < 0 {
-			res.Max.Y += layout.Body.Dy() - res.Min.Y + 1
-		}
-
-		layout.ItemIndex++
+	// handle next row
+	if layout.ItemIndex == layout.Items {
+		ctx.LayoutRow(layout.Items, nil, layout.Size.Y)
 	}
+
+	// position
+	res = image.Rect(layout.Position.X, layout.Position.Y, layout.Position.X+res.Dx(), layout.Position.Y+res.Dy())
+
+	// size
+	if layout.Items > 0 {
+		res.Max.X = res.Min.X + layout.Widths[layout.ItemIndex]
+	} else {
+		res.Max.X = res.Min.X + layout.Size.X
+	}
+	res.Max.Y = res.Min.Y + layout.Size.Y
+	if res.Dx() == 0 {
+		res.Max.X = res.Min.X + style.Size.X + style.Padding*2
+	}
+	if res.Dy() == 0 {
+		res.Max.Y = res.Min.Y + style.Size.Y + style.Padding*2
+	}
+	if res.Dx() < 0 {
+		res.Max.X += layout.Body.Dx() - res.Min.X + 1
+	}
+	if res.Dy() < 0 {
+		res.Max.Y += layout.Body.Dy() - res.Min.Y + 1
+	}
+
+	layout.ItemIndex++
 
 	// update position
 	layout.Position.X += res.Dx() + style.Spacing
