@@ -90,7 +90,7 @@ func (c *Context) UpdateControl(id ID, rect image.Rectangle, opt Option) {
 func (c *Context) Text(text string) {
 	var start_idx, end_idx, p int
 	color := c.Style.Colors[ColorText]
-	c.LayoutBeginColumn()
+	c.layoutBeginColumn()
 	c.LayoutRow(1, []int{-1}, textHeight())
 	for end_idx < len(text) {
 		r := c.LayoutNext()
@@ -115,7 +115,7 @@ func (c *Context) Text(text string) {
 		c.DrawText(text[start_idx:end_idx], r.Min, color)
 		p = end_idx + 1
 	}
-	c.LayoutEndColumn()
+	c.layoutEndColumn()
 }
 
 func (c *Context) Label(text string) {

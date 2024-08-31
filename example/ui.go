@@ -68,64 +68,64 @@ func (g *Game) testWindow() {
 		// tree
 		if g.ctx.HeaderEx("Tree and Text", microui.OptExpanded) != 0 {
 			g.ctx.LayoutRow(2, []int{140, -1}, 0)
-			g.ctx.LayoutBeginColumn()
-			g.ctx.TreeNode("Test 1", func(res microui.Res) {
-				g.ctx.TreeNode("Test 1a", func(res microui.Res) {
-					g.ctx.Label("Hello")
-					g.ctx.Label("World")
+			g.ctx.LayoutColumn(func() {
+				g.ctx.TreeNode("Test 1", func(res microui.Res) {
+					g.ctx.TreeNode("Test 1a", func(res microui.Res) {
+						g.ctx.Label("Hello")
+						g.ctx.Label("World")
+					})
+					g.ctx.TreeNode("Test 1b", func(res microui.Res) {
+						if g.ctx.Button("Button 1") != 0 {
+							g.WriteLog("Pressed button 1")
+						}
+						if g.ctx.Button("Button 2") != 0 {
+							g.WriteLog("Pressed button 2")
+						}
+					})
 				})
-				g.ctx.TreeNode("Test 1b", func(res microui.Res) {
-					if g.ctx.Button("Button 1") != 0 {
-						g.WriteLog("Pressed button 1")
+				g.ctx.TreeNode("Test 2", func(res microui.Res) {
+					g.ctx.LayoutRow(2, []int{54, 54}, 0)
+					if g.ctx.Button("Button 3") != 0 {
+						g.WriteLog("Pressed button 3")
 					}
-					if g.ctx.Button("Button 2") != 0 {
-						g.WriteLog("Pressed button 2")
+					if g.ctx.Button("Button 4") != 0 {
+						g.WriteLog("Pressed button 4")
+					}
+					if g.ctx.Button("Button 5") != 0 {
+						g.WriteLog("Pressed button 5")
+					}
+					if g.ctx.Button("Button 6") != 0 {
+						g.WriteLog("Pressed button 6")
 					}
 				})
+				g.ctx.TreeNode("Test 3", func(res microui.Res) {
+					g.ctx.Checkbox("Checkbox 1", &g.checks[0])
+					g.ctx.Checkbox("Checkbox 2", &g.checks[1])
+					g.ctx.Checkbox("Checkbox 3", &g.checks[2])
+				})
 			})
-			g.ctx.TreeNode("Test 2", func(res microui.Res) {
-				g.ctx.LayoutRow(2, []int{54, 54}, 0)
-				if g.ctx.Button("Button 3") != 0 {
-					g.WriteLog("Pressed button 3")
-				}
-				if g.ctx.Button("Button 4") != 0 {
-					g.WriteLog("Pressed button 4")
-				}
-				if g.ctx.Button("Button 5") != 0 {
-					g.WriteLog("Pressed button 5")
-				}
-				if g.ctx.Button("Button 6") != 0 {
-					g.WriteLog("Pressed button 6")
-				}
-			})
-			g.ctx.TreeNode("Test 3", func(res microui.Res) {
-				g.ctx.Checkbox("Checkbox 1", &g.checks[0])
-				g.ctx.Checkbox("Checkbox 2", &g.checks[1])
-				g.ctx.Checkbox("Checkbox 3", &g.checks[2])
-			})
-			g.ctx.LayoutEndColumn()
 
-			g.ctx.LayoutBeginColumn()
-			g.ctx.LayoutRow(1, []int{-1}, 0)
-			g.ctx.Text("Lorem ipsum dolor sit amet, consectetur adipiscing " +
-				"elit. Maecenas lacinia, sem eu lacinia molestie, mi risus faucibus " +
-				"ipsum, eu varius magna felis a nulla.")
-			g.ctx.LayoutEndColumn()
+			g.ctx.LayoutColumn(func() {
+				g.ctx.LayoutRow(1, []int{-1}, 0)
+				g.ctx.Text("Lorem ipsum dolor sit amet, consectetur adipiscing " +
+					"elit. Maecenas lacinia, sem eu lacinia molestie, mi risus faucibus " +
+					"ipsum, eu varius magna felis a nulla.")
+			})
 		}
 
 		// background color sliders
 		if g.ctx.HeaderEx("Background Color", microui.OptExpanded) != 0 {
 			g.ctx.LayoutRow(2, []int{-78, -1}, 74)
 			// sliders
-			g.ctx.LayoutBeginColumn()
-			g.ctx.LayoutRow(2, []int{46, -1}, 0)
-			g.ctx.Label("Red:")
-			g.ctx.Slider(&g.bg[0], 0, 255)
-			g.ctx.Label("Green:")
-			g.ctx.Slider(&g.bg[1], 0, 255)
-			g.ctx.Label("Blue:")
-			g.ctx.Slider(&g.bg[2], 0, 255)
-			g.ctx.LayoutEndColumn()
+			g.ctx.LayoutColumn(func() {
+				g.ctx.LayoutRow(2, []int{46, -1}, 0)
+				g.ctx.Label("Red:")
+				g.ctx.Slider(&g.bg[0], 0, 255)
+				g.ctx.Label("Green:")
+				g.ctx.Slider(&g.bg[1], 0, 255)
+				g.ctx.Label("Blue:")
+				g.ctx.Slider(&g.bg[2], 0, 255)
+			})
 			// color preview
 			r := g.ctx.LayoutNext()
 			g.ctx.DrawRect(r, color.RGBA{byte(g.bg[0]), byte(g.bg[1]), byte(g.bg[2]), 255})

@@ -16,11 +16,17 @@ func (c *Context) pushLayout(body image.Rectangle, scroll image.Point) {
 	c.LayoutRow(1, []int{0}, 0)
 }
 
-func (c *Context) LayoutBeginColumn() {
+func (c *Context) LayoutColumn(f func()) {
+	c.layoutBeginColumn()
+	defer c.layoutEndColumn()
+	f()
+}
+
+func (c *Context) layoutBeginColumn() {
 	c.pushLayout(c.LayoutNext(), image.Pt(0, 0))
 }
 
-func (c *Context) LayoutEndColumn() {
+func (c *Context) layoutEndColumn() {
 	b := c.Layout()
 	// pop()
 	c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
