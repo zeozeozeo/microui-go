@@ -215,7 +215,7 @@ func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt Option
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *float64, r image.Rectangle, id ID) bool {
+func (ctx *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool {
 	if ctx.mousePressed == mouseLeft && (ctx.keyDown&keyShift) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -251,7 +251,7 @@ func (ctx *Context) SliderEx(value *float64, low, high, step float64, format str
 	base := ctx.LayoutNext()
 
 	// handle text input mode
-	if ctx.NumberTextBox(&v, base, id) {
+	if ctx.numberTextBox(&v, base, id) {
 		return res
 	}
 
@@ -293,7 +293,7 @@ func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Op
 	last := *value
 
 	// handle text input mode
-	if ctx.NumberTextBox(value, base, id) {
+	if ctx.numberTextBox(value, base, id) {
 		return res
 	}
 
