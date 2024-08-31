@@ -172,7 +172,7 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	return res
 }
 
-func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt Option) int {
+func (ctx *Context) TextBoxRaw(buf *string, id ID, r image.Rectangle, opt Option) int {
 	var res int = 0
 	ctx.UpdateControl(id, r, opt|OptHoldFocus)
 	buflen := len(*buf)
@@ -222,7 +222,7 @@ func (ctx *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool
 		ctx.NumberEditBuf = fmt.Sprintf(realFmt, *value)
 	}
 	if ctx.NumberEdit == id {
-		res := ctx.TextboxRaw(&ctx.NumberEditBuf, id, r, 0)
+		res := ctx.TextBoxRaw(&ctx.NumberEditBuf, id, r, 0)
 		if (res&ResSubmit) != 0 || ctx.Focus != id {
 			nval, err := strconv.ParseFloat(ctx.NumberEditBuf, 32)
 			if err != nil {
@@ -240,7 +240,7 @@ func (ctx *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool
 func (ctx *Context) TextBoxEx(buf *string, opt Option) int {
 	id := ctx.GetID(PtrToBytes(unsafe.Pointer(buf)))
 	r := ctx.LayoutNext()
-	return ctx.TextboxRaw(buf, id, r, opt)
+	return ctx.TextBoxRaw(buf, id, r, opt)
 }
 
 func (ctx *Context) SliderEx(value *float64, low, high, step float64, format string, opt Option) int {
