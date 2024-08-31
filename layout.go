@@ -23,7 +23,6 @@ func (ctx *Context) LayoutBeginColumn() {
 func (ctx *Context) LayoutEndColumn() {
 	b := ctx.GetLayout()
 	// pop()
-	expect(len(ctx.layoutStack) > 0)
 	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
 	a := ctx.GetLayout()

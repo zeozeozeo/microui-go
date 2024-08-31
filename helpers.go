@@ -85,7 +85,6 @@ func (ctx *Context) PushID(data []byte) {
 }
 
 func (ctx *Context) PopID() {
-	expect(len(ctx.idStack) > 0)
 	ctx.idStack = ctx.idStack[:len(ctx.idStack)-1]
 }
 
@@ -96,12 +95,10 @@ func (ctx *Context) PushClipRect(rect image.Rectangle) {
 }
 
 func (ctx *Context) PopClipRect() {
-	expect(len(ctx.clipStack) > 0)
 	ctx.clipStack = ctx.clipStack[:len(ctx.clipStack)-1]
 }
 
 func (ctx *Context) GetClipRect() image.Rectangle {
-	expect(len(ctx.clipStack) > 0)
 	return ctx.clipStack[len(ctx.clipStack)-1]
 }
 
@@ -117,7 +114,6 @@ func (ctx *Context) CheckClip(r image.Rectangle) int {
 }
 
 func (ctx *Context) GetLayout() *Layout {
-	expect(len(ctx.layoutStack) > 0)
 	return &ctx.layoutStack[len(ctx.layoutStack)-1]
 }
 
@@ -128,16 +124,13 @@ func (ctx *Context) popContainer() {
 	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Min.Y
 	// pop container, layout and id
 	// pop()
-	expect(len(ctx.containerStack) > 0) // TODO: no expect in original impl
 	ctx.containerStack = ctx.containerStack[:len(ctx.containerStack)-1]
 	// pop()
-	expect(len(ctx.layoutStack) > 0) // TODO: no expect in original impl
 	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
 	ctx.PopID()
 }
 
 func (ctx *Context) GetCurrentContainer() *Container {
-	expect(len(ctx.containerStack) > 0)
 	return ctx.containerStack[len(ctx.containerStack)-1]
 }
 
