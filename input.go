@@ -9,8 +9,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (ctx *Context) inputMouseMove(x, y int) {
-	ctx.mousePos = image.Pt(x, y)
+func (c *Context) inputMouseMove(x, y int) {
+	c.mousePos = image.Pt(x, y)
 }
 
 func mouseButtonToInt(btn ebiten.MouseButton) int {
@@ -25,20 +25,20 @@ func mouseButtonToInt(btn ebiten.MouseButton) int {
 	return 0
 }
 
-func (ctx *Context) inputMouseDown(x, y int, btn ebiten.MouseButton) {
-	ctx.inputMouseMove(x, y)
-	ctx.mouseDown |= mouseButtonToInt(btn)
-	ctx.mousePressed |= mouseButtonToInt(btn)
+func (c *Context) inputMouseDown(x, y int, btn ebiten.MouseButton) {
+	c.inputMouseMove(x, y)
+	c.mouseDown |= mouseButtonToInt(btn)
+	c.mousePressed |= mouseButtonToInt(btn)
 }
 
-func (ctx *Context) inputMouseUp(x, y int, btn ebiten.MouseButton) {
-	ctx.inputMouseMove(x, y)
-	ctx.mouseDown &= ^mouseButtonToInt(btn)
+func (c *Context) inputMouseUp(x, y int, btn ebiten.MouseButton) {
+	c.inputMouseMove(x, y)
+	c.mouseDown &= ^mouseButtonToInt(btn)
 }
 
-func (ctx *Context) inputScroll(x, y int) {
-	ctx.scrollDelta.X += x
-	ctx.scrollDelta.Y += y
+func (c *Context) inputScroll(x, y int) {
+	c.scrollDelta.X += x
+	c.scrollDelta.Y += y
 }
 
 func keyToInt(key ebiten.Key) int {
@@ -57,15 +57,15 @@ func keyToInt(key ebiten.Key) int {
 	return 0
 }
 
-func (ctx *Context) inputKeyDown(key ebiten.Key) {
-	ctx.keyPressed |= keyToInt(key)
-	ctx.keyDown |= keyToInt(key)
+func (c *Context) inputKeyDown(key ebiten.Key) {
+	c.keyPressed |= keyToInt(key)
+	c.keyDown |= keyToInt(key)
 }
 
-func (ctx *Context) inputKeyUp(key ebiten.Key) {
-	ctx.keyDown &= ^keyToInt(key)
+func (c *Context) inputKeyUp(key ebiten.Key) {
+	c.keyDown &= ^keyToInt(key)
 }
 
-func (ctx *Context) inputText(text []rune) {
-	ctx.textInput = text
+func (c *Context) inputText(text []rune) {
+	c.textInput = text
 }

@@ -5,35 +5,35 @@ package microui
 
 import "image"
 
-func (ctx *Context) pushLayout(body image.Rectangle, scroll image.Point) {
+func (c *Context) pushLayout(body image.Rectangle, scroll image.Point) {
 	layout := Layout{}
 	layout.Body = body.Sub(scroll)
 	layout.Max = image.Pt(-0x1000000, -0x1000000)
 
 	// push()
-	ctx.layoutStack = append(ctx.layoutStack, layout)
+	c.layoutStack = append(c.layoutStack, layout)
 
-	ctx.LayoutRow(1, []int{0}, 0)
+	c.LayoutRow(1, []int{0}, 0)
 }
 
-func (ctx *Context) LayoutBeginColumn() {
-	ctx.pushLayout(ctx.LayoutNext(), image.Pt(0, 0))
+func (c *Context) LayoutBeginColumn() {
+	c.pushLayout(c.LayoutNext(), image.Pt(0, 0))
 }
 
-func (ctx *Context) LayoutEndColumn() {
-	b := ctx.GetLayout()
+func (c *Context) LayoutEndColumn() {
+	b := c.GetLayout()
 	// pop()
-	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
+	c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
-	a := ctx.GetLayout()
+	a := c.GetLayout()
 	a.Position.X = max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)
 	a.NextRow = max(a.NextRow, b.NextRow+b.Body.Min.Y-a.Body.Min.Y)
 	a.Max.X = max(a.Max.X, b.Max.X)
 	a.Max.Y = max(a.Max.Y, b.Max.Y)
 }
 
-func (ctx *Context) LayoutRow(items int, widths []int, height int) {
-	layout := ctx.GetLayout()
+func (c *Context) LayoutRow(items int, widths []int, height int) {
+	layout := c.GetLayout()
 
 	expect(len(widths) <= maxWidths)
 	copy(layout.Widths[:], widths)
@@ -45,23 +45,23 @@ func (ctx *Context) LayoutRow(items int, widths []int, height int) {
 }
 
 // LayoutWidth sets layout size.x
-func (ctx *Context) LayoutWidth(width int) {
-	ctx.GetLayout().Size.X = width
+func (c *Context) LayoutWidth(width int) {
+	c.GetLayout().Size.X = width
 }
 
 // LayoutHeight sets layout size.y
-func (ctx *Context) LayoutHeight(height int) {
-	ctx.GetLayout().Size.Y = height
+func (c *Context) LayoutHeight(height int) {
+	c.GetLayout().Size.Y = height
 }
 
-func (ctx *Context) LayoutNext() image.Rectangle {
-	layout := ctx.GetLayout()
-	style := ctx.Style
+func (c *Context) LayoutNext() image.Rectangle {
+	layout := c.GetLayout()
+	style := c.Style
 	var res image.Rectangle
 
 	// handle next row
 	if layout.ItemIndex == layout.Items {
-		ctx.LayoutRow(layout.Items, nil, layout.Size.Y)
+		c.LayoutRow(layout.Items, nil, layout.Size.Y)
 	}
 
 	// position
@@ -100,6 +100,6 @@ func (ctx *Context) LayoutNext() image.Rectangle {
 	layout.Max.X = max(layout.Max.X, res.Max.X)
 	layout.Max.Y = max(layout.Max.Y, res.Max.Y)
 
-	ctx.LastRect = res
-	return ctx.LastRect
+	c.LastRect = res
+	return c.LastRect
 }

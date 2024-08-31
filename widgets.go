@@ -5,24 +5,24 @@ package microui
 
 import "image"
 
-func (ctx *Context) Button(label string) Res {
-	return ctx.ButtonEx(label, 0, OptAlignCenter)
+func (c *Context) Button(label string) Res {
+	return c.ButtonEx(label, 0, OptAlignCenter)
 }
 
-func (ctx *Context) TextBox(buf *string) Res {
-	return ctx.TextBoxEx(buf, 0)
+func (c *Context) TextBox(buf *string) Res {
+	return c.TextBoxEx(buf, 0)
 }
 
-func (ctx *Context) Slider(value *float64, lo, hi float64) Res {
-	return ctx.SliderEx(value, lo, hi, 0, sliderFmt, OptAlignCenter)
+func (c *Context) Slider(value *float64, lo, hi float64) Res {
+	return c.SliderEx(value, lo, hi, 0, sliderFmt, OptAlignCenter)
 }
 
-func (ctx *Context) Number(value *float64, step float64) Res {
-	return ctx.NumberEx(value, step, sliderFmt, OptAlignCenter)
+func (c *Context) Number(value *float64, step float64) Res {
+	return c.NumberEx(value, step, sliderFmt, OptAlignCenter)
 }
 
-func (ctx *Context) Header(label string) Res {
-	return ctx.HeaderEx(label, 0)
+func (c *Context) Header(label string) Res {
+	return c.HeaderEx(label, 0)
 }
 
 func (c *Context) TreeNode(label string, f func(res Res)) {
@@ -32,19 +32,19 @@ func (c *Context) TreeNode(label string, f func(res Res)) {
 	}
 }
 
-func (ctx *Context) beginTreeNode(label string) Res {
-	return ctx.beginTreeNodeEx(label, 0)
+func (c *Context) beginTreeNode(label string) Res {
+	return c.beginTreeNodeEx(label, 0)
 }
 
-func (ctx *Context) Window(title string, rect image.Rectangle, f func(res Res)) {
-	if res := ctx.beginWindow(title, rect); res != 0 {
-		defer ctx.endWindow()
+func (c *Context) Window(title string, rect image.Rectangle, f func(res Res)) {
+	if res := c.beginWindow(title, rect); res != 0 {
+		defer c.endWindow()
 		f(res)
 	}
 }
 
-func (ctx *Context) beginWindow(title string, rect image.Rectangle) Res {
-	return ctx.beginWindowEx(title, rect, 0)
+func (c *Context) beginWindow(title string, rect image.Rectangle) Res {
+	return c.beginWindowEx(title, rect, 0)
 }
 
 func (c *Context) Panel(name string, f func()) {
@@ -53,6 +53,6 @@ func (c *Context) Panel(name string, f func()) {
 	f()
 }
 
-func (ctx *Context) beginPanel(name string) {
-	ctx.beginPanelEx(name, 0)
+func (c *Context) beginPanel(name string) {
+	c.beginPanelEx(name, 0)
 }

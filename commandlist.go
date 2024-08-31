@@ -9,106 +9,106 @@ import (
 )
 
 // pushCommand adds a new command with type cmd_type to command_list
-func (ctx *Context) pushCommand(cmd_type int) *command {
+func (c *Context) pushCommand(cmd_type int) *command {
 	cmd := command{
 		typ: cmd_type,
 	}
 	//expect(uintptr(len(ctx.CommandList))*size+size < MU_COMMANDLIST_SIZE)
 	cmd.base.typ = cmd_type
-	cmd.idx = len(ctx.commandList)
-	ctx.commandList = append(ctx.commandList, &cmd)
+	cmd.idx = len(c.commandList)
+	c.commandList = append(c.commandList, &cmd)
 	return &cmd
 }
 
-func (ctx *Context) nextCommand(cmd **command) bool {
-	if len(ctx.commandList) == 0 {
+func (c *Context) nextCommand(cmd **command) bool {
+	if len(c.commandList) == 0 {
 		return false
 	}
 	if *cmd == nil {
-		*cmd = ctx.commandList[0]
+		*cmd = c.commandList[0]
 	} else {
-		*cmd = ctx.commandList[(*cmd).idx+1]
+		*cmd = c.commandList[(*cmd).idx+1]
 	}
 
-	for (*cmd).idx < len(ctx.commandList) {
+	for (*cmd).idx < len(c.commandList) {
 		if (*cmd).typ != commandJump {
 			return true
 		}
 		idx := (*cmd).jump.dstIdx
-		if idx > len(ctx.commandList)-1 {
+		if idx > len(c.commandList)-1 {
 			break
 		}
-		*cmd = ctx.commandList[idx]
+		*cmd = c.commandList[idx]
 	}
 	return false
 }
 
 // pushJump pushes a new jump command to command_list
-func (ctx *Context) pushJump(dstIdx int) int {
-	cmd := ctx.pushCommand(commandJump)
+func (c *Context) pushJump(dstIdx int) int {
+	cmd := c.pushCommand(commandJump)
 	cmd.jump.dstIdx = dstIdx
-	return len(ctx.commandList) - 1
+	return len(c.commandList) - 1
 }
 
 // SetClip pushes a new clip command
-func (ctx *Context) SetClip(rect image.Rectangle) {
-	cmd := ctx.pushCommand(commandClip)
+func (c *Context) SetClip(rect image.Rectangle) {
+	cmd := c.pushCommand(commandClip)
 	cmd.clip.rect = rect
 }
 
 // DrawRect pushes a new rect command
-func (ctx *Context) DrawRect(rect image.Rectangle, color color.Color) {
-	rect2 := rect.Intersect(ctx.GetClipRect())
+func (c *Context) DrawRect(rect image.Rectangle, color color.Color) {
+	rect2 := rect.Intersect(c.GetClipRect())
 	if rect2.Dx() > 0 && rect2.Dy() > 0 {
-		cmd := ctx.pushCommand(commandRect)
+		cmd := c.pushCommand(commandRect)
 		cmd.rect.rect = rect2
 		cmd.rect.color = color
 	}
 }
 
-func (ctx *Context) DrawBox(rect image.Rectangle, color color.Color) {
-	ctx.DrawRect(image.Rect(rect.Min.X+1, rect.Min.Y, rect.Max.X-1, rect.Min.Y+1), color)
-	ctx.DrawRect(image.Rect(rect.Min.X+1, rect.Max.Y-1, rect.Max.X-1, rect.Max.Y), color)
-	ctx.DrawRect(image.Rect(rect.Min.X, rect.Min.Y, rect.Min.X+1, rect.Max.Y), color)
-	ctx.DrawRect(image.Rect(rect.Max.X-1, rect.Min.Y, rect.Max.X, rect.Max.Y), color)
+func (c *Context) DrawBox(rect image.Rectangle, color color.Color) {
+	c.DrawRect(image.Rect(rect.Min.X+1, rect.Min.Y, rect.Max.X-1, rect.Min.Y+1), color)
+	c.DrawRect(image.Rect(rect.Min.X+1, rect.Max.Y-1, rect.Max.X-1, rect.Max.Y), color)
+	c.DrawRect(image.Rect(rect.Min.X, rect.Min.Y, rect.Min.X+1, rect.Max.Y), color)
+	c.DrawRect(image.Rect(rect.Max.X-1, rect.Min.Y, rect.Max.X, rect.Max.Y), color)
 }
 
-func (ctx *Context) DrawText(str string, pos image.Point, color color.Color) {
+func (c *Context) DrawText(str string, pos image.Point, color color.Color) {
 	rect := image.Rect(pos.X, pos.Y, pos.X+textWidth(str), pos.Y+textHeight())
-	clipped := ctx.CheckClip(rect)
+	clipped := c.CheckClip(rect)
 	if clipped == ClipAll {
 		return
 	}
 	if clipped == ClipPart {
-		ctx.SetClip(ctx.GetClipRect())
+		c.SetClip(c.GetClipRect())
 	}
 	// add command
-	cmd := ctx.pushCommand(commandText)
+	cmd := c.pushCommand(commandText)
 	cmd.text.str = str
 	cmd.text.pos = pos
 	cmd.text.color = color
 	// reset clipping if it was set
 	if clipped != 0 {
-		ctx.SetClip(unclippedRect)
+		c.SetClip(unclippedRect)
 	}
 }
 
-func (ctx *Context) DrawIcon(icon Icon, rect image.Rectangle, color color.Color) {
+func (c *Context) DrawIcon(icon Icon, rect image.Rectangle, color color.Color) {
 	// do clip command if the rect isn't fully contained within the cliprect
-	clipped := ctx.CheckClip(rect)
+	clipped := c.CheckClip(rect)
 	if clipped == ClipAll {
 		return
 	}
 	if clipped == ClipPart {
-		ctx.SetClip(ctx.GetClipRect())
+		c.SetClip(c.GetClipRect())
 	}
 	// do icon command
-	cmd := ctx.pushCommand(commandIcon)
+	cmd := c.pushCommand(commandIcon)
 	cmd.icon.icon = icon
 	cmd.icon.rect = rect
 	cmd.icon.color = color
 	// reset clipping if it was set
 	if clipped != 0 {
-		ctx.SetClip(unclippedRect)
+		c.SetClip(unclippedRect)
 	}
 }

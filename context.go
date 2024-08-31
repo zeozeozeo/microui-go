@@ -7,8 +7,8 @@ import (
 	"image"
 )
 
-func (ctx *Context) drawFrame(rect image.Rectangle, colorid int) {
-	ctx.DrawRect(rect, ctx.Style.Colors[colorid])
+func (c *Context) drawFrame(rect image.Rectangle, colorid int) {
+	c.DrawRect(rect, c.Style.Colors[colorid])
 	if colorid == ColorScrollBase ||
 		colorid == ColorScrollThumb ||
 		colorid == ColorTitleBG {
@@ -16,8 +16,8 @@ func (ctx *Context) drawFrame(rect image.Rectangle, colorid int) {
 	}
 
 	// draw border
-	if ctx.Style.Colors[ColorBorder].A != 0 {
-		ctx.DrawBox(rect.Inset(-1), ctx.Style.Colors[ColorBorder])
+	if c.Style.Colors[ColorBorder].A != 0 {
+		c.DrawBox(rect.Inset(-1), c.Style.Colors[ColorBorder])
 	}
 }
 

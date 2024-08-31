@@ -62,48 +62,48 @@ func ptrToBytes(ptr unsafe.Pointer) []byte {
 }
 
 // id returns a hash value based on the data and the last ID on the stack.
-func (ctx *Context) id(data []byte) ID {
+func (c *Context) id(data []byte) ID {
 	const (
 		hashInitial = 2166136261 // 32bit fnv-1a hash
 	)
 
-	idx := len(ctx.idStack)
+	idx := len(c.idStack)
 	var res ID
 	if idx > 0 {
-		res = ctx.idStack[len(ctx.idStack)-1]
+		res = c.idStack[len(c.idStack)-1]
 	} else {
 		res = hashInitial
 	}
 	hash(&res, data)
-	ctx.LastID = res
+	c.LastID = res
 	return res
 }
 
-func (ctx *Context) pushID(data []byte) {
+func (c *Context) pushID(data []byte) {
 	// push()
-	ctx.idStack = append(ctx.idStack, ctx.id(data))
+	c.idStack = append(c.idStack, c.id(data))
 }
 
-func (ctx *Context) popID() {
-	ctx.idStack = ctx.idStack[:len(ctx.idStack)-1]
+func (c *Context) popID() {
+	c.idStack = c.idStack[:len(c.idStack)-1]
 }
 
-func (ctx *Context) PushClipRect(rect image.Rectangle) {
-	last := ctx.GetClipRect()
+func (c *Context) PushClipRect(rect image.Rectangle) {
+	last := c.GetClipRect()
 	// push()
-	ctx.clipStack = append(ctx.clipStack, rect.Intersect(last))
+	c.clipStack = append(c.clipStack, rect.Intersect(last))
 }
 
-func (ctx *Context) PopClipRect() {
-	ctx.clipStack = ctx.clipStack[:len(ctx.clipStack)-1]
+func (c *Context) PopClipRect() {
+	c.clipStack = c.clipStack[:len(c.clipStack)-1]
 }
 
-func (ctx *Context) GetClipRect() image.Rectangle {
-	return ctx.clipStack[len(ctx.clipStack)-1]
+func (c *Context) GetClipRect() image.Rectangle {
+	return c.clipStack[len(c.clipStack)-1]
 }
 
-func (ctx *Context) CheckClip(r image.Rectangle) int {
-	cr := ctx.GetClipRect()
+func (c *Context) CheckClip(r image.Rectangle) int {
+	cr := c.GetClipRect()
 	if !r.Overlaps(cr) {
 		return ClipAll
 	}
@@ -113,63 +113,63 @@ func (ctx *Context) CheckClip(r image.Rectangle) int {
 	return ClipPart
 }
 
-func (ctx *Context) GetLayout() *Layout {
-	return &ctx.layoutStack[len(ctx.layoutStack)-1]
+func (c *Context) GetLayout() *Layout {
+	return &c.layoutStack[len(c.layoutStack)-1]
 }
 
-func (ctx *Context) popContainer() {
-	cnt := ctx.GetCurrentContainer()
-	layout := ctx.GetLayout()
+func (c *Context) popContainer() {
+	cnt := c.GetCurrentContainer()
+	layout := c.GetLayout()
 	cnt.ContentSize.X = layout.Max.X - layout.Body.Min.X
 	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Min.Y
 	// pop container, layout and id
 	// pop()
-	ctx.containerStack = ctx.containerStack[:len(ctx.containerStack)-1]
+	c.containerStack = c.containerStack[:len(c.containerStack)-1]
 	// pop()
-	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
-	ctx.popID()
+	c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
+	c.popID()
 }
 
-func (ctx *Context) GetCurrentContainer() *Container {
-	return ctx.containerStack[len(ctx.containerStack)-1]
+func (c *Context) GetCurrentContainer() *Container {
+	return c.containerStack[len(c.containerStack)-1]
 }
 
-func (ctx *Context) getContainer(id ID, opt Option) *Container {
+func (c *Context) getContainer(id ID, opt Option) *Container {
 	// try to get existing container from pool
-	idx := ctx.poolGet(ctx.containerPool[:], id)
+	idx := c.poolGet(c.containerPool[:], id)
 	if idx >= 0 {
-		if ctx.containers[idx].Open || (^opt&OptClosed) != 0 {
-			ctx.poolUpdate(ctx.containerPool[:], idx)
+		if c.containers[idx].Open || (^opt&OptClosed) != 0 {
+			c.poolUpdate(c.containerPool[:], idx)
 		}
-		return &ctx.containers[idx]
+		return &c.containers[idx]
 	}
 	if (opt & OptClosed) != 0 {
 		return nil
 	}
 	// container not found in pool: init new container
-	idx = ctx.poolInit(ctx.containerPool[:], id)
-	cnt := &ctx.containers[idx]
+	idx = c.poolInit(c.containerPool[:], id)
+	cnt := &c.containers[idx]
 	*cnt = Container{}
 	cnt.HeadIdx = -1
 	cnt.TailIdx = -1
 	cnt.Open = true
-	ctx.BringToFront(cnt)
+	c.BringToFront(cnt)
 	return cnt
 }
 
-func (ctx *Context) GetContainer(name string) *Container {
-	id := ctx.id([]byte(name))
-	return ctx.getContainer(id, 0)
+func (c *Context) GetContainer(name string) *Container {
+	id := c.id([]byte(name))
+	return c.getContainer(id, 0)
 }
 
-func (ctx *Context) BringToFront(cnt *Container) {
-	ctx.LastZindex++
-	cnt.Zindex = ctx.LastZindex
+func (c *Context) BringToFront(cnt *Container) {
+	c.LastZindex++
+	cnt.Zindex = c.LastZindex
 }
 
-func (ctx *Context) SetFocus(id ID) {
-	ctx.Focus = id
-	ctx.UpdatedFocus = true
+func (c *Context) SetFocus(id ID) {
+	c.Focus = id
+	c.UpdatedFocus = true
 }
 
 func (c *Context) Update(f func()) {
@@ -178,74 +178,74 @@ func (c *Context) Update(f func()) {
 	f()
 }
 
-func (ctx *Context) begin() {
-	ctx.updateInput()
+func (c *Context) begin() {
+	c.updateInput()
 
-	ctx.commandList = ctx.commandList[:0]
-	ctx.rootList = ctx.rootList[:0]
-	ctx.ScrollTarget = nil
-	ctx.HoverRoot = ctx.NextHoverRoot
-	ctx.NextHoverRoot = nil
-	ctx.mouseDelta.X = ctx.mousePos.X - ctx.lastMousePos.X
-	ctx.mouseDelta.Y = ctx.mousePos.Y - ctx.lastMousePos.Y
-	ctx.tick++
+	c.commandList = c.commandList[:0]
+	c.rootList = c.rootList[:0]
+	c.ScrollTarget = nil
+	c.HoverRoot = c.NextHoverRoot
+	c.NextHoverRoot = nil
+	c.mouseDelta.X = c.mousePos.X - c.lastMousePos.X
+	c.mouseDelta.Y = c.mousePos.Y - c.lastMousePos.Y
+	c.tick++
 }
 
-func (ctx *Context) end() {
+func (c *Context) end() {
 	// check stacks
-	expect(len(ctx.containerStack) == 0)
-	expect(len(ctx.clipStack) == 0)
-	expect(len(ctx.idStack) == 0)
-	expect(len(ctx.layoutStack) == 0)
+	expect(len(c.containerStack) == 0)
+	expect(len(c.clipStack) == 0)
+	expect(len(c.idStack) == 0)
+	expect(len(c.layoutStack) == 0)
 
 	// handle scroll input
-	if ctx.ScrollTarget != nil {
-		ctx.ScrollTarget.Scroll.X += ctx.scrollDelta.X
-		ctx.ScrollTarget.Scroll.Y += ctx.scrollDelta.Y
+	if c.ScrollTarget != nil {
+		c.ScrollTarget.Scroll.X += c.scrollDelta.X
+		c.ScrollTarget.Scroll.Y += c.scrollDelta.Y
 	}
 
 	// unset focus if focus id was not touched this frame
-	if !ctx.UpdatedFocus {
-		ctx.Focus = 0
+	if !c.UpdatedFocus {
+		c.Focus = 0
 	}
-	ctx.UpdatedFocus = false
+	c.UpdatedFocus = false
 
 	// bring hover root to front if mouse was pressed
-	if ctx.mousePressed != 0 && ctx.NextHoverRoot != nil &&
-		ctx.NextHoverRoot.Zindex < ctx.LastZindex &&
-		ctx.NextHoverRoot.Zindex >= 0 {
-		ctx.BringToFront(ctx.NextHoverRoot)
+	if c.mousePressed != 0 && c.NextHoverRoot != nil &&
+		c.NextHoverRoot.Zindex < c.LastZindex &&
+		c.NextHoverRoot.Zindex >= 0 {
+		c.BringToFront(c.NextHoverRoot)
 	}
 
 	// reset input state
-	ctx.keyPressed = 0
-	ctx.textInput = nil
-	ctx.mousePressed = 0
-	ctx.scrollDelta = image.Pt(0, 0)
-	ctx.lastMousePos = ctx.mousePos
+	c.keyPressed = 0
+	c.textInput = nil
+	c.mousePressed = 0
+	c.scrollDelta = image.Pt(0, 0)
+	c.lastMousePos = c.mousePos
 
 	// sort root containers by zindex
-	sort.SliceStable(ctx.rootList, func(i, j int) bool {
-		return ctx.rootList[i].Zindex < ctx.rootList[j].Zindex
+	sort.SliceStable(c.rootList, func(i, j int) bool {
+		return c.rootList[i].Zindex < c.rootList[j].Zindex
 	})
 
 	// set root container jump commands
-	for i := 0; i < len(ctx.rootList); i++ {
-		cnt := ctx.rootList[i]
+	for i := 0; i < len(c.rootList); i++ {
+		cnt := c.rootList[i]
 		// if this is the first container then make the first command jump to it.
 		// otherwise set the previous container's tail to jump to this one
 		if i == 0 {
-			cmd := ctx.commandList[0]
+			cmd := c.commandList[0]
 			expect(cmd.typ == commandJump)
 			cmd.jump.dstIdx = cnt.HeadIdx + 1
 			expect(cmd.jump.dstIdx < commandListSize)
 		} else {
-			prev := ctx.rootList[i-1]
-			ctx.commandList[prev.TailIdx].jump.dstIdx = cnt.HeadIdx + 1
+			prev := c.rootList[i-1]
+			c.commandList[prev.TailIdx].jump.dstIdx = cnt.HeadIdx + 1
 		}
 		// make the last container's tail jump to the end of command list
-		if i == len(ctx.rootList)-1 {
-			ctx.commandList[cnt.TailIdx].jump.dstIdx = len(ctx.commandList)
+		if i == len(c.rootList)-1 {
+			c.commandList[cnt.TailIdx].jump.dstIdx = len(c.commandList)
 		}
 	}
 }
