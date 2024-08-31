@@ -41,7 +41,9 @@ func (c *Context) layoutEndColumn() {
 func (c *Context) LayoutRow(items int, widths []int, height int) {
 	layout := c.layout()
 
-	expect(len(widths) <= maxWidths)
+	if len(layout.widths) < len(widths) {
+		layout.widths = append(layout.widths, make([]int, len(widths)-len(layout.widths))...)
+	}
 	copy(layout.widths[:], widths)
 
 	layout.items = items

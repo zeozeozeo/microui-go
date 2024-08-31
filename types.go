@@ -49,7 +49,7 @@ type layout struct {
 	position  image.Point
 	size      image.Point
 	max       image.Point
-	widths    [maxWidths]int
+	widths    []int
 	items     int
 	itemIndex int
 	nextRow   int
