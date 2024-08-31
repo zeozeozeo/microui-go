@@ -175,11 +175,11 @@ func (g *Game) LogWindow() {
 	}
 }
 
-func (g *Game) uint8Slider(fvalue *float64, value *byte, low, high byte) int {
+func (g *Game) byteSlider(fvalue *float64, value *byte, low, high byte) int {
 	*fvalue = float64(*value)
 	g.ctx.PushID(microui.PtrToBytes(unsafe.Pointer(fvalue)))
 	res := g.ctx.SliderEx(fvalue, float64(low), float64(high), 0, "%.0f", microui.OptAlignCenter)
-	*value = uint8(*fvalue)
+	*value = byte(*fvalue)
 	g.ctx.PopID()
 
 	return res
@@ -216,10 +216,10 @@ func (g *Game) StyleWindow() {
 		g.ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
 		for _, c := range colors {
 			g.ctx.Label(c.Label)
-			g.uint8Slider(&fcolors[c.ColorID].R, &g.ctx.Style.Colors[c.ColorID].R, 0, 255)
-			g.uint8Slider(&fcolors[c.ColorID].G, &g.ctx.Style.Colors[c.ColorID].G, 0, 255)
-			g.uint8Slider(&fcolors[c.ColorID].B, &g.ctx.Style.Colors[c.ColorID].B, 0, 255)
-			g.uint8Slider(&fcolors[c.ColorID].A, &g.ctx.Style.Colors[c.ColorID].A, 0, 255)
+			g.byteSlider(&fcolors[c.ColorID].R, &g.ctx.Style.Colors[c.ColorID].R, 0, 255)
+			g.byteSlider(&fcolors[c.ColorID].G, &g.ctx.Style.Colors[c.ColorID].G, 0, 255)
+			g.byteSlider(&fcolors[c.ColorID].B, &g.ctx.Style.Colors[c.ColorID].B, 0, 255)
+			g.byteSlider(&fcolors[c.ColorID].A, &g.ctx.Style.Colors[c.ColorID].A, 0, 255)
 			g.ctx.DrawRect(g.ctx.LayoutNext(), g.ctx.Style.Colors[c.ColorID])
 		}
 		g.ctx.EndWindow()
