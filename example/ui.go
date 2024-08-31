@@ -27,14 +27,14 @@ func (g *Game) WriteLog(text string) {
 }
 
 func (g *Game) TestWindow() {
-	if g.ctx.BeginWindow("Demo Window", image.Rect(40, 40, 340, 490)) {
+	if g.ctx.BeginWindow("Demo Window", image.Rect(40, 40, 340, 490)) != 0 {
 		defer g.ctx.EndWindow()
 		win := g.ctx.GetCurrentContainer()
 		win.Rect.Max.X = win.Rect.Min.X + max(win.Rect.Dx(), 240)
 		win.Rect.Max.Y = win.Rect.Min.Y + max(win.Rect.Dy(), 300)
 
 		/* window info */
-		if g.ctx.Header("Window Info") {
+		if g.ctx.Header("Window Info") != 0 {
 			win := g.ctx.GetCurrentContainer()
 			g.ctx.LayoutRow(2, []int{54, -1}, 0)
 			g.ctx.Label("Position:")
@@ -47,17 +47,17 @@ func (g *Game) TestWindow() {
 		if g.ctx.HeaderEx("Test Buttons", microui.OptExpanded) != 0 {
 			g.ctx.LayoutRow(3, []int{100, -110, -1}, 0)
 			g.ctx.Label("Test buttons 1:")
-			if g.ctx.Button("Button 1") {
+			if g.ctx.Button("Button 1") != 0 {
 				g.WriteLog("Pressed button 1")
 			}
-			if g.ctx.Button("Button 2") {
+			if g.ctx.Button("Button 2") != 0 {
 				g.WriteLog("Pressed button 2")
 			}
 			g.ctx.Label("Test buttons 2:")
-			if g.ctx.Button("Button 3") {
+			if g.ctx.Button("Button 3") != 0 {
 				g.WriteLog("Pressed button 3")
 			}
-			if g.ctx.Button("Popup") {
+			if g.ctx.Button("Popup") != 0 {
 				g.ctx.OpenPopup("Test Popup")
 			}
 			if g.ctx.BeginPopup("Test Popup") != 0 {
@@ -71,40 +71,40 @@ func (g *Game) TestWindow() {
 		if g.ctx.HeaderEx("Tree and Text", microui.OptExpanded) != 0 {
 			g.ctx.LayoutRow(2, []int{140, -1}, 0)
 			g.ctx.LayoutBeginColumn()
-			if g.ctx.BeginTreeNode("Test 1") {
-				if g.ctx.BeginTreeNode("Test 1a") {
+			if g.ctx.BeginTreeNode("Test 1") != 0 {
+				if g.ctx.BeginTreeNode("Test 1a") != 0 {
 					g.ctx.Label("Hello")
 					g.ctx.Label("World")
 					g.ctx.EndTreeNode()
 				}
-				if g.ctx.BeginTreeNode("Test 1b") {
-					if g.ctx.Button("Button 1") {
+				if g.ctx.BeginTreeNode("Test 1b") != 0 {
+					if g.ctx.Button("Button 1") != 0 {
 						g.WriteLog("Pressed button 1")
 					}
-					if g.ctx.Button("Button 2") {
+					if g.ctx.Button("Button 2") != 0 {
 						g.WriteLog("Pressed button 2")
 					}
 					g.ctx.EndTreeNode()
 				}
 				g.ctx.EndTreeNode()
 			}
-			if g.ctx.BeginTreeNode("Test 2") {
+			if g.ctx.BeginTreeNode("Test 2") != 0 {
 				g.ctx.LayoutRow(2, []int{54, 54}, 0)
-				if g.ctx.Button("Button 3") {
+				if g.ctx.Button("Button 3") != 0 {
 					g.WriteLog("Pressed button 3")
 				}
-				if g.ctx.Button("Button 4") {
+				if g.ctx.Button("Button 4") != 0 {
 					g.WriteLog("Pressed button 4")
 				}
-				if g.ctx.Button("Button 5") {
+				if g.ctx.Button("Button 5") != 0 {
 					g.WriteLog("Pressed button 5")
 				}
-				if g.ctx.Button("Button 6") {
+				if g.ctx.Button("Button 6") != 0 {
 					g.WriteLog("Pressed button 6")
 				}
 				g.ctx.EndTreeNode()
 			}
-			if g.ctx.BeginTreeNode("Test 3") {
+			if g.ctx.BeginTreeNode("Test 3") != 0 {
 				g.ctx.Checkbox("Checkbox 1", &g.checks[0])
 				g.ctx.Checkbox("Checkbox 2", &g.checks[1])
 				g.ctx.Checkbox("Checkbox 3", &g.checks[2])
@@ -143,7 +143,7 @@ func (g *Game) TestWindow() {
 }
 
 func (g *Game) LogWindow() {
-	if g.ctx.BeginWindow("Log Window", image.Rect(350, 40, 650, 240)) {
+	if g.ctx.BeginWindow("Log Window", image.Rect(350, 40, 650, 240)) != 0 {
 		defer g.ctx.EndWindow()
 		/* output text panel */
 		g.ctx.LayoutRow(1, []int{-1}, -25)
@@ -164,7 +164,7 @@ func (g *Game) LogWindow() {
 			g.ctx.SetFocus(g.ctx.LastID)
 			submitted = true
 		}
-		if g.ctx.Button("Submit") {
+		if g.ctx.Button("Submit") != 0 {
 			submitted = true
 		}
 		if submitted {
@@ -207,7 +207,7 @@ var (
 )
 
 func (g *Game) StyleWindow() {
-	if g.ctx.BeginWindow("Style Editor", image.Rect(350, 250, 650, 490)) {
+	if g.ctx.BeginWindow("Style Editor", image.Rect(350, 250, 650, 490)) != 0 {
 		sw := int(float64(g.ctx.GetCurrentContainer().Body.Dx()) * 0.14)
 		g.ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
 		for _, c := range colors {
