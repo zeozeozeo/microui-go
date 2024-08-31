@@ -172,7 +172,13 @@ func (ctx *Context) SetFocus(id ID) {
 	ctx.UpdatedFocus = true
 }
 
-func (ctx *Context) Begin() {
+func (c *Context) Update(f func()) {
+	c.begin()
+	defer c.end()
+	f()
+}
+
+func (ctx *Context) begin() {
 	ctx.updateInput()
 
 	ctx.commandList = ctx.commandList[:0]
@@ -185,7 +191,7 @@ func (ctx *Context) Begin() {
 	ctx.tick++
 }
 
-func (ctx *Context) End() {
+func (ctx *Context) end() {
 	// check stacks
 	expect(len(ctx.containerStack) == 0)
 	expect(len(ctx.clipStack) == 0)

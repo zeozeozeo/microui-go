@@ -25,14 +25,34 @@ func (ctx *Context) Header(label string) Res {
 	return ctx.HeaderEx(label, 0)
 }
 
-func (ctx *Context) BeginTreeNode(label string) Res {
-	return ctx.BeginTreeNodeEx(label, 0)
+func (c *Context) TreeNode(label string, f func(res Res)) {
+	if res := c.beginTreeNode(label); res != 0 {
+		defer c.endTreeNode()
+		f(res)
+	}
 }
 
-func (ctx *Context) BeginWindow(title string, rect image.Rectangle) Res {
-	return ctx.BeginWindowEx(title, rect, 0)
+func (ctx *Context) beginTreeNode(label string) Res {
+	return ctx.beginTreeNodeEx(label, 0)
 }
 
-func (ctx *Context) BeginPanel(name string) {
-	ctx.BeginPanelEx(name, 0)
+func (ctx *Context) Window(title string, rect image.Rectangle, f func(res Res)) {
+	if res := ctx.beginWindow(title, rect); res != 0 {
+		defer ctx.endWindow()
+		f(res)
+	}
+}
+
+func (ctx *Context) beginWindow(title string, rect image.Rectangle) Res {
+	return ctx.beginWindowEx(title, rect, 0)
+}
+
+func (c *Context) Panel(name string, f func()) {
+	c.beginPanel(name)
+	defer c.endPanel()
+	f()
+}
+
+func (ctx *Context) beginPanel(name string) {
+	ctx.beginPanelEx(name, 0)
 }

@@ -387,7 +387,14 @@ func (ctx *Context) HeaderEx(label string, opt Option) Res {
 	return ctx.header(label, false, opt)
 }
 
-func (ctx *Context) BeginTreeNodeEx(label string, opt Option) Res {
+func (c *Context) TreeNodeEx(label string, opt Option, f func(res Res)) {
+	if res := c.beginTreeNodeEx(label, opt); res != 0 {
+		defer c.endTreeNode()
+		f(res)
+	}
+}
+
+func (ctx *Context) beginTreeNodeEx(label string, opt Option) Res {
 	res := ctx.header(label, true, opt)
 	if (res & ResActive) != 0 {
 		ctx.GetLayout().Indent += ctx.Style.Indent
@@ -397,7 +404,7 @@ func (ctx *Context) BeginTreeNodeEx(label string, opt Option) Res {
 	return res
 }
 
-func (ctx *Context) EndTreeNode() {
+func (ctx *Context) endTreeNode() {
 	ctx.GetLayout().Indent -= ctx.Style.Indent
 	ctx.popID()
 }
@@ -541,7 +548,14 @@ func (ctx *Context) endRootContainer() {
 	ctx.popContainer()
 }
 
-func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option) Res {
+func (c *Context) WindowEx(title string, rect image.Rectangle, opt Option, f func(res Res)) {
+	if res := c.beginWindowEx(title, rect, opt); res != 0 {
+		defer c.endWindow()
+		f(res)
+	}
+}
+
+func (ctx *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) Res {
 	id := ctx.id([]byte(title))
 	cnt := ctx.getContainer(id, opt)
 	if cnt == nil || !cnt.Open {
@@ -622,7 +636,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 	return ResActive
 }
 
-func (ctx *Context) EndWindow() {
+func (ctx *Context) endWindow() {
 	ctx.PopClipRect()
 	ctx.endRootContainer()
 }
@@ -638,17 +652,29 @@ func (ctx *Context) OpenPopup(name string) {
 	ctx.BringToFront(cnt)
 }
 
-func (ctx *Context) BeginPopup(name string) Res {
-	opt := OptPopup | OptAutoSize | OptNoResize |
-		OptNoScroll | OptNoTitle | OptClosed
-	return ctx.BeginWindowEx(name, image.Rectangle{}, opt)
+func (c *Context) Popup(name string, f func(res Res)) {
+	if res := c.beginPopup(name); res != 0 {
+		defer c.endPopup()
+		f(res)
+	}
 }
 
-func (ctx *Context) EndPopup() {
-	ctx.EndWindow()
+func (ctx *Context) beginPopup(name string) Res {
+	opt := OptPopup | OptAutoSize | OptNoResize | OptNoScroll | OptNoTitle | OptClosed
+	return ctx.beginWindowEx(name, image.Rectangle{}, opt)
 }
 
-func (ctx *Context) BeginPanelEx(name string, opt Option) {
+func (ctx *Context) endPopup() {
+	ctx.endWindow()
+}
+
+func (c *Context) PanelEx(name string, opt Option, f func()) {
+	c.beginPanelEx(name, opt)
+	defer c.endPanel()
+	f()
+}
+
+func (ctx *Context) beginPanelEx(name string, opt Option) {
 	var cnt *Container
 	ctx.pushID([]byte(name))
 	cnt = ctx.getContainer(ctx.LastID, opt)
@@ -662,7 +688,7 @@ func (ctx *Context) BeginPanelEx(name string, opt Option) {
 	ctx.PushClipRect(cnt.Body)
 }
 
-func (ctx *Context) EndPanel() {
+func (ctx *Context) endPanel() {
 	ctx.PopClipRect()
 	ctx.popContainer()
 }
