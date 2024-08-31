@@ -215,7 +215,7 @@ func (ctx *Context) TextboxRaw(buf *string, id ID, r image.Rectangle, opt Option
 	return res
 }
 
-func (ctx *Context) NumberTextBox(value *float32, r image.Rectangle, id ID) bool {
+func (ctx *Context) NumberTextBox(value *float64, r image.Rectangle, id ID) bool {
 	if ctx.mousePressed == mouseLeft && (ctx.keyDown&keyShift) != 0 &&
 		ctx.Hover == id {
 		ctx.NumberEdit = id
@@ -228,7 +228,7 @@ func (ctx *Context) NumberTextBox(value *float32, r image.Rectangle, id ID) bool
 			if err != nil {
 				nval = 0
 			}
-			*value = float32(nval)
+			*value = float64(nval)
 			ctx.NumberEdit = 0
 		} else {
 			return true
@@ -243,7 +243,7 @@ func (ctx *Context) TextBoxEx(buf *string, opt Option) int {
 	return ctx.TextboxRaw(buf, id, r, opt)
 }
 
-func (ctx *Context) SliderEx(value *float32, low, high, step float32, format string, opt Option) int {
+func (ctx *Context) SliderEx(value *float64, low, high, step float64, format string, opt Option) int {
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
@@ -260,7 +260,7 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 
 	// handle input
 	if ctx.Focus == id && (ctx.mouseDown|ctx.mousePressed) == mouseLeft {
-		v = low + float32(ctx.mousePos.X-base.Min.X)*(high-low)/float32(base.Dx())
+		v = low + float64(ctx.mousePos.X-base.Min.X)*(high-low)/float64(base.Dx())
 		if step != 0 {
 			v = ((v + step/2) / step) * step
 		}
@@ -276,7 +276,7 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 	ctx.DrawControlFrame(id, base, ColorBase, opt)
 	// draw thumb
 	w = ctx.Style.ThumbSize
-	x = int((v - low) * float32(base.Dx()-w) / (high - low))
+	x = int((v - low) * float64(base.Dx()-w) / (high - low))
 	thumb := image.Rect(base.Min.X+x, base.Min.Y, base.Min.X+x+w, base.Max.Y)
 	ctx.DrawControlFrame(id, thumb, ColorButton, opt)
 	// draw text
@@ -286,7 +286,7 @@ func (ctx *Context) SliderEx(value *float32, low, high, step float32, format str
 	return res
 }
 
-func (ctx *Context) NumberEx(value *float32, step float32, format string, opt Option) int {
+func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Option) int {
 	var res int = 0
 	id := ctx.GetID(PtrToBytes(unsafe.Pointer(&value)))
 	base := ctx.LayoutNext()
@@ -302,7 +302,7 @@ func (ctx *Context) NumberEx(value *float32, step float32, format string, opt Op
 
 	// handle input
 	if ctx.Focus == id && ctx.mouseDown == mouseLeft {
-		*value += float32(ctx.mouseDelta.X) * step
+		*value += float64(ctx.mouseDelta.X) * step
 	}
 	// set flag if value changed
 	if *value != last {

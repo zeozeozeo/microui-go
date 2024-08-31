@@ -13,11 +13,11 @@ func (ctx *Context) TextBox(buf *string) int {
 	return ctx.TextBoxEx(buf, 0)
 }
 
-func (ctx *Context) Slider(value *float32, lo, hi float32) int {
+func (ctx *Context) Slider(value *float64, lo, hi float64) int {
 	return ctx.SliderEx(value, lo, hi, 0, sliderFmt, OptAlignCenter)
 }
 
-func (ctx *Context) Number(value *float32, step float32) int {
+func (ctx *Context) Number(value *float64, step float64) int {
 	return ctx.NumberEx(value, step, sliderFmt, OptAlignCenter)
 }
 

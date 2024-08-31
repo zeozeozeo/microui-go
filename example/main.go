@@ -17,14 +17,14 @@ type Game struct {
 	logBuf       string
 	logSubmitBuf string
 	logUpdated   bool
-	bg           [3]float32
+	bg           [3]float64
 	checks       [3]bool
 }
 
 func New() *Game {
 	return &Game{
 		ctx:    microui.NewContext(),
-		bg:     [3]float32{90, 95, 100},
+		bg:     [3]float64{90, 95, 100},
 		checks: [3]bool{true, false, true},
 	}
 }

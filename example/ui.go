@@ -175,10 +175,10 @@ func (g *Game) LogWindow() {
 	}
 }
 
-func (g *Game) uint8Slider(fvalue *float32, value *uint8, low, high uint8) int {
-	*fvalue = float32(*value)
+func (g *Game) uint8Slider(fvalue *float64, value *byte, low, high byte) int {
+	*fvalue = float64(*value)
 	g.ctx.PushID(microui.PtrToBytes(unsafe.Pointer(fvalue)))
-	res := g.ctx.SliderEx(fvalue, float32(low), float32(high), 0, "%.0f", microui.OptAlignCenter)
+	res := g.ctx.SliderEx(fvalue, float64(low), float64(high), 0, "%.0f", microui.OptAlignCenter)
 	*value = uint8(*fvalue)
 	g.ctx.PopID()
 
@@ -187,7 +187,7 @@ func (g *Game) uint8Slider(fvalue *float32, value *uint8, low, high uint8) int {
 
 var (
 	fcolors = [14]struct {
-		R, G, B, A float32
+		R, G, B, A float64
 	}{}
 	colors = []struct {
 		Label   string

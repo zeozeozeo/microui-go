@@ -29,14 +29,14 @@ func max(a, b int) int {
 	return b
 }
 
-func minF(a, b float32) float32 {
+func minF(a, b float64) float64 {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func maxF(a, b float32) float32 {
+func maxF(a, b float64) float64 {
 	if a > b {
 		return a
 	}
@@ -47,7 +47,7 @@ func clamp(x, a, b int) int {
 	return min(b, max(a, x))
 }
 
-func clampF(x, a, b float32) float32 {
+func clampF(x, a, b float64) float64 {
 	return minF(b, maxF(a, x))
 }
 
