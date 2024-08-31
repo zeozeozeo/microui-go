@@ -28,13 +28,13 @@ func (g *Game) WriteLog(text string) {
 
 func (g *Game) testWindow() {
 	g.ctx.Window("Demo Window", image.Rect(40, 40, 340, 490), func(res microui.Res) {
-		win := g.ctx.GetCurrentContainer()
+		win := g.ctx.CurrentContainer()
 		win.Rect.Max.X = win.Rect.Min.X + max(win.Rect.Dx(), 240)
 		win.Rect.Max.Y = win.Rect.Min.Y + max(win.Rect.Dy(), 300)
 
 		// window info
 		if g.ctx.Header("Window Info") != 0 {
-			win := g.ctx.GetCurrentContainer()
+			win := g.ctx.CurrentContainer()
 			g.ctx.LayoutRow(2, []int{54, -1}, 0)
 			g.ctx.Label("Position:")
 			g.ctx.Label(fmt.Sprintf("%d, %d", win.Rect.Min.X, win.Rect.Min.Y))
@@ -141,7 +141,7 @@ func (g *Game) logWindow() {
 		g.ctx.LayoutRow(1, []int{-1}, -25)
 		var panel *microui.Container
 		g.ctx.Panel("Log Output", func() {
-			panel = g.ctx.GetCurrentContainer()
+			panel = g.ctx.CurrentContainer()
 			g.ctx.LayoutRow(1, []int{-1}, -1)
 			g.ctx.Text(g.logBuf)
 		})
@@ -201,7 +201,7 @@ var (
 
 func (g *Game) styleWindow() {
 	g.ctx.Window("Style Editor", image.Rect(350, 250, 650, 490), func(res microui.Res) {
-		sw := int(float64(g.ctx.GetCurrentContainer().Body.Dx()) * 0.14)
+		sw := int(float64(g.ctx.CurrentContainer().Body.Dx()) * 0.14)
 		g.ctx.LayoutRow(6, []int{80, sw, sw, sw, sw, -1}, 0)
 		for _, c := range colors {
 			g.ctx.Label(c.Label)

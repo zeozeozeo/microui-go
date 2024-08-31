@@ -21,11 +21,11 @@ func (c *Context) LayoutBeginColumn() {
 }
 
 func (c *Context) LayoutEndColumn() {
-	b := c.GetLayout()
+	b := c.Layout()
 	// pop()
 	c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
 	// inherit position/next_row/max from child layout if they are greater
-	a := c.GetLayout()
+	a := c.Layout()
 	a.Position.X = max(a.Position.X, b.Position.X+b.Body.Min.X-a.Body.Min.X)
 	a.NextRow = max(a.NextRow, b.NextRow+b.Body.Min.Y-a.Body.Min.Y)
 	a.Max.X = max(a.Max.X, b.Max.X)
@@ -33,7 +33,7 @@ func (c *Context) LayoutEndColumn() {
 }
 
 func (c *Context) LayoutRow(items int, widths []int, height int) {
-	layout := c.GetLayout()
+	layout := c.Layout()
 
 	expect(len(widths) <= maxWidths)
 	copy(layout.Widths[:], widths)
@@ -46,16 +46,16 @@ func (c *Context) LayoutRow(items int, widths []int, height int) {
 
 // LayoutWidth sets layout size.x
 func (c *Context) LayoutWidth(width int) {
-	c.GetLayout().Size.X = width
+	c.Layout().Size.X = width
 }
 
 // LayoutHeight sets layout size.y
 func (c *Context) LayoutHeight(height int) {
-	c.GetLayout().Size.Y = height
+	c.Layout().Size.Y = height
 }
 
 func (c *Context) LayoutNext() image.Rectangle {
-	layout := c.GetLayout()
+	layout := c.Layout()
 	style := c.Style
 	var res image.Rectangle
 

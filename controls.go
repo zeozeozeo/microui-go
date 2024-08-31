@@ -53,7 +53,7 @@ func (c *Context) DrawControlText(str string, rect image.Rectangle, colorid int,
 }
 
 func (c *Context) mouseOver(rect image.Rectangle) bool {
-	return c.mousePos.In(rect) && c.mousePos.In(c.GetClipRect()) && c.inHoverRoot()
+	return c.mousePos.In(rect) && c.mousePos.In(c.ClipRect()) && c.inHoverRoot()
 }
 
 func (c *Context) UpdateControl(id ID, rect image.Rectangle, opt Option) {
@@ -397,7 +397,7 @@ func (c *Context) TreeNodeEx(label string, opt Option, f func(res Res)) {
 func (c *Context) beginTreeNodeEx(label string, opt Option) Res {
 	res := c.header(label, true, opt)
 	if (res & ResActive) != 0 {
-		c.GetLayout().Indent += c.Style.Indent
+		c.Layout().Indent += c.Style.Indent
 		// push()
 		c.idStack = append(c.idStack, c.LastID)
 	}
@@ -405,7 +405,7 @@ func (c *Context) beginTreeNodeEx(label string, opt Option) Res {
 }
 
 func (c *Context) endTreeNode() {
-	c.GetLayout().Indent -= c.Style.Indent
+	c.Layout().Indent -= c.Style.Indent
 	c.popID()
 }
 
@@ -540,7 +540,7 @@ func (c *Context) beginRootContainer(cnt *Container) {
 func (c *Context) endRootContainer() {
 	// push tail 'goto' jump command and set head 'skip' command. the final steps
 	// on initing these are done in End
-	cnt := c.GetCurrentContainer()
+	cnt := c.CurrentContainer()
 	cnt.TailIdx = c.pushJump(-1)
 	c.commandList[cnt.HeadIdx].jump.dstIdx = len(c.commandList) //- 1
 	// pop base clip rect and container
@@ -557,7 +557,7 @@ func (c *Context) WindowEx(title string, rect image.Rectangle, opt Option, f fun
 
 func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) Res {
 	id := c.id([]byte(title))
-	cnt := c.getContainer(id, opt)
+	cnt := c.container(id, opt)
 	if cnt == nil || !cnt.Open {
 		return 0
 	}
@@ -622,7 +622,7 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 
 	// resize to content size
 	if (opt & OptAutoSize) != 0 {
-		r := c.GetLayout().Body
+		r := c.Layout().Body
 		cnt.Rect.Max.X = cnt.Rect.Min.X + cnt.ContentSize.X + (cnt.Rect.Dx() - r.Dx())
 		cnt.Rect.Max.Y = cnt.Rect.Min.Y + cnt.ContentSize.Y + (cnt.Rect.Dy() - r.Dy())
 	}
@@ -642,7 +642,7 @@ func (c *Context) endWindow() {
 }
 
 func (c *Context) OpenPopup(name string) {
-	cnt := c.GetContainer(name)
+	cnt := c.Container(name)
 	// set as hover root so popup isn't closed in begin_window_ex()
 	c.NextHoverRoot = cnt
 	c.HoverRoot = c.NextHoverRoot
@@ -677,7 +677,7 @@ func (c *Context) PanelEx(name string, opt Option, f func()) {
 func (c *Context) beginPanelEx(name string, opt Option) {
 	var cnt *Container
 	c.pushID([]byte(name))
-	cnt = c.getContainer(c.LastID, opt)
+	cnt = c.container(c.LastID, opt)
 	cnt.Rect = c.LayoutNext()
 	if (^opt & OptNoFrame) != 0 {
 		c.drawFrame(cnt.Rect, ColorPanelBG)

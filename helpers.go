@@ -89,7 +89,7 @@ func (c *Context) popID() {
 }
 
 func (c *Context) PushClipRect(rect image.Rectangle) {
-	last := c.GetClipRect()
+	last := c.ClipRect()
 	// push()
 	c.clipStack = append(c.clipStack, rect.Intersect(last))
 }
@@ -98,12 +98,12 @@ func (c *Context) PopClipRect() {
 	c.clipStack = c.clipStack[:len(c.clipStack)-1]
 }
 
-func (c *Context) GetClipRect() image.Rectangle {
+func (c *Context) ClipRect() image.Rectangle {
 	return c.clipStack[len(c.clipStack)-1]
 }
 
 func (c *Context) CheckClip(r image.Rectangle) int {
-	cr := c.GetClipRect()
+	cr := c.ClipRect()
 	if !r.Overlaps(cr) {
 		return ClipAll
 	}
@@ -113,13 +113,13 @@ func (c *Context) CheckClip(r image.Rectangle) int {
 	return ClipPart
 }
 
-func (c *Context) GetLayout() *Layout {
+func (c *Context) Layout() *Layout {
 	return &c.layoutStack[len(c.layoutStack)-1]
 }
 
 func (c *Context) popContainer() {
-	cnt := c.GetCurrentContainer()
-	layout := c.GetLayout()
+	cnt := c.CurrentContainer()
+	layout := c.Layout()
 	cnt.ContentSize.X = layout.Max.X - layout.Body.Min.X
 	cnt.ContentSize.Y = layout.Max.Y - layout.Body.Min.Y
 	// pop container, layout and id
@@ -130,11 +130,11 @@ func (c *Context) popContainer() {
 	c.popID()
 }
 
-func (c *Context) GetCurrentContainer() *Container {
+func (c *Context) CurrentContainer() *Container {
 	return c.containerStack[len(c.containerStack)-1]
 }
 
-func (c *Context) getContainer(id ID, opt Option) *Container {
+func (c *Context) container(id ID, opt Option) *Container {
 	// try to get existing container from pool
 	idx := c.poolGet(c.containerPool[:], id)
 	if idx >= 0 {
@@ -157,9 +157,9 @@ func (c *Context) getContainer(id ID, opt Option) *Container {
 	return cnt
 }
 
-func (c *Context) GetContainer(name string) *Container {
+func (c *Context) Container(name string) *Container {
 	id := c.id([]byte(name))
-	return c.getContainer(id, 0)
+	return c.container(id, 0)
 }
 
 func (c *Context) BringToFront(cnt *Container) {
