@@ -9,15 +9,15 @@ func (ctx *Context) Button(label string) bool {
 	return ctx.ButtonEx(label, 0, OptAlignCenter) != 0
 }
 
-func (ctx *Context) TextBox(buf *string) int {
+func (ctx *Context) TextBox(buf *string) Res {
 	return ctx.TextBoxEx(buf, 0)
 }
 
-func (ctx *Context) Slider(value *float64, lo, hi float64) int {
+func (ctx *Context) Slider(value *float64, lo, hi float64) Res {
 	return ctx.SliderEx(value, lo, hi, 0, sliderFmt, OptAlignCenter)
 }
 
-func (ctx *Context) Number(value *float64, step float64) int {
+func (ctx *Context) Number(value *float64, step float64) Res {
 	return ctx.NumberEx(value, step, sliderFmt, OptAlignCenter)
 }
 

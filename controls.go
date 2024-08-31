@@ -122,8 +122,8 @@ func (ctx *Context) Label(text string) {
 	ctx.DrawControlText(text, ctx.LayoutNext(), ColorText, 0)
 }
 
-func (ctx *Context) ButtonEx(label string, icon Icon, opt Option) int {
-	var res int = 0
+func (ctx *Context) ButtonEx(label string, icon Icon, opt Option) Res {
+	var res Res
 	var id ID
 	if len(label) > 0 {
 		id = ctx.id([]byte(label))
@@ -151,8 +151,8 @@ func (ctx *Context) ButtonEx(label string, icon Icon, opt Option) int {
 	return res
 }
 
-func (ctx *Context) Checkbox(label string, state *bool) int {
-	var res int = 0
+func (ctx *Context) Checkbox(label string, state *bool) Res {
+	var res Res
 	id := ctx.id(ptrToBytes(unsafe.Pointer(state)))
 	r := ctx.LayoutNext()
 	box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
@@ -172,8 +172,8 @@ func (ctx *Context) Checkbox(label string, state *bool) int {
 	return res
 }
 
-func (ctx *Context) TextBoxRaw(buf *string, id ID, r image.Rectangle, opt Option) int {
-	var res int = 0
+func (ctx *Context) TextBoxRaw(buf *string, id ID, r image.Rectangle, opt Option) Res {
+	var res Res
 	ctx.UpdateControl(id, r, opt|OptHoldFocus)
 	buflen := len(*buf)
 
@@ -237,14 +237,14 @@ func (ctx *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool
 	return false
 }
 
-func (ctx *Context) TextBoxEx(buf *string, opt Option) int {
+func (ctx *Context) TextBoxEx(buf *string, opt Option) Res {
 	id := ctx.id(ptrToBytes(unsafe.Pointer(buf)))
 	r := ctx.LayoutNext()
 	return ctx.TextBoxRaw(buf, id, r, opt)
 }
 
-func (ctx *Context) SliderEx(value *float64, low, high, step float64, format string, opt Option) int {
-	var x, w, res int = 0, 0, 0
+func (ctx *Context) SliderEx(value *float64, low, high, step float64, format string, opt Option) Res {
+	var res Res
 	last := *value
 	v := last
 	id := ctx.id(ptrToBytes(unsafe.Pointer(value)))
@@ -275,8 +275,8 @@ func (ctx *Context) SliderEx(value *float64, low, high, step float64, format str
 	// draw base
 	ctx.DrawControlFrame(id, base, ColorBase, opt)
 	// draw thumb
-	w = ctx.Style.ThumbSize
-	x = int((v - low) * float64(base.Dx()-w) / (high - low))
+	w := ctx.Style.ThumbSize
+	x := int((v - low) * float64(base.Dx()-w) / (high - low))
 	thumb := image.Rect(base.Min.X+x, base.Min.Y, base.Min.X+x+w, base.Max.Y)
 	ctx.DrawControlFrame(id, thumb, ColorButton, opt)
 	// draw text
@@ -286,8 +286,8 @@ func (ctx *Context) SliderEx(value *float64, low, high, step float64, format str
 	return res
 }
 
-func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Option) int {
-	var res int = 0
+func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Option) Res {
+	var res Res
 	id := ctx.id(ptrToBytes(unsafe.Pointer(&value)))
 	base := ctx.LayoutNext()
 	last := *value
@@ -318,7 +318,7 @@ func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Op
 	return res
 }
 
-func (ctx *Context) header(label string, istreenode bool, opt Option) int {
+func (ctx *Context) header(label string, istreenode bool, opt Option) Res {
 	id := ctx.id([]byte(label))
 	idx := ctx.poolGet(ctx.treeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
@@ -383,11 +383,11 @@ func (ctx *Context) header(label string, istreenode bool, opt Option) int {
 	return 0
 }
 
-func (ctx *Context) HeaderEx(label string, opt Option) int {
+func (ctx *Context) HeaderEx(label string, opt Option) Res {
 	return ctx.header(label, false, opt)
 }
 
-func (ctx *Context) BeginTreeNodeEx(label string, opt Option) int {
+func (ctx *Context) BeginTreeNodeEx(label string, opt Option) Res {
 	res := ctx.header(label, true, opt)
 	if (res & ResActive) != 0 {
 		ctx.GetLayout().Indent += ctx.Style.Indent
@@ -541,7 +541,7 @@ func (ctx *Context) endRootContainer() {
 	ctx.popContainer()
 }
 
-func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option) int {
+func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option) Res {
 	id := ctx.id([]byte(title))
 	cnt := ctx.getContainer(id, opt)
 	if cnt == nil || !cnt.Open {
@@ -638,7 +638,7 @@ func (ctx *Context) OpenPopup(name string) {
 	ctx.BringToFront(cnt)
 }
 
-func (ctx *Context) BeginPopup(name string) int {
+func (ctx *Context) BeginPopup(name string) Res {
 	opt := OptPopup | OptAutoSize | OptNoResize |
 		OptNoScroll | OptNoTitle | OptClosed
 	return ctx.BeginWindowEx(name, image.Rectangle{}, opt)

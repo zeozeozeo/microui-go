@@ -174,11 +174,10 @@ func (g *Game) LogWindow() {
 	}
 }
 
-func (g *Game) byteSlider(fvalue *float64, value *byte, low, high byte) int {
+func (g *Game) byteSlider(fvalue *float64, value *byte, low, high byte) microui.Res {
 	*fvalue = float64(*value)
 	res := g.ctx.SliderEx(fvalue, float64(low), float64(high), 0, "%.0f", microui.OptAlignCenter)
 	*value = byte(*fvalue)
-
 	return res
 }
 

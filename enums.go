@@ -43,10 +43,12 @@ const (
 	IconExpanded
 )
 
+type Res int
+
 const (
-	ResActive = (1 << 0)
-	ResSubmit = (1 << 1)
-	ResChange = (1 << 2)
+	ResActive Res = (1 << 0)
+	ResSubmit Res = (1 << 1)
+	ResChange Res = (1 << 2)
 )
 
 type Option int
