@@ -71,7 +71,7 @@ func (ctx *Context) LayoutNext() image.Rectangle {
 	var res image.Rectangle
 
 	if layout.NextType != 0 {
-		// handle rect set by `mu_layout_set_next`
+		// handle rect set by `LayoutSetNext`
 		next_type := layout.NextType
 		layout.NextType = 0
 		res = layout.Next

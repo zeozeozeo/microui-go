@@ -532,7 +532,7 @@ func (ctx *Context) beginRootContainer(cnt *Container) {
 
 func (ctx *Context) endRootContainer() {
 	// push tail 'goto' jump command and set head 'skip' command. the final steps
-	// on initing these are done in mu_end()
+	// on initing these are done in End
 	cnt := ctx.GetCurrentContainer()
 	cnt.TailIdx = ctx.pushJump(-1)
 	ctx.commandList[cnt.HeadIdx].jump.dstIdx = len(ctx.commandList) //- 1
