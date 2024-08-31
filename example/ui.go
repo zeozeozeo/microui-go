@@ -18,7 +18,7 @@ func max(a, b int) int {
 	return b
 }
 
-func (g *Game) WriteLog(text string) {
+func (g *Game) writeLog(text string) {
 	if len(g.logBuf) > 0 {
 		g.logBuf += "\n"
 	}
@@ -47,14 +47,14 @@ func (g *Game) testWindow() {
 			g.ctx.LayoutRow(3, []int{100, -110, -1}, 0)
 			g.ctx.Label("Test buttons 1:")
 			if g.ctx.Button("Button 1") != 0 {
-				g.WriteLog("Pressed button 1")
+				g.writeLog("Pressed button 1")
 			}
 			if g.ctx.Button("Button 2") != 0 {
-				g.WriteLog("Pressed button 2")
+				g.writeLog("Pressed button 2")
 			}
 			g.ctx.Label("Test buttons 2:")
 			if g.ctx.Button("Button 3") != 0 {
-				g.WriteLog("Pressed button 3")
+				g.writeLog("Pressed button 3")
 			}
 			if g.ctx.Button("Popup") != 0 {
 				g.ctx.OpenPopup("Test Popup")
@@ -76,26 +76,26 @@ func (g *Game) testWindow() {
 					})
 					g.ctx.TreeNode("Test 1b", func(res microui.Res) {
 						if g.ctx.Button("Button 1") != 0 {
-							g.WriteLog("Pressed button 1")
+							g.writeLog("Pressed button 1")
 						}
 						if g.ctx.Button("Button 2") != 0 {
-							g.WriteLog("Pressed button 2")
+							g.writeLog("Pressed button 2")
 						}
 					})
 				})
 				g.ctx.TreeNode("Test 2", func(res microui.Res) {
 					g.ctx.LayoutRow(2, []int{54, 54}, 0)
 					if g.ctx.Button("Button 3") != 0 {
-						g.WriteLog("Pressed button 3")
+						g.writeLog("Pressed button 3")
 					}
 					if g.ctx.Button("Button 4") != 0 {
-						g.WriteLog("Pressed button 4")
+						g.writeLog("Pressed button 4")
 					}
 					if g.ctx.Button("Button 5") != 0 {
-						g.WriteLog("Pressed button 5")
+						g.writeLog("Pressed button 5")
 					}
 					if g.ctx.Button("Button 6") != 0 {
-						g.WriteLog("Pressed button 6")
+						g.writeLog("Pressed button 6")
 					}
 				})
 				g.ctx.TreeNode("Test 3", func(res microui.Res) {
@@ -161,7 +161,7 @@ func (g *Game) logWindow() {
 			submitted = true
 		}
 		if submitted {
-			g.WriteLog(g.logSubmitBuf)
+			g.writeLog(g.logSubmitBuf)
 			g.logSubmitBuf = ""
 		}
 	})
