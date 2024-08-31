@@ -57,12 +57,12 @@ func hash(hash *ID, data []byte) {
 	}
 }
 
-func PtrToBytes(ptr unsafe.Pointer) []byte {
+func ptrToBytes(ptr unsafe.Pointer) []byte {
 	return unsafe.Slice((*byte)(unsafe.Pointer(&ptr)), unsafe.Sizeof(ptr))
 }
 
-// GetID returns a hash value based on the data and the last ID on the stack.
-func (ctx *Context) GetID(data []byte) ID {
+// id returns a hash value based on the data and the last ID on the stack.
+func (ctx *Context) id(data []byte) ID {
 	const (
 		hashInitial = 2166136261 // 32bit fnv-1a hash
 	)
@@ -79,12 +79,12 @@ func (ctx *Context) GetID(data []byte) ID {
 	return res
 }
 
-func (ctx *Context) PushID(data []byte) {
+func (ctx *Context) pushID(data []byte) {
 	// push()
-	ctx.idStack = append(ctx.idStack, ctx.GetID(data))
+	ctx.idStack = append(ctx.idStack, ctx.id(data))
 }
 
-func (ctx *Context) PopID() {
+func (ctx *Context) popID() {
 	ctx.idStack = ctx.idStack[:len(ctx.idStack)-1]
 }
 
@@ -127,7 +127,7 @@ func (ctx *Context) popContainer() {
 	ctx.containerStack = ctx.containerStack[:len(ctx.containerStack)-1]
 	// pop()
 	ctx.layoutStack = ctx.layoutStack[:len(ctx.layoutStack)-1]
-	ctx.PopID()
+	ctx.popID()
 }
 
 func (ctx *Context) GetCurrentContainer() *Container {
@@ -158,7 +158,7 @@ func (ctx *Context) getContainer(id ID, opt Option) *Container {
 }
 
 func (ctx *Context) GetContainer(name string) *Container {
-	id := ctx.GetID([]byte(name))
+	id := ctx.id([]byte(name))
 	return ctx.getContainer(id, 0)
 }
 

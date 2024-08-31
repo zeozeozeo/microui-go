@@ -126,13 +126,13 @@ func (ctx *Context) ButtonEx(label string, icon Icon, opt Option) int {
 	var res int = 0
 	var id ID
 	if len(label) > 0 {
-		id = ctx.GetID([]byte(label))
+		id = ctx.id([]byte(label))
 	} else {
 		iconPtr := &icon
 		// TODO: investigate if this okay, if icon represents an icon ID we might need
 		// to refer to the value instead of a pointer, like commented below:
 		// unsafe.Slice((*byte)(unsafe.Pointer(&icon)), unsafe.Sizeof(icon)))
-		id = ctx.GetID(PtrToBytes(unsafe.Pointer(iconPtr)))
+		id = ctx.id(ptrToBytes(unsafe.Pointer(iconPtr)))
 	}
 	r := ctx.LayoutNext()
 	ctx.UpdateControl(id, r, opt)
@@ -153,7 +153,7 @@ func (ctx *Context) ButtonEx(label string, icon Icon, opt Option) int {
 
 func (ctx *Context) Checkbox(label string, state *bool) int {
 	var res int = 0
-	id := ctx.GetID(PtrToBytes(unsafe.Pointer(state)))
+	id := ctx.id(ptrToBytes(unsafe.Pointer(state)))
 	r := ctx.LayoutNext()
 	box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
 	ctx.UpdateControl(id, r, 0)
@@ -238,7 +238,7 @@ func (ctx *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool
 }
 
 func (ctx *Context) TextBoxEx(buf *string, opt Option) int {
-	id := ctx.GetID(PtrToBytes(unsafe.Pointer(buf)))
+	id := ctx.id(ptrToBytes(unsafe.Pointer(buf)))
 	r := ctx.LayoutNext()
 	return ctx.TextBoxRaw(buf, id, r, opt)
 }
@@ -247,7 +247,7 @@ func (ctx *Context) SliderEx(value *float64, low, high, step float64, format str
 	var x, w, res int = 0, 0, 0
 	last := *value
 	v := last
-	id := ctx.GetID(PtrToBytes(unsafe.Pointer(value)))
+	id := ctx.id(ptrToBytes(unsafe.Pointer(value)))
 	base := ctx.LayoutNext()
 
 	// handle text input mode
@@ -288,7 +288,7 @@ func (ctx *Context) SliderEx(value *float64, low, high, step float64, format str
 
 func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Option) int {
 	var res int = 0
-	id := ctx.GetID(PtrToBytes(unsafe.Pointer(&value)))
+	id := ctx.id(ptrToBytes(unsafe.Pointer(&value)))
 	base := ctx.LayoutNext()
 	last := *value
 
@@ -319,7 +319,7 @@ func (ctx *Context) NumberEx(value *float64, step float64, format string, opt Op
 }
 
 func (ctx *Context) header(label string, istreenode bool, opt Option) int {
-	id := ctx.GetID([]byte(label))
+	id := ctx.id([]byte(label))
 	idx := ctx.poolGet(ctx.treeNodePool[:], id)
 	ctx.LayoutRow(1, []int{-1}, 0)
 
@@ -399,14 +399,14 @@ func (ctx *Context) BeginTreeNodeEx(label string, opt Option) int {
 
 func (ctx *Context) EndTreeNode() {
 	ctx.GetLayout().Indent -= ctx.Style.Indent
-	ctx.PopID()
+	ctx.popID()
 }
 
 // x = x, y = y, w = w, h = h
 func (ctx *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs image.Point) {
 	maxscroll := cs.Y - b.Dy()
 	if maxscroll > 0 && b.Dy() > 0 {
-		id := ctx.GetID([]byte("!scrollbar" + "y"))
+		id := ctx.id([]byte("!scrollbar" + "y"))
 
 		// get sizing / positioning
 		base := b
@@ -442,7 +442,7 @@ func (ctx *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs imag
 func (ctx *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs image.Point) {
 	maxscroll := cs.X - b.Dx()
 	if maxscroll > 0 && b.Dx() > 0 {
-		id := ctx.GetID([]byte("!scrollbar" + "x"))
+		id := ctx.id([]byte("!scrollbar" + "x"))
 
 		// get sizing / positioning
 		base := b
@@ -542,7 +542,7 @@ func (ctx *Context) endRootContainer() {
 }
 
 func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option) int {
-	id := ctx.GetID([]byte(title))
+	id := ctx.id([]byte(title))
 	cnt := ctx.getContainer(id, opt)
 	if cnt == nil || !cnt.Open {
 		return 0
@@ -570,7 +570,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 
 		// do title text
 		if (^opt & OptNoTitle) != 0 {
-			id := ctx.GetID([]byte("!title"))
+			id := ctx.id([]byte("!title"))
 			ctx.UpdateControl(id, tr, opt)
 			ctx.DrawControlText(title, tr, ColorTitleText, opt)
 			if id == ctx.Focus && ctx.mouseDown == mouseLeft {
@@ -581,7 +581,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 
 		// do `close` button
 		if (^opt & OptNoClose) != 0 {
-			id := ctx.GetID([]byte("!close"))
+			id := ctx.id([]byte("!close"))
 			r := image.Rect(tr.Max.X-tr.Dy(), tr.Min.Y, tr.Max.X, tr.Max.Y)
 			tr.Max.X -= r.Dx()
 			ctx.DrawIcon(IconClose, r, ctx.Style.Colors[ColorTitleText])
@@ -597,7 +597,7 @@ func (ctx *Context) BeginWindowEx(title string, rect image.Rectangle, opt Option
 	// do `resize` handle
 	if (^opt & OptNoResize) != 0 {
 		sz := ctx.Style.TitleHeight
-		id := ctx.GetID([]byte("!resize"))
+		id := ctx.id([]byte("!resize"))
 		r := image.Rect(rect.Max.X-sz, rect.Max.Y-sz, rect.Max.X, rect.Max.Y)
 		ctx.UpdateControl(id, r, opt)
 		if id == ctx.Focus && ctx.mouseDown == mouseLeft {
@@ -650,7 +650,7 @@ func (ctx *Context) EndPopup() {
 
 func (ctx *Context) BeginPanelEx(name string, opt Option) {
 	var cnt *Container
-	ctx.PushID([]byte(name))
+	ctx.pushID([]byte(name))
 	cnt = ctx.getContainer(ctx.LastID, opt)
 	cnt.Rect = ctx.LayoutNext()
 	if (^opt & OptNoFrame) != 0 {
