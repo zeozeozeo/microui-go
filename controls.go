@@ -172,8 +172,9 @@ func (c *Context) Checkbox(label string, state *bool) Res {
 	return res
 }
 
-func (c *Context) textBoxRaw(buf *string, id ID, r image.Rectangle, opt Option) Res {
+func (c *Context) textBoxRaw(buf *string, id ID, opt Option) Res {
 	var res Res
+	r := c.LayoutNext()
 	c.UpdateControl(id, r, opt|OptHoldFocus)
 	buflen := len(*buf)
 
@@ -215,14 +216,14 @@ func (c *Context) textBoxRaw(buf *string, id ID, r image.Rectangle, opt Option) 
 	return res
 }
 
-func (c *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool {
+func (c *Context) numberTextBox(value *float64, id ID) bool {
 	if c.mousePressed == mouseLeft && (c.keyDown&keyShift) != 0 &&
 		c.Hover == id {
 		c.NumberEdit = id
 		c.NumberEditBuf = fmt.Sprintf(realFmt, *value)
 	}
 	if c.NumberEdit == id {
-		res := c.textBoxRaw(&c.NumberEditBuf, id, r, 0)
+		res := c.textBoxRaw(&c.NumberEditBuf, id, 0)
 		if (res&ResSubmit) != 0 || c.Focus != id {
 			nval, err := strconv.ParseFloat(c.NumberEditBuf, 32)
 			if err != nil {
@@ -230,17 +231,15 @@ func (c *Context) numberTextBox(value *float64, r image.Rectangle, id ID) bool {
 			}
 			*value = float64(nval)
 			c.NumberEdit = 0
-		} else {
-			return true
 		}
+		return true
 	}
 	return false
 }
 
 func (c *Context) TextBoxEx(buf *string, opt Option) Res {
 	id := c.id(ptrToBytes(unsafe.Pointer(buf)))
-	r := c.LayoutNext()
-	return c.textBoxRaw(buf, id, r, opt)
+	return c.textBoxRaw(buf, id, opt)
 }
 
 func (c *Context) SliderEx(value *float64, low, high, step float64, format string, opt Option) Res {
@@ -248,14 +247,14 @@ func (c *Context) SliderEx(value *float64, low, high, step float64, format strin
 	last := *value
 	v := last
 	id := c.id(ptrToBytes(unsafe.Pointer(value)))
-	base := c.LayoutNext()
 
 	// handle text input mode
-	if c.numberTextBox(&v, base, id) {
+	if c.numberTextBox(&v, id) {
 		return res
 	}
 
 	// handle normal mode
+	base := c.LayoutNext()
 	c.UpdateControl(id, base, opt)
 
 	// handle input
@@ -289,15 +288,15 @@ func (c *Context) SliderEx(value *float64, low, high, step float64, format strin
 func (c *Context) NumberEx(value *float64, step float64, format string, opt Option) Res {
 	var res Res
 	id := c.id(ptrToBytes(unsafe.Pointer(value)))
-	base := c.LayoutNext()
 	last := *value
 
 	// handle text input mode
-	if c.numberTextBox(value, base, id) {
+	if c.numberTextBox(value, id) {
 		return res
 	}
 
 	// handle normal mode
+	base := c.LayoutNext()
 	c.UpdateControl(id, base, opt)
 
 	// handle input
