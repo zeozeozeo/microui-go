@@ -47,16 +47,6 @@ func (c *Context) LayoutRow(items int, widths []int, height int) {
 	layout.itemIndex = 0
 }
 
-// LayoutWidth sets layout size.x
-func (c *Context) LayoutWidth(width int) {
-	c.layout().size.X = width
-}
-
-// LayoutHeight sets layout size.y
-func (c *Context) LayoutHeight(height int) {
-	c.layout().size.Y = height
-}
-
 func (c *Context) layoutNext() image.Rectangle {
 	layout := c.layout()
 	style := c.Style
