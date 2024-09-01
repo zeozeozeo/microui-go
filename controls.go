@@ -95,36 +95,36 @@ func (c *Context) Control(id ID, opt Option, f func(r image.Rectangle) Res) Res 
 }
 
 func (c *Context) Text(text string) {
-	var start_idx, end_idx, p int
 	color := c.Style.Colors[ColorText]
-	c.layoutBeginColumn()
-	c.LayoutRow(1, []int{-1}, textHeight())
-	for end_idx < len(text) {
-		c.Control(0, 0, func(r image.Rectangle) Res {
-			w := 0
-			end_idx = p
-			start_idx = end_idx
-			for end_idx < len(text) && text[end_idx] != '\n' {
-				word := p
-				for p < len(text) && text[p] != ' ' && text[p] != '\n' {
+	c.LayoutColumn(func() {
+		var endIdx, p int
+		c.LayoutRow(1, []int{-1}, textHeight())
+		for endIdx < len(text) {
+			c.Control(0, 0, func(r image.Rectangle) Res {
+				w := 0
+				endIdx = p
+				startIdx := endIdx
+				for endIdx < len(text) && text[endIdx] != '\n' {
+					word := p
+					for p < len(text) && text[p] != ' ' && text[p] != '\n' {
+						p++
+					}
+					w += textWidth(text[word:p])
+					if w > r.Dx() && endIdx != startIdx {
+						break
+					}
+					if p < len(text) {
+						w += textWidth(string(text[p]))
+					}
+					endIdx = p
 					p++
 				}
-				w += textWidth(text[word:p])
-				if w > r.Dx() && end_idx != start_idx {
-					break
-				}
-				if p < len(text) {
-					w += textWidth(string(text[p]))
-				}
-				end_idx = p
-				p++
-			}
-			c.DrawText(text[start_idx:end_idx], r.Min, color)
-			p = end_idx + 1
-			return 0
-		})
-	}
-	c.layoutEndColumn()
+				c.DrawText(text[startIdx:endIdx], r.Min, color)
+				p = endIdx + 1
+				return 0
+			})
+		}
+	})
 }
 
 func (c *Context) Label(text string) {
