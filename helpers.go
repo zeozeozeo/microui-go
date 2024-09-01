@@ -51,10 +51,12 @@ func clampF(x, a, b float64) float64 {
 	return minF(b, maxF(a, x))
 }
 
-func hash(hash *ID, data []byte) {
+func fnv1a(init ID, data []byte) ID {
+	h := init
 	for i := 0; i < len(data); i++ {
-		*hash = (*hash ^ ID(data[i])) * 16777619
+		h = (h ^ ID(data[i])) * 1099511628211
 	}
+	return h
 }
 
 func ptrToBytes(ptr unsafe.Pointer) []byte {
@@ -64,19 +66,18 @@ func ptrToBytes(ptr unsafe.Pointer) []byte {
 // id returns a hash value based on the data and the last ID on the stack.
 func (c *Context) id(data []byte) ID {
 	const (
-		hashInitial = 2166136261 // 32bit fnv-1a hash
+		// hashInitial is the initial value for the FNV-1a hash.
+		// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+		hashInitial = 14695981039346656037
 	)
 
-	idx := len(c.idStack)
-	var res ID
-	if idx > 0 {
-		res = c.idStack[len(c.idStack)-1]
-	} else {
-		res = hashInitial
+	var init ID = hashInitial
+	if len(c.idStack) > 0 {
+		init = c.idStack[len(c.idStack)-1]
 	}
-	hash(&res, data)
-	c.LastID = res
-	return res
+	id := fnv1a(init, data)
+	c.LastID = id
+	return id
 }
 
 func (c *Context) pushID(data []byte) ID {

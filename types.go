@@ -8,7 +8,7 @@ import (
 	"image/color"
 )
 
-type ID uintptr
+type ID uint64
 
 type poolItem struct {
 	id         ID
