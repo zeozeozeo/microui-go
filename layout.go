@@ -17,17 +17,20 @@ func (c *Context) pushLayout(body image.Rectangle, scroll image.Point) {
 }
 
 func (c *Context) LayoutColumn(f func()) {
-	c.pushLayout(c.layoutNext(), image.Pt(0, 0))
-	f()
-	b := c.layout()
-	// pop()
-	c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
-	// inherit position/next_row/max from child layout if they are greater
-	a := c.layout()
-	a.position.X = max(a.position.X, b.position.X+b.body.Min.X-a.body.Min.X)
-	a.nextRow = max(a.nextRow, b.nextRow+b.body.Min.Y-a.body.Min.Y)
-	a.max.X = max(a.max.X, b.max.X)
-	a.max.Y = max(a.max.Y, b.max.Y)
+	c.Control(0, 0, func(r image.Rectangle) Res {
+		c.pushLayout(r, image.Pt(0, 0))
+		f()
+		b := c.layout()
+		// pop()
+		c.layoutStack = c.layoutStack[:len(c.layoutStack)-1]
+		// inherit position/next_row/max from child layout if they are greater
+		a := c.layout()
+		a.position.X = max(a.position.X, b.position.X+b.body.Min.X-a.body.Min.X)
+		a.nextRow = max(a.nextRow, b.nextRow+b.body.Min.Y-a.body.Min.Y)
+		a.max.X = max(a.max.X, b.max.X)
+		a.max.Y = max(a.max.Y, b.max.Y)
+		return 0
+	})
 }
 
 func (c *Context) LayoutRow(items int, widths []int, height int) {

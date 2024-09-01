@@ -26,33 +26,13 @@ func (c *Context) Header(label string) Res {
 }
 
 func (c *Context) TreeNode(label string, f func(res Res)) {
-	if res := c.beginTreeNode(label); res != 0 {
-		defer c.endTreeNode()
-		f(res)
-	}
-}
-
-func (c *Context) beginTreeNode(label string) Res {
-	return c.beginTreeNodeEx(label, 0)
+	c.TreeNodeEx(label, 0, f)
 }
 
 func (c *Context) Window(title string, rect image.Rectangle, f func(res Res)) {
-	if res := c.beginWindow(title, rect); res != 0 {
-		defer c.endWindow()
-		f(res)
-	}
-}
-
-func (c *Context) beginWindow(title string, rect image.Rectangle) Res {
-	return c.beginWindowEx(title, rect, 0)
+	c.WindowEx(title, rect, 0, f)
 }
 
 func (c *Context) Panel(name string, f func()) {
-	c.beginPanel(name)
-	defer c.endPanel()
-	f()
-}
-
-func (c *Context) beginPanel(name string) {
-	c.beginPanelEx(name, 0)
+	c.PanelEx(name, 0, f)
 }

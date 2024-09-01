@@ -678,15 +678,8 @@ func (c *Context) endPopup() {
 }
 
 func (c *Context) PanelEx(name string, opt Option, f func()) {
-	c.beginPanelEx(name, opt)
-	defer c.endPanel()
-	f()
-}
-
-func (c *Context) beginPanelEx(name string, opt Option) {
-	var cnt *Container
 	c.pushID([]byte(name))
-	cnt = c.container(c.LastID, opt)
+	cnt := c.container(c.LastID, opt)
 	cnt.Rect = c.layoutNext()
 	if (^opt & OptNoFrame) != 0 {
 		c.drawFrame(cnt.Rect, ColorPanelBG)
@@ -694,10 +687,8 @@ func (c *Context) beginPanelEx(name string, opt Option) {
 	// push()
 	c.containerStack = append(c.containerStack, cnt)
 	c.pushContainerBody(cnt, cnt.Rect, opt)
+	defer c.popContainer()
 	c.PushClipRect(cnt.Body)
-}
-
-func (c *Context) endPanel() {
-	c.PopClipRect()
-	c.popContainer()
+	defer c.PopClipRect()
+	f()
 }
