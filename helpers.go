@@ -163,13 +163,13 @@ func (c *Context) Container(name string) *Container {
 }
 
 func (c *Context) BringToFront(cnt *Container) {
-	c.LastZindex++
-	cnt.Zindex = c.LastZindex
+	c.lastZIndex++
+	cnt.ZIndex = c.lastZIndex
 }
 
 func (c *Context) SetFocus(id ID) {
-	c.Focus = id
-	c.UpdatedFocus = true
+	c.focus = id
+	c.keepFocus = true
 }
 
 func (c *Context) Update(f func()) {
@@ -183,9 +183,9 @@ func (c *Context) begin() {
 
 	c.commandList = c.commandList[:0]
 	c.rootList = c.rootList[:0]
-	c.ScrollTarget = nil
-	c.HoverRoot = c.NextHoverRoot
-	c.NextHoverRoot = nil
+	c.scrollTarget = nil
+	c.hoverRoot = c.nextHoverRoot
+	c.nextHoverRoot = nil
 	c.mouseDelta.X = c.mousePos.X - c.lastMousePos.X
 	c.mouseDelta.Y = c.mousePos.Y - c.lastMousePos.Y
 	c.tick++
@@ -199,22 +199,22 @@ func (c *Context) end() {
 	expect(len(c.layoutStack) == 0)
 
 	// handle scroll input
-	if c.ScrollTarget != nil {
-		c.ScrollTarget.Scroll.X += c.scrollDelta.X
-		c.ScrollTarget.Scroll.Y += c.scrollDelta.Y
+	if c.scrollTarget != nil {
+		c.scrollTarget.Scroll.X += c.scrollDelta.X
+		c.scrollTarget.Scroll.Y += c.scrollDelta.Y
 	}
 
 	// unset focus if focus id was not touched this frame
-	if !c.UpdatedFocus {
-		c.Focus = 0
+	if !c.keepFocus {
+		c.focus = 0
 	}
-	c.UpdatedFocus = false
+	c.keepFocus = false
 
 	// bring hover root to front if mouse was pressed
-	if c.mousePressed != 0 && c.NextHoverRoot != nil &&
-		c.NextHoverRoot.Zindex < c.LastZindex &&
-		c.NextHoverRoot.Zindex >= 0 {
-		c.BringToFront(c.NextHoverRoot)
+	if c.mousePressed != 0 && c.nextHoverRoot != nil &&
+		c.nextHoverRoot.ZIndex < c.lastZIndex &&
+		c.nextHoverRoot.ZIndex >= 0 {
+		c.BringToFront(c.nextHoverRoot)
 	}
 
 	// reset input state
@@ -226,7 +226,7 @@ func (c *Context) end() {
 
 	// sort root containers by zindex
 	sort.SliceStable(c.rootList, func(i, j int) bool {
-		return c.rootList[i].Zindex < c.rootList[j].Zindex
+		return c.rootList[i].ZIndex < c.rootList[j].ZIndex
 	})
 
 	// set root container jump commands

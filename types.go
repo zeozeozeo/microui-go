@@ -74,7 +74,7 @@ type Container struct {
 	Body        image.Rectangle
 	ContentSize image.Point
 	Scroll      image.Point
-	Zindex      int
+	ZIndex      int
 	Open        bool
 }
 
@@ -93,18 +93,18 @@ type Context struct {
 	// core state
 
 	Style         *Style
-	Hover         ID
-	Focus         ID
+	hover         ID
+	focus         ID
 	LastID        ID
-	LastRect      image.Rectangle
-	LastZindex    int
-	UpdatedFocus  bool
+	lastRect      image.Rectangle
+	lastZIndex    int
+	keepFocus     bool
 	tick          int
-	HoverRoot     *Container
-	NextHoverRoot *Container
-	ScrollTarget  *Container
-	NumberEditBuf string
-	NumberEdit    ID
+	hoverRoot     *Container
+	nextHoverRoot *Container
+	scrollTarget  *Container
+	numberEditBuf string
+	numberEdit    ID
 
 	// stacks
 
