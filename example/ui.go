@@ -129,6 +129,12 @@ func (g *Game) testWindow() {
 			clr := fmt.Sprintf("#%02X%02X%02X", int(g.bg[0]), int(g.bg[1]), int(g.bg[2]))
 			g.ctx.DrawControlText(clr, r, microui.ColorText, microui.OptAlignCenter)
 		}
+
+		// Number
+		if g.ctx.HeaderEx("Number", microui.OptExpanded) != 0 {
+			g.ctx.LayoutRow(1, []int{-1}, 0)
+			g.ctx.Number(&g.num, 0.1)
+		}
 	})
 }
 
