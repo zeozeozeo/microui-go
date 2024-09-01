@@ -21,12 +21,8 @@ func (c *Context) drawFrame(rect image.Rectangle, colorid int) {
 	}
 }
 
-func initContext(ctx *Context) {
-	ctx.Style = &defaultStyle
-}
-
 func NewContext() *Context {
-	ctx := &Context{}
-	initContext(ctx)
-	return ctx
+	return &Context{
+		Style: &defaultStyle,
+	}
 }
