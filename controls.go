@@ -558,25 +558,21 @@ func (c *Context) endRootContainer() {
 }
 
 func (c *Context) WindowEx(title string, rect image.Rectangle, opt Option, f func(res Res)) {
-	if res := c.beginWindowEx(title, rect, opt); res != 0 {
-		defer c.endWindow()
-		f(res)
-	}
-}
-
-func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) Res {
 	id := c.id([]byte(title))
 	cnt := c.container(id, opt)
 	if cnt == nil || !cnt.Open {
-		return 0
+		return
 	}
 	// push()
 	c.idStack = append(c.idStack, id)
+	// This is popped at endRootContainer.
+	// TODO: This is tricky. Refactor this.
 
 	if cnt.Rect.Dx() == 0 {
 		cnt.Rect = rect
 	}
 	c.beginRootContainer(cnt)
+	defer c.endRootContainer()
 	body := cnt.Rect
 	rect = body
 
@@ -616,6 +612,8 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 	}
 
 	c.pushContainerBody(cnt, body, opt)
+	// p.popContainer is called at endRootContainer.
+	// TODO: This is tricky. Refactor this.
 
 	// do `resize` handle
 	if (^opt & OptNoResize) != 0 {
@@ -642,12 +640,8 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 	}
 
 	c.PushClipRect(cnt.Body)
-	return ResActive
-}
-
-func (c *Context) endWindow() {
-	c.PopClipRect()
-	c.endRootContainer()
+	defer c.PopClipRect()
+	f(ResActive)
 }
 
 func (c *Context) OpenPopup(name string) {
@@ -662,19 +656,8 @@ func (c *Context) OpenPopup(name string) {
 }
 
 func (c *Context) Popup(name string, f func(res Res)) {
-	if res := c.beginPopup(name); res != 0 {
-		defer c.endPopup()
-		f(res)
-	}
-}
-
-func (c *Context) beginPopup(name string) Res {
 	opt := OptPopup | OptAutoSize | OptNoResize | OptNoScroll | OptNoTitle | OptClosed
-	return c.beginWindowEx(name, image.Rectangle{}, opt)
-}
-
-func (c *Context) endPopup() {
-	c.endWindow()
+	c.WindowEx(name, image.Rectangle{}, opt, f)
 }
 
 func (c *Context) PanelEx(name string, opt Option, f func()) {
