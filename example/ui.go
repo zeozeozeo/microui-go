@@ -133,7 +133,8 @@ func (g *Game) testWindow() {
 		// Number
 		if g.ctx.HeaderEx("Number", microui.OptExpanded) != 0 {
 			g.ctx.LayoutRow(1, []int{-1}, 0)
-			g.ctx.Number(&g.num, 0.1)
+			g.ctx.Number(&g.num1, 0.1)
+			g.ctx.SliderEx(&g.num2, 0, 10, 0.1, "%.2f", microui.OptAlignCenter)
 		}
 	})
 }

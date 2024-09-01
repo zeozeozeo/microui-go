@@ -19,7 +19,8 @@ type Game struct {
 	logUpdated   bool
 	bg           [3]float64
 	checks       [3]bool
-	num          float64
+	num1         float64
+	num2         float64
 }
 
 func New() *Game {

@@ -6,6 +6,7 @@ package microui
 import (
 	"fmt"
 	"image"
+	"math"
 	"strconv"
 	"unsafe"
 )
@@ -261,7 +262,7 @@ func (c *Context) SliderEx(value *float64, low, high, step float64, format strin
 	if c.Focus == id && (c.mouseDown|c.mousePressed) == mouseLeft {
 		v = low + float64(c.mousePos.X-base.Min.X)*(high-low)/float64(base.Dx())
 		if step != 0 {
-			v = ((v + step/2) / step) * step
+			v = math.Round(v/step) * step
 		}
 	}
 	// clamp and store value, update res
