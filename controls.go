@@ -397,23 +397,16 @@ func (c *Context) HeaderEx(label string, opt Option) Res {
 }
 
 func (c *Context) TreeNodeEx(label string, opt Option, f func(res Res)) {
-	if res := c.beginTreeNodeEx(label, opt); res != 0 {
-		defer c.endTreeNode()
-		f(res)
-	}
-}
-
-func (c *Context) beginTreeNodeEx(label string, opt Option) Res {
 	res := c.header(label, true, opt)
 	if (res & ResActive) != 0 {
 		c.layout().indent += c.Style.Indent
 		// push()
 		c.idStack = append(c.idStack, c.LastID)
 	}
-	return res
-}
-
-func (c *Context) endTreeNode() {
+	if res == 0 {
+		return
+	}
+	f(res)
 	c.layout().indent -= c.Style.Indent
 	c.popID()
 }
@@ -661,8 +654,8 @@ func (c *Context) Popup(name string, f func(res Res)) {
 }
 
 func (c *Context) PanelEx(name string, opt Option, f func()) {
-	c.pushID([]byte(name))
-	cnt := c.container(c.LastID, opt)
+	id := c.pushID([]byte(name))
+	cnt := c.container(id, opt)
 	cnt.Rect = c.layoutNext()
 	if (^opt & OptNoFrame) != 0 {
 		c.drawFrame(cnt.Rect, ColorPanelBG)

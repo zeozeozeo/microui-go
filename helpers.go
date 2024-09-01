@@ -79,9 +79,11 @@ func (c *Context) id(data []byte) ID {
 	return res
 }
 
-func (c *Context) pushID(data []byte) {
+func (c *Context) pushID(data []byte) ID {
 	// push()
-	c.idStack = append(c.idStack, c.id(data))
+	id := c.id(data)
+	c.idStack = append(c.idStack, id)
+	return id
 }
 
 func (c *Context) popID() {
@@ -136,18 +138,19 @@ func (c *Context) CurrentContainer() *Container {
 
 func (c *Context) container(id ID, opt Option) *Container {
 	// try to get existing container from pool
-	idx := c.poolGet(c.containerPool[:], id)
-	if idx >= 0 {
+	if idx := c.poolGet(c.containerPool[:], id); idx >= 0 {
 		if c.containers[idx].Open || (^opt&OptClosed) != 0 {
 			c.poolUpdate(c.containerPool[:], idx)
 		}
 		return &c.containers[idx]
 	}
+
 	if (opt & OptClosed) != 0 {
 		return nil
 	}
+
 	// container not found in pool: init new container
-	idx = c.poolInit(c.containerPool[:], id)
+	idx := c.poolInit(c.containerPool[:], id)
 	cnt := &c.containers[idx]
 	*cnt = Container{}
 	cnt.HeadIdx = -1
