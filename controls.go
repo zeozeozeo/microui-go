@@ -57,7 +57,7 @@ func (c *Context) mouseOver(rect image.Rectangle) bool {
 	return c.mousePos.In(rect) && c.mousePos.In(c.ClipRect()) && c.inHoverRoot()
 }
 
-func (c *Context) UpdateControl(id ID, rect image.Rectangle, opt Option) {
+func (c *Context) updateControl(id ID, rect image.Rectangle, opt Option) {
 	mouseover := c.mouseOver(rect)
 
 	if c.Focus == id {
@@ -88,43 +88,53 @@ func (c *Context) UpdateControl(id ID, rect image.Rectangle, opt Option) {
 	}
 }
 
+func (c *Context) Control(id ID, opt Option, f func(r image.Rectangle) Res) Res {
+	r := c.layoutNext()
+	c.updateControl(id, r, opt)
+	return f(r)
+}
+
 func (c *Context) Text(text string) {
 	var start_idx, end_idx, p int
 	color := c.Style.Colors[ColorText]
 	c.layoutBeginColumn()
 	c.LayoutRow(1, []int{-1}, textHeight())
 	for end_idx < len(text) {
-		r := c.LayoutNext()
-		w := 0
-		end_idx = p
-		start_idx = end_idx
-		for end_idx < len(text) && text[end_idx] != '\n' {
-			word := p
-			for p < len(text) && text[p] != ' ' && text[p] != '\n' {
+		c.Control(0, 0, func(r image.Rectangle) Res {
+			w := 0
+			end_idx = p
+			start_idx = end_idx
+			for end_idx < len(text) && text[end_idx] != '\n' {
+				word := p
+				for p < len(text) && text[p] != ' ' && text[p] != '\n' {
+					p++
+				}
+				w += textWidth(text[word:p])
+				if w > r.Dx() && end_idx != start_idx {
+					break
+				}
+				if p < len(text) {
+					w += textWidth(string(text[p]))
+				}
+				end_idx = p
 				p++
 			}
-			w += textWidth(text[word:p])
-			if w > r.Dx() && end_idx != start_idx {
-				break
-			}
-			if p < len(text) {
-				w += textWidth(string(text[p]))
-			}
-			end_idx = p
-			p++
-		}
-		c.DrawText(text[start_idx:end_idx], r.Min, color)
-		p = end_idx + 1
+			c.DrawText(text[start_idx:end_idx], r.Min, color)
+			p = end_idx + 1
+			return 0
+		})
 	}
 	c.layoutEndColumn()
 }
 
 func (c *Context) Label(text string) {
-	c.DrawControlText(text, c.LayoutNext(), ColorText, 0)
+	c.Control(0, 0, func(r image.Rectangle) Res {
+		c.DrawControlText(text, r, ColorText, 0)
+		return 0
+	})
 }
 
 func (c *Context) ButtonEx(label string, icon Icon, opt Option) Res {
-	var res Res
 	var id ID
 	if len(label) > 0 {
 		id = c.id([]byte(label))
@@ -135,86 +145,87 @@ func (c *Context) ButtonEx(label string, icon Icon, opt Option) Res {
 		// unsafe.Slice((*byte)(unsafe.Pointer(&icon)), unsafe.Sizeof(icon)))
 		id = c.id(ptrToBytes(unsafe.Pointer(iconPtr)))
 	}
-	r := c.LayoutNext()
-	c.UpdateControl(id, r, opt)
-	// handle click
-	if c.mousePressed == mouseLeft && c.Focus == id {
-		res |= ResSubmit
-	}
-	// draw
-	c.DrawControlFrame(id, r, ColorButton, opt)
-	if len(label) > 0 {
-		c.DrawControlText(label, r, ColorText, opt)
-	}
-	if icon != 0 {
-		c.DrawIcon(icon, r, c.Style.Colors[ColorText])
-	}
-	return res
+	return c.Control(id, opt, func(r image.Rectangle) Res {
+		var res Res
+		// handle click
+		if c.mousePressed == mouseLeft && c.Focus == id {
+			res |= ResSubmit
+		}
+		// draw
+		c.DrawControlFrame(id, r, ColorButton, opt)
+		if len(label) > 0 {
+			c.DrawControlText(label, r, ColorText, opt)
+		}
+		if icon != 0 {
+			c.DrawIcon(icon, r, c.Style.Colors[ColorText])
+		}
+		return res
+	})
 }
 
 func (c *Context) Checkbox(label string, state *bool) Res {
-	var res Res
 	id := c.id(ptrToBytes(unsafe.Pointer(state)))
-	r := c.LayoutNext()
-	box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
-	c.UpdateControl(id, r, 0)
-	// handle click
-	if c.mousePressed == mouseLeft && c.Focus == id {
-		res |= ResChange
-		*state = !*state
-	}
-	// draw
-	c.DrawControlFrame(id, box, ColorBase, 0)
-	if *state {
-		c.DrawIcon(IconCheck, box, c.Style.Colors[ColorText])
-	}
-	r = image.Rect(r.Min.X+box.Dx(), r.Min.Y, r.Max.X, r.Max.Y)
-	c.DrawControlText(label, r, ColorText, 0)
-	return res
+	return c.Control(id, 0, func(r image.Rectangle) Res {
+		var res Res
+		box := image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y)
+		c.updateControl(id, r, 0)
+		// handle click
+		if c.mousePressed == mouseLeft && c.Focus == id {
+			res |= ResChange
+			*state = !*state
+		}
+		// draw
+		c.DrawControlFrame(id, box, ColorBase, 0)
+		if *state {
+			c.DrawIcon(IconCheck, box, c.Style.Colors[ColorText])
+		}
+		r = image.Rect(r.Min.X+box.Dx(), r.Min.Y, r.Max.X, r.Max.Y)
+		c.DrawControlText(label, r, ColorText, 0)
+		return res
+	})
 }
 
 func (c *Context) textBoxRaw(buf *string, id ID, opt Option) Res {
-	var res Res
-	r := c.LayoutNext()
-	c.UpdateControl(id, r, opt|OptHoldFocus)
-	buflen := len(*buf)
+	return c.Control(id, opt|OptHoldFocus, func(r image.Rectangle) Res {
+		var res Res
+		buflen := len(*buf)
 
-	if c.Focus == id {
-		// handle text input
-		if len(c.textInput) > 0 {
-			*buf += string(c.textInput)
-			res |= ResChange
+		if c.Focus == id {
+			// handle text input
+			if len(c.textInput) > 0 {
+				*buf += string(c.textInput)
+				res |= ResChange
+			}
+			// handle backspace
+			if (c.keyPressed&keyBackspace) != 0 && buflen > 0 {
+				*buf = (*buf)[:buflen-1]
+				res |= ResChange
+			}
+			// handle return
+			if (c.keyPressed & keyReturn) != 0 {
+				c.SetFocus(0)
+				res |= ResSubmit
+			}
 		}
-		// handle backspace
-		if (c.keyPressed&keyBackspace) != 0 && buflen > 0 {
-			*buf = (*buf)[:buflen-1]
-			res |= ResChange
-		}
-		// handle return
-		if (c.keyPressed & keyReturn) != 0 {
-			c.SetFocus(0)
-			res |= ResSubmit
-		}
-	}
 
-	// draw
-	c.DrawControlFrame(id, r, ColorBase, opt)
-	if c.Focus == id {
-		color := c.Style.Colors[ColorText]
-		textw := textWidth(*buf)
-		texth := textHeight()
-		ofx := r.Dx() - c.Style.Padding - textw - 1
-		textx := r.Min.X + min(ofx, c.Style.Padding)
-		texty := r.Min.Y + (r.Dy()-texth)/2
-		c.PushClipRect(r)
-		c.DrawText(*buf, image.Pt(textx, texty), color)
-		c.DrawRect(image.Rect(textx+textw, texty, textx+textw+1, texty+texth), color)
-		c.PopClipRect()
-	} else {
-		c.DrawControlText(*buf, r, ColorText, opt)
-	}
-
-	return res
+		// draw
+		c.DrawControlFrame(id, r, ColorBase, opt)
+		if c.Focus == id {
+			color := c.Style.Colors[ColorText]
+			textw := textWidth(*buf)
+			texth := textHeight()
+			ofx := r.Dx() - c.Style.Padding - textw - 1
+			textx := r.Min.X + min(ofx, c.Style.Padding)
+			texty := r.Min.Y + (r.Dy()-texth)/2
+			c.PushClipRect(r)
+			c.DrawText(*buf, image.Pt(textx, texty), color)
+			c.DrawRect(image.Rect(textx+textw, texty, textx+textw+1, texty+texth), color)
+			c.PopClipRect()
+		} else {
+			c.DrawControlText(*buf, r, ColorText, opt)
+		}
+		return res
+	})
 }
 
 func (c *Context) numberTextBox(value *float64, id ID) bool {
@@ -244,78 +255,76 @@ func (c *Context) TextBoxEx(buf *string, opt Option) Res {
 }
 
 func (c *Context) SliderEx(value *float64, low, high, step float64, format string, opt Option) Res {
-	var res Res
 	last := *value
 	v := last
 	id := c.id(ptrToBytes(unsafe.Pointer(value)))
 
 	// handle text input mode
 	if c.numberTextBox(&v, id) {
-		return res
+		return 0
 	}
 
 	// handle normal mode
-	base := c.LayoutNext()
-	c.UpdateControl(id, base, opt)
-
-	// handle input
-	if c.Focus == id && (c.mouseDown|c.mousePressed) == mouseLeft {
-		v = low + float64(c.mousePos.X-base.Min.X)*(high-low)/float64(base.Dx())
-		if step != 0 {
-			v = math.Round(v/step) * step
+	return c.Control(id, opt, func(r image.Rectangle) Res {
+		var res Res
+		// handle input
+		if c.Focus == id && (c.mouseDown|c.mousePressed) == mouseLeft {
+			v = low + float64(c.mousePos.X-r.Min.X)*(high-low)/float64(r.Dx())
+			if step != 0 {
+				v = math.Round(v/step) * step
+			}
 		}
-	}
-	// clamp and store value, update res
-	*value = clampF(v, low, high)
-	v = *value
-	if last != v {
-		res |= ResChange
-	}
+		// clamp and store value, update res
+		*value = clampF(v, low, high)
+		v = *value
+		if last != v {
+			res |= ResChange
+		}
 
-	// draw base
-	c.DrawControlFrame(id, base, ColorBase, opt)
-	// draw thumb
-	w := c.Style.ThumbSize
-	x := int((v - low) * float64(base.Dx()-w) / (high - low))
-	thumb := image.Rect(base.Min.X+x, base.Min.Y, base.Min.X+x+w, base.Max.Y)
-	c.DrawControlFrame(id, thumb, ColorButton, opt)
-	// draw text
-	text := fmt.Sprintf(format, v)
-	c.DrawControlText(text, base, ColorText, opt)
+		// draw base
+		c.DrawControlFrame(id, r, ColorBase, opt)
+		// draw thumb
+		w := c.Style.ThumbSize
+		x := int((v - low) * float64(r.Dx()-w) / (high - low))
+		thumb := image.Rect(r.Min.X+x, r.Min.Y, r.Min.X+x+w, r.Max.Y)
+		c.DrawControlFrame(id, thumb, ColorButton, opt)
+		// draw text
+		text := fmt.Sprintf(format, v)
+		c.DrawControlText(text, r, ColorText, opt)
 
-	return res
+		return res
+	})
 }
 
 func (c *Context) NumberEx(value *float64, step float64, format string, opt Option) Res {
-	var res Res
 	id := c.id(ptrToBytes(unsafe.Pointer(value)))
 	last := *value
 
 	// handle text input mode
 	if c.numberTextBox(value, id) {
-		return res
+		return 0
 	}
 
 	// handle normal mode
-	base := c.LayoutNext()
-	c.UpdateControl(id, base, opt)
+	return c.Control(id, opt, func(r image.Rectangle) Res {
+		var res Res
+		// handle input
+		if c.Focus == id && c.mouseDown == mouseLeft {
+			*value += float64(c.mouseDelta.X) * step
+		}
+		// set flag if value changed
+		if *value != last {
+			res |= ResChange
+		}
 
-	// handle input
-	if c.Focus == id && c.mouseDown == mouseLeft {
-		*value += float64(c.mouseDelta.X) * step
-	}
-	// set flag if value changed
-	if *value != last {
-		res |= ResChange
-	}
+		// draw base
+		c.DrawControlFrame(id, r, ColorBase, opt)
+		// draw text
+		text := fmt.Sprintf(format, *value)
+		c.DrawControlText(text, r, ColorText, opt)
 
-	// draw base
-	c.DrawControlFrame(id, base, ColorBase, opt)
-	// draw text
-	text := fmt.Sprintf(format, *value)
-	c.DrawControlText(text, base, ColorText, opt)
-
-	return res
+		return res
+	})
 }
 
 func (c *Context) header(label string, istreenode bool, opt Option) Res {
@@ -330,57 +339,57 @@ func (c *Context) header(label string, istreenode bool, opt Option) Res {
 	} else {
 		expanded = active
 	}
-	r := c.LayoutNext()
-	c.UpdateControl(id, r, 0)
 
-	// handle click (TODO (port): check if this is correct)
-	clicked := c.mousePressed == mouseLeft && c.Focus == id
-	v1, v2 := 0, 0
-	if active {
-		v1 = 1
-	}
-	if clicked {
-		v2 = 1
-	}
-	active = (v1 ^ v2) == 1
-
-	// update pool ref
-	if idx >= 0 {
+	return c.Control(id, 0, func(r image.Rectangle) Res {
+		// handle click (TODO (port): check if this is correct)
+		clicked := c.mousePressed == mouseLeft && c.Focus == id
+		v1, v2 := 0, 0
 		if active {
-			c.poolUpdate(c.treeNodePool[:], idx)
+			v1 = 1
+		}
+		if clicked {
+			v2 = 1
+		}
+		active = (v1 ^ v2) == 1
+
+		// update pool ref
+		if idx >= 0 {
+			if active {
+				c.poolUpdate(c.treeNodePool[:], idx)
+			} else {
+				c.treeNodePool[idx] = poolItem{}
+			}
+		} else if active {
+			c.poolInit(c.treeNodePool[:], id)
+		}
+
+		// draw
+		if istreenode {
+			if c.Hover == id {
+				c.drawFrame(r, ColorButtonHover)
+			}
 		} else {
-			c.treeNodePool[idx] = poolItem{}
+			c.DrawControlFrame(id, r, ColorButton, 0)
 		}
-	} else if active {
-		c.poolInit(c.treeNodePool[:], id)
-	}
-
-	// draw
-	if istreenode {
-		if c.Hover == id {
-			c.drawFrame(r, ColorButtonHover)
+		var icon Icon
+		if expanded {
+			icon = IconExpanded
+		} else {
+			icon = IconCollapsed
 		}
-	} else {
-		c.DrawControlFrame(id, r, ColorButton, 0)
-	}
-	var icon Icon
-	if expanded {
-		icon = IconExpanded
-	} else {
-		icon = IconCollapsed
-	}
-	c.DrawIcon(
-		icon,
-		image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y),
-		c.Style.Colors[ColorText],
-	)
-	r.Min.X += r.Dy() - c.Style.Padding
-	c.DrawControlText(label, r, ColorText, 0)
+		c.DrawIcon(
+			icon,
+			image.Rect(r.Min.X, r.Min.Y, r.Min.X+r.Dy(), r.Max.Y),
+			c.Style.Colors[ColorText],
+		)
+		r.Min.X += r.Dy() - c.Style.Padding
+		c.DrawControlText(label, r, ColorText, 0)
 
-	if expanded {
-		return ResActive
-	}
-	return 0
+		if expanded {
+			return ResActive
+		}
+		return 0
+	})
 }
 
 func (c *Context) HeaderEx(label string, opt Option) Res {
@@ -421,7 +430,7 @@ func (c *Context) scrollbarVertical(cnt *Container, b image.Rectangle, cs image.
 		base.Max.X = base.Min.X + c.Style.ScrollbarSize
 
 		// handle input
-		c.UpdateControl(id, base, 0)
+		c.updateControl(id, base, 0)
 		if c.Focus == id && c.mouseDown == mouseLeft {
 			cnt.Scroll.Y += c.mouseDelta.Y * cs.Y / base.Dy()
 		}
@@ -457,7 +466,7 @@ func (c *Context) scrollbarHorizontal(cnt *Container, b image.Rectangle, cs imag
 		base.Max.Y = base.Min.Y + c.Style.ScrollbarSize
 
 		// handle input
-		c.UpdateControl(id, base, 0)
+		c.updateControl(id, base, 0)
 		if c.Focus == id && c.mouseDown == mouseLeft {
 			cnt.Scroll.X += c.mouseDelta.X * cs.X / base.Dx()
 		}
@@ -585,7 +594,7 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 		// do title text
 		if (^opt & OptNoTitle) != 0 {
 			id := c.id([]byte("!title"))
-			c.UpdateControl(id, tr, opt)
+			c.updateControl(id, tr, opt)
 			c.DrawControlText(title, tr, ColorTitleText, opt)
 			if id == c.Focus && c.mouseDown == mouseLeft {
 				cnt.Rect = cnt.Rect.Add(c.mouseDelta)
@@ -599,7 +608,7 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 			r := image.Rect(tr.Max.X-tr.Dy(), tr.Min.Y, tr.Max.X, tr.Max.Y)
 			tr.Max.X -= r.Dx()
 			c.DrawIcon(IconClose, r, c.Style.Colors[ColorTitleText])
-			c.UpdateControl(id, r, opt)
+			c.updateControl(id, r, opt)
 			if c.mousePressed == mouseLeft && id == c.Focus {
 				cnt.Open = false
 			}
@@ -613,7 +622,7 @@ func (c *Context) beginWindowEx(title string, rect image.Rectangle, opt Option) 
 		sz := c.Style.TitleHeight
 		id := c.id([]byte("!resize"))
 		r := image.Rect(rect.Max.X-sz, rect.Max.Y-sz, rect.Max.X, rect.Max.Y)
-		c.UpdateControl(id, r, opt)
+		c.updateControl(id, r, opt)
 		if id == c.Focus && c.mouseDown == mouseLeft {
 			cnt.Rect.Max.X = cnt.Rect.Min.X + max(96, cnt.Rect.Dx()+c.mouseDelta.X)
 			cnt.Rect.Max.Y = cnt.Rect.Min.Y + max(64, cnt.Rect.Dy()+c.mouseDelta.Y)
@@ -678,7 +687,7 @@ func (c *Context) beginPanelEx(name string, opt Option) {
 	var cnt *Container
 	c.pushID([]byte(name))
 	cnt = c.container(c.LastID, opt)
-	cnt.Rect = c.LayoutNext()
+	cnt.Rect = c.layoutNext()
 	if (^opt & OptNoFrame) != 0 {
 		c.drawFrame(cnt.Rect, ColorPanelBG)
 	}

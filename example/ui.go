@@ -124,10 +124,12 @@ func (g *Game) testWindow() {
 				g.ctx.Slider(&g.bg[2], 0, 255)
 			})
 			// color preview
-			r := g.ctx.LayoutNext()
-			g.ctx.DrawRect(r, color.RGBA{byte(g.bg[0]), byte(g.bg[1]), byte(g.bg[2]), 255})
-			clr := fmt.Sprintf("#%02X%02X%02X", int(g.bg[0]), int(g.bg[1]), int(g.bg[2]))
-			g.ctx.DrawControlText(clr, r, microui.ColorText, microui.OptAlignCenter)
+			g.ctx.Control(0, 0, func(r image.Rectangle) microui.Res {
+				g.ctx.DrawRect(r, color.RGBA{byte(g.bg[0]), byte(g.bg[1]), byte(g.bg[2]), 255})
+				clr := fmt.Sprintf("#%02X%02X%02X", int(g.bg[0]), int(g.bg[1]), int(g.bg[2]))
+				g.ctx.DrawControlText(clr, r, microui.ColorText, microui.OptAlignCenter)
+				return 0
+			})
 		}
 
 		// Number
@@ -213,7 +215,10 @@ func (g *Game) styleWindow() {
 			g.byteSlider(&fcolors[c.ColorID].G, &g.ctx.Style.Colors[c.ColorID].G, 0, 255)
 			g.byteSlider(&fcolors[c.ColorID].B, &g.ctx.Style.Colors[c.ColorID].B, 0, 255)
 			g.byteSlider(&fcolors[c.ColorID].A, &g.ctx.Style.Colors[c.ColorID].A, 0, 255)
-			g.ctx.DrawRect(g.ctx.LayoutNext(), g.ctx.Style.Colors[c.ColorID])
+			g.ctx.Control(0, 0, func(r image.Rectangle) microui.Res {
+				g.ctx.DrawRect(r, g.ctx.Style.Colors[c.ColorID])
+				return 0
+			})
 		}
 	})
 }

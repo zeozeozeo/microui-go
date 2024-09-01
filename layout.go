@@ -23,7 +23,7 @@ func (c *Context) LayoutColumn(f func()) {
 }
 
 func (c *Context) layoutBeginColumn() {
-	c.pushLayout(c.LayoutNext(), image.Pt(0, 0))
+	c.pushLayout(c.layoutNext(), image.Pt(0, 0))
 }
 
 func (c *Context) layoutEndColumn() {
@@ -62,7 +62,7 @@ func (c *Context) LayoutHeight(height int) {
 	c.layout().size.Y = height
 }
 
-func (c *Context) LayoutNext() image.Rectangle {
+func (c *Context) layoutNext() image.Rectangle {
 	layout := c.layout()
 	style := c.Style
 	var res image.Rectangle
