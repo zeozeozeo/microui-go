@@ -499,7 +499,7 @@ func (c *Context) scrollbar(cnt *Container, b image.Rectangle, cs image.Point, s
 	}
 }
 
-func (c *Context) Scrollbars(cnt *Container, body *image.Rectangle) {
+func (c *Context) scrollbars(cnt *Container, body *image.Rectangle) {
 	sz := c.Style.ScrollbarSize
 	cs := cnt.ContentSize
 	cs.X += c.Style.Padding * 2
@@ -521,7 +521,7 @@ func (c *Context) Scrollbars(cnt *Container, body *image.Rectangle) {
 
 func (c *Context) pushContainerBody(cnt *Container, body image.Rectangle, opt Option) {
 	if (^opt & OptNoScroll) != 0 {
-		c.Scrollbars(cnt, &body)
+		c.scrollbars(cnt, &body)
 	}
 	c.pushLayout(body.Inset(c.Style.Padding), cnt.Scroll)
 	cnt.Body = body
