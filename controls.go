@@ -288,7 +288,7 @@ func (c *Context) SliderEx(value *float64, low, high, step float64, format strin
 
 func (c *Context) NumberEx(value *float64, step float64, format string, opt Option) Res {
 	var res Res
-	id := c.id(ptrToBytes(unsafe.Pointer(&value)))
+	id := c.id(ptrToBytes(unsafe.Pointer(value)))
 	base := c.LayoutNext()
 	last := *value
 
