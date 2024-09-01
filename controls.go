@@ -398,17 +398,16 @@ func (c *Context) HeaderEx(label string, opt Option) Res {
 
 func (c *Context) TreeNodeEx(label string, opt Option, f func(res Res)) {
 	res := c.header(label, true, opt)
-	if (res & ResActive) != 0 {
-		c.layout().indent += c.Style.Indent
-		// push()
-		c.idStack = append(c.idStack, c.LastID)
-	}
-	if res == 0 {
+	if res&ResActive == 0 {
 		return
 	}
+	c.layout().indent += c.Style.Indent
+	defer func() {
+		c.layout().indent -= c.Style.Indent
+	}()
+	c.idStack = append(c.idStack, c.LastID)
+	defer c.popID()
 	f(res)
-	c.layout().indent -= c.Style.Indent
-	c.popID()
 }
 
 // x = x, y = y, w = w, h = h
