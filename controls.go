@@ -491,12 +491,12 @@ func (c *Context) scrollbar(cnt *Container, b image.Rectangle, cs image.Point, s
 	}
 }
 
-func (c *Context) scrollbars(cnt *Container, body *image.Rectangle) {
+func (c *Context) scrollbars(cnt *Container, body image.Rectangle) image.Rectangle {
 	sz := c.Style.ScrollbarSize
 	cs := cnt.ContentSize
 	cs.X += c.Style.Padding * 2
 	cs.Y += c.Style.Padding * 2
-	c.PushClipRect(*body)
+	c.PushClipRect(body)
 	// resize body to make room for scrollbars
 	if cs.Y > cnt.Body.Dy() {
 		body.Max.X -= sz
@@ -506,14 +506,15 @@ func (c *Context) scrollbars(cnt *Container, body *image.Rectangle) {
 	}
 	// to create a horizontal or vertical scrollbar almost-identical code is
 	// used; only the references to `x|y` `w|h` need to be switched
-	c.scrollbar(cnt, *body, cs, false)
-	c.scrollbar(cnt, *body, cs, true)
+	c.scrollbar(cnt, body, cs, false)
+	c.scrollbar(cnt, body, cs, true)
 	c.PopClipRect()
+	return body
 }
 
 func (c *Context) pushContainerBody(cnt *Container, body image.Rectangle, opt Option) {
 	if (^opt & OptNoScroll) != 0 {
-		c.scrollbars(cnt, &body)
+		body = c.scrollbars(cnt, body)
 	}
 	c.pushLayout(body.Inset(c.Style.Padding), cnt.Scroll)
 	cnt.Body = body
