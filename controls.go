@@ -58,6 +58,10 @@ func (c *Context) mouseOver(rect image.Rectangle) bool {
 }
 
 func (c *Context) updateControl(id ID, rect image.Rectangle, opt Option) {
+	if id == 0 {
+		return
+	}
+
 	mouseover := c.mouseOver(rect)
 
 	if c.focus == id {
