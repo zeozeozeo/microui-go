@@ -265,7 +265,7 @@ func (ctx *Context) SliderEx(value *float32, low float32, high float32, step flo
 	if ctx.Focus == id && (ctx.MouseDown|ctx.MousePressed) == MU_MOUSE_LEFT {
 		v = low + float32(ctx.MousePos.X-base.X)*(high-low)/float32(base.W)
 		if step != 0 {
-			v = ((v + step/2) / step) * step
+			v = float32(int((v+step/2)/step)) * step
 		}
 	}
 	// clamp and store value, update res
